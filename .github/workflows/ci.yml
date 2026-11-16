@@ -29,8 +29,17 @@ jobs:
         run: uv run --directory backend ruff format --check ..
       - name: mypy
         run: uv run --directory backend mypy
+      - name: Cache Quran text (Tanzil)
+        uses: actions/cache@v4
+        with:
+          path: ml/data/tanzil
+          key: tanzil-v1
+      - name: Download Quran text + verify integrity
+        run: uv run --project backend python ml/scripts/download_quran.py
       - name: pytest
         run: uv run --directory backend pytest -q
+        env:
+          ANSIT_REQUIRE_QURAN_DATA: "1" # matcher tests must run, never skip
 
   backend-image:
     name: Backend image builds

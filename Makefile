@@ -40,14 +40,14 @@ logs: ## Follow backend logs
 ps: ## Service status
 	$(COMPOSE) ps
 
-data: ## Download Quran text + metadata (Phase 1)
-	@echo "make data: implemented in Phase 1" && exit 1
+data: ## Download Quran text + metadata from Tanzil
+	uv run --project backend python ml/scripts/download_quran.py
 
-index: ## Build the Quran search index (Phase 1)
-	@echo "make index: implemented in Phase 1" && exit 1
+index: ## Build the Quran search index artifact
+	uv run --project backend python ml/scripts/build_index.py
 
 gallery: ## Build the reciter gallery (Phase 3)
 	@echo "make gallery: implemented in Phase 3" && exit 1
 
-eval: ## Run evaluation scripts (Phase 1+)
-	@echo "make eval: implemented in Phase 1" && exit 1
+eval: ## Run the text-only matcher evaluation (writes ml/eval/reports/phase1.md)
+	uv run --project backend python ml/eval/text_eval.py

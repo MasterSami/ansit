@@ -23,9 +23,12 @@ class Settings(BaseSettings):
     database_url: str | None = None
     redis_url: str | None = None
 
-    # --- matching: placeholder defaults, NOT calibrated until Phase 1 / Phase 3 ---
-    match_threshold: float = Field(default=70.0, ge=0, le=100)
+    # --- matching ---
+    # 76: lowest score with <= 1% false accepts on hard text negatives (Phase 1 report).
+    # Provisional until re-calibrated on audio in Phase 2.
+    match_threshold: float = Field(default=76.0, ge=0, le=100)
     ambiguity_delta: float = Field(default=2.0, ge=0)
+    # Placeholder, NOT calibrated until Phase 3.
     reciter_threshold: float = Field(default=0.5, ge=-1, le=1)
 
     # --- audio limits ---
