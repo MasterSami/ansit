@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (lint, type-check, tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: uv sync --directory backend --frozen
+      - name: ruff check (backend + ml)
+        run: uv run --directory backend ruff check ..
+      - name: ruff format
+        run: uv run --directory backend ruff format --check ..
+      - name: mypy
+        run: uv run --directory backend mypy
+      - name: pytest
+        run: uv run --directory backend pytest -q
+
+  backend-image:
+    name: Backend image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f infra/docker/backend.Dockerfile backend
+
+  web:
+    name: Web (lint, type-check, tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The Next.js project is created in Phase 5; until then this job is a no-op.
+      - id: detect
+        run: echo "present=$([ -f web/package.json ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - if: steps.detect.outputs.present == 'true'
+        working-directory: web
+        run: |
+          npm ci
+          npm run lint
+          npm run typecheck
+          npm test
+
+  mobile:
+    name: Mobile (analyze, tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The Flutter project is created in Phase 6; until then this job is a no-op.
+      - id: detect
+        run: echo "present=$([ -f mobile/pubspec.yaml ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@v2
+        if: steps.detect.outputs.present == 'true'
+        with:
+          channel: stable
+          cache: true
+      - if: steps.detect.outputs.present == 'true'
+        working-directory: mobile
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test
