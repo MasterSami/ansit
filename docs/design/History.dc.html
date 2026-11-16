@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>أنصِت — السجل</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#0E1512}
+a{color:#D9B36C;text-decoration:none}a:hover{color:#E8CB91}
+input::placeholder{color:#8A968F}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; box-sizing: border-box; background: #0E1512; color: #F2EDE3; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; flex-direction: column; gap: 16px; padding: 56px 20px 0 20px">
+    <h1 style="margin: 0; font-size: 28px; font-weight: 700">السجل</h1>
+    <label style="display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px; border-radius: 24px; background: #16201B; border: 1px solid #2A3731; color: #A3AFA8">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">ابحث في السجل</span>
+      <input type="search" placeholder="ابحث بسورة أو قارئ" style="flex-grow: 1; min-width: 0; border: 0; outline: none; background: transparent; color: #F2EDE3; font-family: inherit; font-size: 15px">
+    </label>
+    <div role="tablist" aria-label="تصفية" style="display: flex; gap: 8px">
+      <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+        <button type="button" role="tab" aria-selected="{{ f.selected }}" onClick="{{ f.pick }}" style="{{ f.style }}">{{ f.label }}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 12px 20px; overflow-y: auto">
+    <h2 style="margin: 0 0 2px 0; font-size: 13px; font-weight: 600; color: #A3AFA8">اليوم</h2>
+    <sc-for list="{{ today }}" as="it" hint-placeholder-count="3">
+      <a href="Result.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 18px; background: #16201B; border: 1px solid #2A3731; color: #F2EDE3">
+        <div aria-hidden="true" style="width: 46px; height: 46px; border-radius: 14px; background: rgba(217,179,108,0.14); color: {{accent}}; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-weight: 700; font-size: 18px; flex-shrink: 0">{{ it.num }}</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1; min-width: 0">
+          <span style="font-size: 15px; font-weight: 600">{{ it.title }}</span>
+          <span style="{{ it.reciterStyle }}">{{ it.reciter }}</span>
+        </div>
+        <span style="font-size: 12px; color: #A3AFA8; flex-shrink: 0">{{ it.time }}</span>
+      </a>
+    </sc-for>
+
+    <h2 style="margin: 10px 0 2px 0; font-size: 13px; font-weight: 600; color: #A3AFA8">أمس</h2>
+    <sc-for list="{{ yesterday }}" as="it" hint-placeholder-count="2">
+      <a href="Result.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 18px; background: #16201B; border: 1px solid #2A3731; color: #F2EDE3">
+        <div aria-hidden="true" style="width: 46px; height: 46px; border-radius: 14px; background: rgba(217,179,108,0.14); color: {{accent}}; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-weight: 700; font-size: 18px; flex-shrink: 0">{{ it.num }}</div>
+        <div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1; min-width: 0">
+          <span style="font-size: 15px; font-weight: 600">{{ it.title }}</span>
+          <span style="{{ it.reciterStyle }}">{{ it.reciter }}</span>
+        </div>
+        <span style="font-size: 12px; color: #A3AFA8; flex-shrink: 0">{{ it.time }}</span>
+      </a>
+    </sc-for>
+  </main>
+
+  <nav aria-label="التنقل الرئيسي" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 10px 8px 26px 8px; border-top: 1px solid #1F2A25; background: #101814">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 500; color: #A3AFA8">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v1a7 7 0 0 0 14 0v-1"></path><path d="M12 18v4"></path></svg>
+      أنصِت
+    </a>
+    <a href="History.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 600; color: {{accent}}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+      السجل
+    </a>
+    <a href="History.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 500; color: #A3AFA8">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+      المحفوظات
+    </a>
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 500; color: #A3AFA8">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"></path><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"></path></svg>
+      المصحف
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#D9B36C","options":["#D9B36C","#7FC8A9","#9DB4E8"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'all' };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#D9B36C';
+    const known = 'font-size: 13px; color: #A3AFA8';
+    const unknown = 'font-size: 13px; color: #F0A48F';
+    const defs = [
+      { id: 'all', label: 'الكل' },
+      { id: 'today', label: 'اليوم' },
+      { id: 'week', label: 'هذا الأسبوع' },
+      { id: 'saved', label: 'المحفوظة' }
+    ];
+    const filters = defs.map((f) => {
+      const on = this.state.filter === f.id;
+      return {
+        ...f,
+        selected: on ? 'true' : 'false',
+        pick: () => this.setState({ filter: f.id }),
+        style: 'height: 36px; padding: 0 14px; border-radius: 18px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; ' + (on ? 'background: ' + accent + '; color: #0E1512; border: 1px solid ' + accent : 'background: #16201B; color: #F2EDE3; border: 1px solid #2A3731')
+      };
+    });
+    const today = [
+      { num: '٦٧', title: 'سورة المُلك · الآية ١', reciter: 'محمد صدّيق المنشاوي', reciterStyle: known, time: '٢:٤٠ م' },
+      { num: '٥٥', title: 'سورة الرحمن · الآية ١٣', reciter: 'عبد الباسط عبد الصمد', reciterStyle: known, time: '١١:١٥ ص' },
+      { num: '١٨', title: 'سورة الكهف · الآية ١٠', reciter: 'قارئ غير معروف · أضِف الاسم', reciterStyle: unknown, time: '٩:٠٢ ص' }
+    ];
+    const yesterday = [
+      { num: '٣٦', title: 'سورة يس · الآية ١', reciter: 'مشاري راشد العفاسي', reciterStyle: known, time: '٨:٣٠ م' },
+      { num: '١', title: 'سورة الفاتحة · الآية ٢', reciter: 'محمود خليل الحصري', reciterStyle: known, time: '٦:١٠ م' }
+    ];
+    return { accent, filters, today, yesterday };
+  }
+}
+</script>
+</body>
+</html>

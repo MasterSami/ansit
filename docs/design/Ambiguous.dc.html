@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>أنصِت — آية متكررة</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Amiri+Quran&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#0E1512}
+a{color:#D9B36C;text-decoration:none}a:hover{color:#E8CB91}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; box-sizing: border-box; background: #0E1512; color: #F2EDE3; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; gap: 12px; padding: 52px 20px 0 20px">
+    <a href="Main.dc.html" aria-label="رجوع" style="width: 44px; height: 44px; border-radius: 22px; background: #16201B; border: 1px solid #2A3731; color: #F2EDE3; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+    </a>
+    <span style="font-size: 16px; font-weight: 600">تحديد موضع الآية</span>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 14px; padding: 20px 20px 0 20px">
+
+    <section aria-label="الآية المسموعة" style="border-radius: 24px; background: #16201B; border: 1px solid #2A3731; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <span style="font-family: 'Amiri', serif; font-weight: 700; font-size: 28px; color: {{accent}}">سورة الرحمن</span>
+        <span style="padding: 6px 12px; border-radius: 999px; background: rgba(224,122,95,0.16); color: #F0A48F; font-size: 13px; font-weight: 600">تتكرر ٣١ مرة</span>
+      </div>
+      <p lang="ar" style="margin: 0; padding: 14px 8px; border-top: 1px solid #24302A; border-bottom: 1px solid #24302A; font-family: 'Amiri Quran', 'Amiri', serif; font-size: 26px; line-height: 2; text-align: center">فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.8; color: #A3AFA8">تعرّفنا على الآية بثقة، لكنها تتكرر في السورة. أنصت لثوانٍ أطول لنحدّد موضعها من الآيات المجاورة، أو اختر الموضع بنفسك.</p>
+    </section>
+
+    <div role="radiogroup" aria-label="المواضع المحتملة" style="display: flex; flex-direction: column; gap: 8px">
+      <sc-for list="{{ candidates }}" as="c" hint-placeholder-count="3">
+        <button type="button" role="radio" aria-checked="{{ c.checked }}" onClick="{{ c.pick }}" style="{{ c.style }}">
+          <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px">
+            <span style="font-size: 15px; font-weight: 600">{{ c.label }}</span>
+            <span style="font-size: 12px; color: #A3AFA8">{{ c.hint }}</span>
+          </span>
+          <span aria-hidden="true" style="{{ c.dotStyle }}"></span>
+        </button>
+      </sc-for>
+      <span style="font-size: 13px; color: #A3AFA8; text-align: center; padding-top: 2px">و٢٨ موضعًا آخر في السورة</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 18px; background: #16201B; border: 1px solid #2A3731">
+      <div aria-hidden="true" style="width: 40px; height: 40px; border-radius: 20px; background: #24302A; color: {{accent}}; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0">ع ب</div>
+      <span style="flex-grow: 1; font-size: 14px; font-weight: 600">عبد الباسط عبد الصمد</span>
+      <span style="font-size: 14px; font-weight: 700; color: {{accent}}">٨٨٪</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-bottom: 36px">
+      <a href="Listening.dc.html" style="height: 54px; border-radius: 27px; background: {{accent}}; color: #0E1512; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 700">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
+        أنصت ١٠ ثوانٍ إضافية
+      </a>
+      <a href="Result.dc.html" style="height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: {{accent}}">تأكيد الموضع المختار</a>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#D9B36C","options":["#D9B36C","#7FC8A9","#9DB4E8"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { picked: 13 };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#D9B36C';
+    const base = [
+      { n: 13, label: 'الآية ١٣', hint: 'بعد ﴿وَالْأَرْضَ وَضَعَهَا لِلْأَنَامِ﴾ وما تلاها' },
+      { n: 16, label: 'الآية ١٦', hint: 'بعد ﴿وَخَلَقَ الْجَانَّ مِن مَّارِجٍ مِّن نَّارٍ﴾' },
+      { n: 18, label: 'الآية ١٨', hint: 'بعد ﴿رَبُّ الْمَشْرِقَيْنِ وَرَبُّ الْمَغْرِبَيْنِ﴾' }
+    ];
+    const candidates = base.map((c) => {
+      const on = this.state.picked === c.n;
+      return {
+        ...c,
+        checked: on ? 'true' : 'false',
+        pick: () => this.setState({ picked: c.n }),
+        style: 'display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 10px 16px; border-radius: 16px; font-family: inherit; text-align: right; cursor: pointer; color: #F2EDE3; background: ' + (on ? 'rgba(217,179,108,0.10)' : '#16201B') + '; border: 1px solid ' + (on ? accent : '#2A3731'),
+        dotStyle: 'width: 20px; height: 20px; border-radius: 10px; box-sizing: border-box; flex-shrink: 0; border: ' + (on ? '6px solid ' + accent : '2px solid #3A4842')
+      };
+    });
+    return { accent, candidates };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+# secrets / local config
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ml: data and built artifacts are never committed
+ml/data/*
+ml/artifacts/*
+!ml/data/.gitkeep
+!ml/artifacts/.gitkeep
+
+# audio never belongs in the repo, except small golden test fixtures
+*.wav
+*.mp3
+*.m4a
+*.webm
+*.opus
+!backend/tests/fixtures/**
+
+# web
+node_modules/
+.next/
+out/
+
+# mobile
+mobile/.dart_tool/
+mobile/build/
+
+# editors / OS
+.idea/
+.vscode/
+.DS_Store

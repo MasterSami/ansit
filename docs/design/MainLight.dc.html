@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>أنصِت — الرئيسية (فاتح)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F7F4EC}
+a{color:#8A6620;text-decoration:none}a:hover{color:#6E511A}
+@keyframes ansitBreathL{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.06);opacity:1}}
+.ansit-ring-l{animation:ansitBreathL 3.2s ease-in-out infinite}
+.ansit-ring-l2{animation:ansitBreathL 3.2s ease-in-out .6s infinite}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F4EC; color: #1A211D; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 56px 24px 0 24px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-family: 'Amiri', serif; font-weight: 700; font-size: 34px; line-height: 1.1; color: {{accent}}">أنصِت</span>
+      <span style="font-size: 13px; color: #5C6660">﴿فَاسْتَمِعُوا لَهُ وَأَنصِتُوا﴾</span>
+    </div>
+    <button type="button" aria-label="الإعدادات" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid #E4DED0; background: #FFFFFF; color: #1A211D; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 0 24px">
+    <div style="position: relative; width: 272px; height: 272px; display: flex; align-items: center; justify-content: center">
+      <div class="ansit-ring-l2" aria-hidden="true" style="position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(138,102,32,0.22)"></div>
+      <div class="ansit-ring-l" aria-hidden="true" style="position: absolute; inset: 30px; border-radius: 50%; border: 1px solid rgba(138,102,32,0.3); background: rgba(138,102,32,0.06)"></div>
+      <a href="Listening.dc.html" aria-label="اضغط لتنصت" style="position: relative; width: 168px; height: 168px; border-radius: 50%; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 10px rgba(138,102,32,0.1)">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v1a7 7 0 0 0 14 0v-1"></path><path d="M12 18v4"></path></svg>
+      </a>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700">اضغط لتنصت</h1>
+      <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #5C6660; max-width: 280px">نتعرّف على السورة والآية واسم القارئ في ثوانٍ</p>
+    </div>
+  </main>
+
+  <section aria-label="آخر ما سمعته" style="padding: 0 24px 20px 24px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <h2 style="margin: 0; font-size: 14px; font-weight: 600; color: #5C6660">آخر ما سمعته</h2>
+      <a href="History.dc.html" style="font-size: 13px; font-weight: 600; color: {{accent}}">عرض السجل</a>
+    </div>
+    <a href="Result.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 18px; background: #FFFFFF; border: 1px solid #E4DED0; color: #1A211D">
+      <div aria-hidden="true" style="width: 48px; height: 48px; border-radius: 14px; background: rgba(138,102,32,0.1); color: {{accent}}; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-weight: 700; font-size: 20px; flex-shrink: 0">٦٧</div>
+      <div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1; min-width: 0">
+        <span style="font-size: 16px; font-weight: 600">سورة المُلك · الآية ١</span>
+        <span style="font-size: 13px; color: #5C6660">محمد صدّيق المنشاوي · منذ ١٠ دقائق</span>
+      </div>
+      <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 20px; background: #F1ECDF; color: #1A211D; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"></path></svg>
+      </span>
+    </a>
+  </section>
+
+  <nav aria-label="التنقل الرئيسي" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 10px 8px 26px 8px; border-top: 1px solid #E4DED0; background: #FFFFFF">
+    <a href="MainLight.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 600; color: {{accent}}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v1a7 7 0 0 0 14 0v-1"></path><path d="M12 18v4"></path></svg>
+      أنصِت
+    </a>
+    <a href="History.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 500; color: #5C6660">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+      السجل
+    </a>
+    <a href="History.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 500; color: #5C6660">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+      المحفوظات
+    </a>
+    <a href="MainLight.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; font-size: 12px; font-weight: 500; color: #5C6660">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"></path><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"></path></svg>
+      المصحف
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#8A6620","options":["#8A6620","#2F6B52","#3B5A99"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#8A6620' };
+  }
+}
+</script>
+</body>
+</html>

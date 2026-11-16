@@ -1,0 +1,15 @@
+target-version = "py311"
+line-length = 100
+extend-exclude = ["ml/data", "ml/artifacts", "docs/design"]
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM", "PTH", "RUF", "S", "ASYNC", "T20"]
+# RUF001-003: Arabic text legitimately contains characters ruff calls "ambiguous".
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[lint.per-file-ignores]
+"**/tests/**" = ["S101"]
+"ml/**" = ["T20"]
+
+[lint.isort]
+known-first-party = ["app"]
