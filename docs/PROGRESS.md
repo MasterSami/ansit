@@ -416,4 +416,102 @@ At that setting, for a reciter who is in the gallery:
 
 ### Next
 
-Phase 4 — production API. Not started; waiting for review.
+Phase 4 — done, see below.
+
+## Phase 4 — production API · complete, awaiting review
+
+Plan and decisions: [`plans/phase-4.md`](plans/phase-4.md) ·
+API reference: [`API.md`](API.md)
+
+### What was built
+
+- `POST /v1/identify`: both branches (ASR → ayah match, speaker embedding →
+  reciter decision) run at the same time on one decoded waveform and are fused
+  into the response schema from the brief.
+- `GET /v1/surahs`, `/v1/surahs/{n}`, `/v1/ayahs/{surah}/{ayah}?context=N`,
+  `GET /v1/reciters`, `/v1/reciters/{id}`, `POST /v1/feedback`.
+- Startup loading as readiness tasks: `/readyz` shows `quran_index`,
+  `asr_model`, `speaker_model`, `reciter_gallery` individually.
+- Rate limiting per IP and per `X-Device-ID` (Redis; in-process without it),
+  upload and duration limits, CORS allowlist, one error format.
+- "Listen longer": `previous_identify_id` resolves an ambiguous result using
+  only the earlier candidates' positions (kept 5 minutes).
+- Metrics: per-stage latency, outcome counts, confidence and similarity
+  histograms. Tables `identify_events` and `feedback` (migration `0002`).
+- Docker: CPU image with models mounted (default) or baked (`--target baked`),
+  migrations at container start, read-only filesystem. GPU Dockerfile provided.
+- `infra/locust/locustfile.py` load test; `make serve | gallery-db | loadtest`.
+- 54 new tests (210 total).
+
+### Verified by running it
+
+- **Real clip through HTTP**: a 12 s phone-like clip of Al-Afasy returned the
+  right surah and ayah and named the reciter (also an automated test, run
+  where the models exist).
+- **Docker stack** (`postgres + redis + backend`): migrations applied at start;
+  gallery loaded from Postgres after `make gallery-db`; an identify request
+  wrote one `identify_events` row; feedback stored; the 21st request in a
+  minute got 429 with counters visible in Redis; container runs as uid 10001
+  on a read-only filesystem and `/tmp` stayed empty.
+- **Privacy**: tests assert that no file is created during a request
+  (including a 1.7 MB upload), that the log line for a request contains no
+  transcript, and that `identify_events` has no column or value holding one.
+
+### Load test (Locust, this 4-vCPU machine, client on the same host)
+
+Final defaults: 2 requests at once, each with 2 ASR threads + 1 speaker
+thread. Mixed 5 / 8 / 12 s phone-like clips, users send back to back, 75 s
+per run, no failures in any run.
+
+| Concurrent users | Requests/s | p50    | p95   | p99   |
+| ---------------- | ---------- | ------ | ----- | ----- |
+| 1                | 1.18       | 0.87 s | 1.1 s | 1.2 s |
+| 2                | 1.80       | 1.1 s  | 1.6 s | 1.8 s |
+| 4                | 1.77       | 2.3 s  | 2.8 s | 2.9 s |
+
+For comparison, the first configuration tried (1 request at a time, 3 ASR
+threads): p95 1.6 s / 3.4 s / 6.6 s at 1 / 2 / 4 users, about 0.9 requests/s.
+
+- **One instance on 4 vCPU handles about 1.8 identifications per second.**
+  The brief's 2.5 s p95 budget holds up to 2 concurrent users and is exceeded
+  at 4 (2.8 s), where requests wait for a free slot. More load needs more
+  instances; the API is stateless apart from Redis and Postgres.
+- These runs used the server started directly with `uvicorn`, without
+  Postgres or Redis. The Docker stack was exercised functionally, not under
+  load.
+- The load generator shared the 4 cores with the server, so real capacity is
+  somewhat higher than measured.
+
+### Decisions
+
+- **No temp files at all** instead of "temp files on tmpfs removed in
+  `finally`": the clip is decoded from memory. Stronger than the brief asks.
+- **"Listen longer" stores candidate positions, not the transcript.**
+- **Thread counts set by measurement**: 2 ASR threads beat 3 and 4.
+- **Gallery from Postgres when it holds one, otherwise from files**, so the
+  service also runs without Postgres or Redis (`make serve`).
+- **Rate limiter fails open** if Redis is configured but unreachable.
+- **`X-Forwarded-For` is ignored unless `TRUST_PROXY_HEADERS=true`.**
+- **Unknown reciter returns best guesses as `alternatives`** but no name.
+- **Locust instead of k6** (k6 is not available here; the brief allows either).
+
+### Open issues
+
+1. **Capacity is ~1.8 requests/s per 4-vCPU instance.** Fine for a launch,
+   but worth knowing before any promotion.
+2. **Deployment needs `TRUST_PROXY_HEADERS=true` behind a reverse proxy**,
+   otherwise every user shares the proxy's IP and one rate limit.
+3. **The GPU Dockerfile is untested** (no GPU here). Marked as such in the file.
+4. **Full-surah audio links are not returned**: the mp3quran URL pattern has
+   not been fetched and checked. Per-ayah EveryAyah links are returned.
+5. **Hot-linking EveryAyah audio from the apps** is a product and licensing
+   decision; the site states no terms.
+6. **Image is 948 MB** before models.
+7. Model-dependent tests still run only locally, not in CI.
+8. Carried over: no non-Quran speech negatives; no second recording per
+   reciter; reciter `country` empty; attribution owed in the apps (Tanzil,
+   WeSpeaker); Flutter not installed here.
+
+### Next
+
+Phase 5 — web app (Next.js). Not started; waiting for review.
