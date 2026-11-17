@@ -3,15 +3,15 @@
 Each source is checked by actually inspecting it (sample, schema, license) in
 the phase that first uses it. Findings are recorded here.
 
-| Need                            | Source                                                              | Verified in | Status       |
-| ------------------------------- | ------------------------------------------------------------------- | ----------- | ------------ |
-| Quran text for matching         | Tanzil "simple clean"                                               | Phase 1     | **verified** |
-| Quran text for display          | Tanzil Uthmani                                                      | Phase 1     | **verified** |
-| Surah / juz / page metadata     | Tanzil `quran-data.xml`                                             | Phase 1     | **verified** |
-| Per-ayah recitation audio       | EveryAyah (HF `tarteel-ai/everyayah`)                               | Phase 2     | not verified |
-| Reciter names, full-surah audio | mp3quran API, Quran Foundation API                                  | Phase 3     | not verified |
-| ASR model                       | `tarteel-ai/whisper-base-ar-quran` + one larger Quran-tuned Whisper | Phase 2     | not verified |
-| Speaker embedding model         | `speechbrain/spkrec-ecapa-voxceleb`                                 | Phase 3     | not verified |
+| Need                            | Source                                                                          | Verified in | Status       |
+| ------------------------------- | ------------------------------------------------------------------------------- | ----------- | ------------ |
+| Quran text for matching         | Tanzil "simple clean"                                                           | Phase 1     | **verified** |
+| Quran text for display          | Tanzil Uthmani                                                                  | Phase 1     | **verified** |
+| Surah / juz / page metadata     | Tanzil `quran-data.xml`                                                         | Phase 1     | **verified** |
+| Per-ayah recitation audio       | EveryAyah — fetched per ayah from everyayah.com, not the 117 GB HF dataset      | Phase 2     | **verified** |
+| Reciter names, full-surah audio | mp3quran API, Quran Foundation API                                              | Phase 3     | not verified |
+| ASR model                       | `tarteel-ai/whisper-base-ar-quran` (plus tiny and a small model for comparison) | Phase 2     | **verified** |
+| Speaker embedding model         | `speechbrain/spkrec-ecapa-voxceleb`                                             | Phase 3     | not verified |
 
 ## Tanzil (verified 2026-11-16)
 
@@ -74,6 +74,67 @@ How this is handled:
   field, and the loader refuses a text file without that block.
 - **To do in Phases 5 and 6:** the web and mobile apps must credit Tanzil
   Project and link to tanzil.net wherever ayah text is displayed.
+
+## EveryAyah recitation audio (verified 2026-11-17)
+
+### The Hugging Face dataset `tarteel-ai/everyayah`
+
+- Exists. Splits `train` / `validation` / `test`; 234,732 rows; 4 columns
+  (audio, duration, text, reciter).
+- **117 GB** of parquet. Not downloaded: far over the 5 GB ask-first limit.
+- The validation and test splits contain the same reciters as each other
+  (15 listed in the dataset statistics), so the splits are not
+  reciter-disjoint. Models trained on this dataset have heard these reciters.
+
+### What we use instead: everyayah.com directly
+
+The same recordings, one MP3 per ayah:
+`https://everyayah.com/data/<folder>/<SSS><AAA>.mp3` (surah and ayah
+zero-padded to three digits, e.g. `067001.mp3`).
+
+- `https://everyayah.com/data/recitations.js` lists 79 folders with a display
+  name and bitrate. Folder names encode reciter, style and bitrate
+  (e.g. `Abdul_Basit_Mujawwad_128kbps`, `Husary_Muallim_128kbps`). The list
+  also contains translations, Warsh recitations and teaching recordings.
+- Not everything listed is there: `Ibrahim_Akhdar_64kbps` returns 404 for
+  every file (the `_32kbps` folder works), and some folders have gaps.
+- Some folders have `audhubillah.mp3` and `bismillah.mp3`; many do not. A
+  basmala file `SSS000.mp3` exists for some surahs in some folders.
+- Phase 2 downloaded 82 MB (about 1,500 ayahs from 28 folders) into
+  `ml/data/everyayah/`.
+
+### License
+
+**No license or terms of use were found on everyayah.com.** Until that is
+clarified, the audio is treated as not redistributable:
+
+- cached locally under `ml/data/` (gitignored), never committed;
+- no recitation audio in test fixtures (tests use synthetic audio);
+- production stores embeddings only (Phase 3), never reciter audio.
+
+## ASR models (verified 2026-11-17)
+
+Converted to CTranslate2 int8 by `ml/scripts/convert_models.py`, which pins
+each to the commit below and writes a `SOURCE.json` next to the model.
+
+| Name            | Hugging Face repo                         | Commit       | License    | Base                   | Training data per its card                 |
+| --------------- | ----------------------------------------- | ------------ | ---------- | ---------------------- | ------------------------------------------ |
+| `tarteel-base`  | `tarteel-ai/whisper-base-ar-quran`        | `5c3c53fdf9` | Apache-2.0 | `openai/whisper-base`  | not stated                                 |
+| `tarteel-tiny`  | `tarteel-ai/whisper-tiny-ar-quran`        | `c3d7e624af` | Apache-2.0 | `openai/whisper-tiny`  | not stated                                 |
+| `deepdml-small` | `deepdml/whisper-small-ar-quran-mix-norm` | `2d0929ee4d` | Apache-2.0 | `openai/whisper-small` | `tarteel-ai/everyayah`, `tarteel-ai/EA-UD` |
+
+- The Tarteel models write fully vowelled text in ordinary (imla'i) spelling,
+  not Uthmani spelling, so it normalizes onto the simple-clean index directly.
+  `deepdml-small` writes unvowelled text.
+- When a basmala is recited before a surah, the Tarteel model usually leaves
+  it out of the transcript.
+- Also found, checked and not used:
+  `naazimsnh02/whisper-large-v3-turbo-ar-quran` (Apache-2.0, trained on
+  EveryAyah) — a large-v3 encoder is too slow for a 2.5 s budget on 4 CPU cores.
+- Weight files are served from `us.aws.cdn.hf.co`.
+
+Silero VAD is the ONNX model bundled inside the `faster-whisper` package
+(MIT), so nothing extra is downloaded for it.
 
 ## For the remaining sources
 

@@ -3,7 +3,7 @@
 Listens to a short Quran recitation (5–15 s) and returns the surah, the ayah and
 the reciter's name.
 
-Status: **Phase 0 (scaffolding) complete.** See [`docs/PROGRESS.md`](docs/PROGRESS.md).
+Status: **Phases 0–2 complete** (scaffolding, ayah matcher, ASR pipeline). No HTTP endpoint for identification yet. See [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Quick start
 

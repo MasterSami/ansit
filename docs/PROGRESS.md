@@ -173,7 +173,121 @@ Both have regression tests.
 
 ### Next
 
-Phase 2 — ASR and end-to-end ayah identification on real audio. Not started;
-waiting for review. It will need network access to Hugging Face for the models
-and the EveryAyah dataset, and the dataset download size must be checked
-against the 5 GB ask-first rule before anything is fetched.
+Phase 2 — done, see below.
+
+## Phase 2 — ASR and end-to-end ayah identification · complete, awaiting review
+
+Plan and decisions: [`plans/phase-2.md`](plans/phase-2.md) ·
+Full report: [`../ml/eval/reports/phase2.md`](../ml/eval/reports/phase2.md)
+
+### What was built
+
+- `app/audio/decode.py` — webm/opus, m4a/aac, mp3, wav → 16 kHz mono, decoded
+  in memory with PyAV. The clip never touches disk.
+- `app/audio/vad.py` — Silero VAD used as a gate.
+- `app/asr/` — `ASREngine` interface, faster-whisper implementation,
+  hallucination guards.
+- `app/pipeline.py` — decode → VAD → ASR → guards → match, with per-stage
+  timings and the limits from the brief (3–15 s, 2 MB, 1.5 s of speech).
+- `ml/scripts/convert_models.py` — Hugging Face → CTranslate2 int8, pinned
+  to commits.
+- `ml/eval/build_audio_eval.py`, `ml/eval/audio_eval.py`, `ml/eval/heldout.py`.
+- 40 new tests (120 total). The pipeline is tested with a scripted ASR engine
+  and synthetic audio; one test runs the real models when they are built
+  locally and is skipped otherwise.
+
+Still a library. Nothing new is reachable over HTTP until Phase 4.
+
+### Results (`tarteel-base`, 4 vCPU x86_64, int8, one request at a time)
+
+| Target                         | Result                | Verdict     |
+| ------------------------------ | --------------------- | ----------- |
+| Top-1 ≥ 90% on clean 8 s clips | **87.5%** (168 clips) | **NOT met** |
+| End-to-end p95 < 2.5 s         | 2.17 s (1,232 clips)  | met         |
+
+Top-1 = the reported ayah is actually heard in the clip.
+
+| Condition  | 5 s   | 8 s   | 12 s  |
+| ---------- | ----- | ----- | ----- |
+| clean      | 78.6% | 87.5% | 93.5% |
+| phone-like | 53.0% | 73.8% | 81.0% |
+
+- **Confidently wrong answers are rare**: status `match` naming an ayah not in
+  the clip happened in 0.0–1.8% of clips depending on condition.
+- **On clean 8 s clips the miss is mostly ambiguity, not error.** Of the 21
+  clips that were not Top-1, 15 came back `ambiguous`; counting an ambiguous
+  result that lists the true location as acceptable gives 94.6%. Slow
+  reciters say only two or three words in 8 s, and those words often occur
+  in several places.
+- **Mujawwad is much harder**: 58.3% clean, 30.6% phone-like (36 clips each),
+  for the same reason — too few words per clip.
+- **One reciter scores 0%** (`Abdullaah_3awwaad_Al-Juhaynee_128kbps`), with
+  all three models, even on whole ayahs. Cause not established. Without that
+  folder clean 8 s Top-1 is 90.7%; it stays in the reported result.
+- **Clips that open with a basmala**: 53.9% clean. The basmala uses up most
+  of an 8 s clip, and when only a one-word opening follows, the transcript is
+  a single word and is rejected as too short.
+- **Non-speech** (silence, noise, tones): 60 of 60 rejected.
+- Latency by clip length, p95: 1.33 s (5 s), 1.78 s (8 s), 2.39 s (12 s).
+  ASR is almost all of it; decode, VAD and matching together are under 70 ms.
+
+### Three things these numbers do not show
+
+1. **The models were trained on the same recordings.** EveryAyah is their
+   training data and its splits share reciters. These are results on studio
+   recordings of famous reciters the model has heard: an upper bound.
+2. **The phone condition is simulated** (synthetic reverb, noise, band-limit,
+   Opus). No real recordings of a phone near a speaker.
+3. **No non-Quran speech was tested.** Ordinary Arabic speech, a sermon or a
+   song could be accepted as a match; that rate is unknown.
+
+### Decisions
+
+- **Model: `tarteel-base`.** `deepdml-small` is 7 points better on phone-like
+  audio (81.0% against 73.8%) but takes 2.20 s at p95 on 8 s clips with all
+  four cores, before the speaker branch is added. `tarteel-tiny` drops to
+  53.6% on phone-like audio. Details in the plan.
+- **VAD is a gate only, threshold 0.15, no trimming.** With the usual 0.5 and
+  trimming, the first full run scored 83.9% clean and 45.8% phone on 8 s
+  clips, because Silero rejected or cut real recitation. This departs from the
+  brief's "trim silence". Experiments are in the plan.
+- **PyAV instead of an ffmpeg subprocess** for decoding: in memory, no temp
+  files, handles iOS M4A, no binary in the image.
+- **EveryAyah fetched per ayah from everyayah.com** (82 MB) instead of the
+  117 GB Hugging Face dataset.
+- **No temperature fallback** in decoding; guards reject weak output instead.
+- `MATCH_THRESHOLD` stays at 76. On audio, the match score does not separate
+  right from wrong well enough for a higher threshold to pay off.
+
+### Environment changes made with approval
+
+The `ansit` cloud environment now also allows `huggingface.co`,
+`datasets-server.huggingface.co`, `us.aws.cdn.hf.co`, `everyayah.com`,
+`download.pytorch.org` and `download-r2.pytorch.org`.
+
+### Open issues
+
+1. **Accuracy target missed** (87.5% against 90%). Options:
+   - accept "truth offered" as the measure (94.6%), since the remaining
+     misses are honest ambiguity that the UI already handles;
+   - record longer by default (12 s gives 93.5%);
+   - switch to `deepdml-small` and accept a higher latency;
+   - on an ambiguous result, automatically listen for more audio.
+2. **No independent test data.** Until there are recordings the models have
+   not seen (other reciters, real phone captures), true accuracy is unknown.
+   A small set of real recordings from the target use would be worth more
+   than anything else here.
+3. **No non-Quran speech negatives.** Needs a source of ordinary Arabic
+   speech; Common Voice Arabic is the obvious one but is a large download.
+4. **EveryAyah audio has no stated license.** Treated as not redistributable.
+5. **The model tests do not run in CI** (no model there).
+6. One-word transcripts are rejected, which loses surah openings such as the
+   disjoint letters.
+7. The Tarteel models leave a recited basmala out of the transcript, so
+   `prefix_detected` is rarely set on real audio.
+8. Carried over: Flutter not installed here; `RECITER_THRESHOLD` placeholder;
+   no database tables yet; Tanzil attribution due in the UI phases.
+
+### Next
+
+Phase 3 — reciter identification. Not started; waiting for review.
