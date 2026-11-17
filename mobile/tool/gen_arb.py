@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -51,7 +52,7 @@ def main() -> None:
 
     TARGET.parent.mkdir(parents=True, exist_ok=True)
     TARGET.write_text(json.dumps(arb, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"wrote {len(flat)} strings to {TARGET.relative_to(ROOT)}")
+    sys.stdout.write(f"wrote {len(flat)} strings to {TARGET.relative_to(ROOT)}\n")
 
 
 if __name__ == "__main__":

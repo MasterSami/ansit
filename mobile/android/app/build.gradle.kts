@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "app.ansit.ansit"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler needs API 37 or newer to compile against.
+    compileSdk = maxOf(flutter.compileSdkVersion, 37)
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
