@@ -5,7 +5,12 @@ from dataclasses import dataclass
 
 from redis.asyncio import Redis
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from app.core.config import Settings
 from app.core.logging import get_logger
@@ -29,6 +34,13 @@ class ExternalDeps:
         )
         redis = Redis.from_url(settings.redis_url) if settings.redis_url else None
         return cls(engine=engine, redis=redis)
+
+    @property
+    def sessions(self) -> async_sessionmaker[AsyncSession] | None:
+        """Session factory, or None when no database is configured."""
+        if self.engine is None:
+            return None
+        return async_sessionmaker(self.engine, expire_on_commit=False)
 
     async def _check_database(self) -> None:
         assert self.engine is not None  # noqa: S101 - narrowed by caller

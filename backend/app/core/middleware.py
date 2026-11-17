@@ -3,6 +3,7 @@
 import re
 import time
 import uuid
+from contextlib import suppress
 
 import structlog
 from starlette.datastructures import Headers, MutableHeaders
@@ -67,3 +68,68 @@ class RequestContextMiddleware:
                     duration_ms=round(elapsed * 1000, 2),
                 )
             structlog.contextvars.clear_contextvars()
+
+
+class BodySizeLimitMiddleware:
+    """Refuse request bodies above a cap before anything buffers them.
+
+    The identify upload is the only large body. Capping it here means the
+    multipart parser can keep the whole file in memory (see `create_app`), so
+    the clip never spills into a temporary file on disk.
+    """
+
+    def __init__(self, app: ASGIApp, max_bytes: int) -> None:
+        self.app = app
+        self.max_bytes = max_bytes
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http" or scope["method"] not in ("POST", "PUT", "PATCH"):
+            await self.app(scope, receive, send)
+            return
+
+        declared = Headers(scope=scope).get("content-length")
+        if declared is not None and declared.isdigit() and int(declared) > self.max_bytes:
+            await self._reject(send)
+            return
+
+        received = 0
+        exceeded = False
+
+        async def counting_receive() -> Message:
+            nonlocal received, exceeded
+            message = await receive()
+            if message["type"] == "http.request":
+                received += len(message.get("body", b""))
+                if received > self.max_bytes:
+                    exceeded = True
+                    raise _BodyTooLarge
+            return message
+
+        async def guarded_send(message: Message) -> None:
+            # Once the cap is hit, whatever the app says is replaced by our 413.
+            if not exceeded:
+                await send(message)
+
+        with suppress(_BodyTooLarge):
+            await self.app(scope, counting_receive, guarded_send)
+        if exceeded:
+            await self._reject(send)
+
+    @staticmethod
+    async def _reject(send: Send) -> None:
+        body = b'{"error":{"code":"payload_too_large","message":"The request body is too large."}}'
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 413,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"content-length", str(len(body)).encode()),
+                ],
+            }
+        )
+        await send({"type": "http.response.body", "body": body})
+
+
+class _BodyTooLarge(Exception):
+    pass
