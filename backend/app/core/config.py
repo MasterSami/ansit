@@ -7,8 +7,8 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 # From the Phase 3 evaluation (ml/eval/reports/phase3.md, "Shipped setting").
-RECITER_THRESHOLD_DEFAULT = 0.60
-RECITER_MARGIN_DEFAULT = 0.08
+RECITER_THRESHOLD_DEFAULT = 0.725
+RECITER_MARGIN_DEFAULT = 0.12
 
 
 class Settings(BaseSettings):
@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     reciter_min_margin: float = Field(default=RECITER_MARGIN_DEFAULT, ge=0, le=2)
 
     quran_index_path: str = "../ml/artifacts/quran_index.json.gz"
-    speaker_model_path: str = "../ml/artifacts/speaker/ecapa.onnx"
+    speaker_model_path: str = "../ml/artifacts/speaker/resnet34.onnx"
     gallery_path: str | None = None
     """Gallery file to use instead of the database (development without Postgres)."""
 

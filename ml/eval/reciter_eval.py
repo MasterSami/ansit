@@ -29,13 +29,13 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "backend"))
 
 from app.audio.decode import decode_audio
-from app.speaker.engine import OnnxEcapaEngine
+from app.speaker.engine import OnnxSpeakerEngine
 from app.speaker.gallery import Gallery
 
 EVAL_DIR = REPO / "ml" / "data" / "eval_audio"
 CACHE = EVAL_DIR / "query_embeddings.npz"
 REGISTRY = REPO / "ml" / "registry" / "reciters.json"
-MODEL = REPO / "ml" / "artifacts" / "speaker" / "ecapa.onnx"
+MODEL = REPO / "ml" / "artifacts" / "speaker" / "resnet34.onnx"
 GALLERY = REPO / "ml" / "artifacts" / "gallery.npz"
 REPORT = REPO / "ml" / "eval" / "reports" / "phase3.md"
 
@@ -43,7 +43,7 @@ TARGET_FALSE_ACCEPT = 0.05
 # The setting is calibrated to a stricter limit than the target, because a
 # setting tuned on one set of reciters accepts somewhat more strangers on
 # another. See "Calibration headroom" in the report for how this was chosen.
-CALIBRATION_LIMIT = 0.03
+CALIBRATION_LIMIT = 0.04
 CPU_THREADS = 4
 
 
@@ -52,8 +52,9 @@ class Query:
     clip: dict[str, Any]
     reciter: str
     style: str
-    scores: dict[str, float]  # reciter id -> score (best voice)
-    voice_scores: dict[tuple[str, str], float]
+    scores: dict[str, float]  # reciter id -> score (best voice), full gallery
+    stranger_scores: dict[str, float]  # same, with this reciter removed from the gallery
+    cross_style: tuple[float, float] | None  # (own other-style score, best rival) or None
 
     @property
     def ranked(self) -> list[str]:
@@ -62,11 +63,6 @@ class Query:
     @property
     def target(self) -> float:
         return self.scores[self.reciter]
-
-    @property
-    def best_other(self) -> float:
-        """Best score once this reciter is taken out of the gallery (open-set)."""
-        return max(score for r, score in self.scores.items() if r != self.reciter)
 
     @property
     def top1(self) -> bool:
@@ -81,7 +77,7 @@ class Query:
 
     def stranger_accepted(self, floor: float, margin: float) -> bool:
         """With this reciter removed from the gallery: is someone else named?"""
-        ordered = sorted((s for r, s in self.scores.items() if r != self.reciter), reverse=True)
+        ordered = sorted(self.stranger_scores.values(), reverse=True)
         return ordered[0] >= floor and ordered[0] - ordered[1] >= margin
 
 
@@ -109,6 +105,52 @@ def equal_error_rate(targets: np.ndarray, nontargets: np.ndarray) -> tuple[float
     return float((far[i] + frr[i]) / 2), float(thresholds[i])
 
 
+def reciter_scores(gallery: Gallery, embedding: np.ndarray) -> dict[str, float]:
+    return {score.reciter_id: score.similarity for score in gallery.rank(embedding)}
+
+
+def build_queries(
+    gallery: Gallery,
+    clips: list[dict[str, Any]],
+    embeddings: np.ndarray,
+    folder_to: dict[str, tuple[str, str]],
+) -> list[Query]:
+    """Score every clip against the full gallery, against the gallery refitted
+    without its reciter (stranger test), and, for reciters with several styles,
+    against the gallery without the clip's own style (cross-style test)."""
+    styles_of: defaultdict[str, set[str]] = defaultdict(set)
+    for voice in gallery.voices:
+        styles_of[voice.reciter_id].add(voice.style)
+    without_reciter: dict[str, Gallery] = {}
+    without_style: dict[tuple[str, str], Gallery] = {}
+
+    queries = []
+    for clip, embedding in zip(clips, embeddings, strict=True):
+        reciter, style = folder_to[clip["reciter"]]
+        if reciter not in without_reciter:
+            without_reciter[reciter] = gallery.without_reciter(reciter)
+        cross = None
+        if len(styles_of[reciter]) > 1:
+            key = (reciter, style)
+            if key not in without_style:
+                without_style[key] = gallery.without_voices(
+                    {v for v in gallery.voices if v.reciter_id == reciter and v.style == style}
+                )
+            ranked = reciter_scores(without_style[key], embedding)
+            cross = (ranked[reciter], max(s for r, s in ranked.items() if r != reciter))
+        queries.append(
+            Query(
+                clip,
+                reciter,
+                style,
+                reciter_scores(gallery, embedding),
+                reciter_scores(without_reciter[reciter], embedding),
+                cross,
+            )
+        )
+    return queries
+
+
 def load_queries(gallery: Gallery) -> tuple[list[Query], list[float]]:
     registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
     folder_to = {
@@ -125,11 +167,15 @@ def load_queries(gallery: Gallery) -> tuple[list[Query], list[float]]:
 
     ids = [c["clip_id"] for c in clips]
     timings: list[float] = []
-    if CACHE.is_file() and list(np.load(CACHE)["ids"]) == ids:
+    if (
+        CACHE.is_file()
+        and list(np.load(CACHE)["ids"]) == ids
+        and np.load(CACHE)["embeddings"].shape[1] == gallery.embeddings.shape[1]
+    ):
         data = np.load(CACHE)
         embeddings, timings = data["embeddings"], list(data["millis"])
     else:
-        engine = OnnxEcapaEngine(MODEL, cpu_threads=CPU_THREADS)
+        engine = OnnxSpeakerEngine(MODEL, cpu_threads=CPU_THREADS)
         engine.warm_up()
         rows = []
         for clip in clips:
@@ -142,17 +188,7 @@ def load_queries(gallery: Gallery) -> tuple[list[Query], list[float]]:
         embeddings = np.stack(rows)
         np.savez_compressed(CACHE, ids=np.array(ids), embeddings=embeddings, millis=timings)
 
-    queries = []
-    for clip, embedding in zip(clips, embeddings, strict=True):
-        reciter, style = folder_to[clip["reciter"]]
-        voice_scores = {
-            (v.reciter_id, v.style): float(s)
-            for v, s in zip(gallery.voices, gallery.voice_scores(embedding), strict=True)
-        }
-        scores: dict[str, float] = {}
-        for (rid, _), score in voice_scores.items():
-            scores[rid] = max(score, scores.get(rid, -1.0))
-        queries.append(Query(clip, reciter, style, scores, voice_scores))
+    queries = build_queries(gallery, clips, embeddings, folder_to)
     return queries, timings
 
 
@@ -168,8 +204,8 @@ def summarize(items: list[Query], floor: float, margin: float) -> dict[str, floa
     }
 
 
-FLOORS = [round(float(x), 3) for x in np.arange(0.30, 0.701, 0.025)]
-MARGINS = [round(float(x), 3) for x in np.arange(0.0, 0.2501, 0.005)]
+FLOORS = [round(float(x), 3) for x in np.arange(0.20, 0.901, 0.025)]
+MARGINS = [round(float(x), 3) for x in np.arange(0.0, 0.4001, 0.01)]
 
 
 def calibrate(
@@ -339,14 +375,11 @@ def main() -> int:
     for reciter in sorted(r for r in reciters if len(styles_of[r]) > 1):
         for style in sorted({q.style for q in queries if q.reciter == reciter}):
             items = [q for q in queries if q.reciter == reciter and q.style == style]
-            right = accepted = 0
-            for q in items:
-                own = max(
-                    s for (r, st), s in q.voice_scores.items() if r == reciter and st != style
-                )
-                others = sorted((s for r, s in q.scores.items() if r != reciter), reverse=True)
-                right += own > others[0]
-                accepted += own > others[0] and own >= floor and own - others[0] >= margin
+            pairs = [q.cross_style for q in items if q.cross_style is not None]
+            right = sum(own > rival for own, rival in pairs)
+            accepted = sum(
+                own > rival and own >= floor and own - rival >= margin for own, rival in pairs
+            )
             cross_style_rows.append(
                 [
                     reciter,
@@ -385,24 +418,40 @@ def main() -> int:
         for (true, guess), n in sorted(confusions.items(), key=lambda kv: -kv[1])[:10]
     ]
 
-    # ---- score weighting ----
-    embeddings = np.load(CACHE)["embeddings"]
-    weight_rows = []
-    for weight in (0.0, 0.5, 1.0):
-        alt = Gallery(
-            gallery.voices, gallery.embeddings, gallery.voice_of_clip, centroid_weight=weight
+    # ---- variants: score weighting, and the projection on/off ----
+    cache = np.load(CACHE)
+    clips_all = [q.clip for q in queries]
+    registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    folder_to = {
+        src["folder"]: (r["id"], src["style"])
+        for r in registry
+        for src in r["sources"]["everyayah"]
+    }
+
+    def variant(label: str, **options: Any) -> list[str]:
+        alt = Gallery(gallery.voices, gallery.embeddings, gallery.voice_of_clip, **options)
+        alt_queries = build_queries(alt, clips_all, cache["embeddings"], folder_to)
+        half_a = [q for q in alt_queries if q.reciter in set(reciters[0::2])]
+        half_b = [q for q in alt_queries if q.reciter in set(reciters[1::2])]
+        outcome = pooled(
+            [
+                (half_b, *calibrate(half_a, MARGINS, CALIBRATION_LIMIT)),
+                (half_a, *calibrate(half_b, MARGINS, CALIBRATION_LIMIT)),
+            ]
         )
-        hits, targets_l, nontargets_l = 0, [], []
-        for q, embedding in zip(queries, embeddings, strict=True):
-            ranked = alt.rank(embedding)
-            hits += ranked[0].reciter_id == q.reciter
-            for score in ranked:
-                (targets_l if score.reciter_id == q.reciter else nontargets_l).append(
-                    score.similarity
-                )
-        eer, _ = equal_error_rate(np.array(targets_l), np.array(nontargets_l))
-        label = {0.0: "top-5 clips only", 0.5: "both, equal weight", 1.0: "centroid only"}[weight]
-        weight_rows.append([label, pct(hits, len(queries)), f"{100 * eer:.2f}%"])
+        return [
+            label,
+            pct(sum(q.top1 for q in alt_queries), len(alt_queries)),
+            f"{100 * outcome['false_accept']:.1f}%",
+            f"{100 * outcome['identified']:.1f}%",
+        ]
+
+    variant_rows = [
+        variant("**as shipped**: LDA, centroid + top-5 clips"),
+        variant("no LDA (model's own space)", use_lda=False),
+        variant("LDA, top-5 clips only", centroid_weight=0.0),
+        variant("LDA, centroid only", centroid_weight=1.0),
+    ]
 
     def times(duration: float) -> list[float]:
         return [t for q, t in zip(queries, timings, strict=True) if q.clip["duration"] == duration]
@@ -423,7 +472,7 @@ def main() -> int:
 Generated by `ml/eval/reciter_eval.py`. Every number below comes from that run.
 
 - Machine: {platform.machine()}, {os.cpu_count()} logical CPUs, Python {platform.python_version()}
-- Embedding model: `speechbrain/spkrec-ecapa-voxceleb` exported to ONNX, 192-d, L2-normalized
+- Embedding model: WeSpeaker ResNet34 (`Wespeaker/wespeaker-voxceleb-resnet34-LM`), ONNX, {gallery.embeddings.shape[1]}-d, L2-normalized\n- Scoring space: LDA projection fitted on the gallery ({"on" if gallery.projection is not None else "off"})
 - Gallery: {n_gallery_reciters} reciters, {n_voices} voices (reciter × style), {len(gallery.embeddings):,} clip embeddings
   (each studio clip plus a phone-like copy of it)
 - Queries: {len(queries):,} clips from {len(reciters)} reciters ({len(pick(queries, condition="clean"))} clean, {len(pick(queries, condition="phone"))} phone-like)
@@ -533,9 +582,11 @@ against only their *other* styles' gallery entries (plus every other reciter).
 
 {table(["True reciter", "Named as", "Clips"], confusion_rows) if confusion_rows else "None."}
 
-## Centroid vs nearest clips
+## What each part contributes
 
-{table(["Score", "Closed-set Top-1", "EER"], weight_rows)}
+Same clips, same two-fold procedure, one thing changed at a time.
+
+{table(["Variant", "Closed-set Top-1", "False accept (test)", "Identified (test)"], variant_rows)}
 
 ## Embedding time (ms, {CPU_THREADS} CPU threads, one clip at a time)
 
