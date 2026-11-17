@@ -9,9 +9,9 @@ the phase that first uses it. Findings are recorded here.
 | Quran text for display          | Tanzil Uthmani                                                                  | Phase 1     | **verified** |
 | Surah / juz / page metadata     | Tanzil `quran-data.xml`                                                         | Phase 1     | **verified** |
 | Per-ayah recitation audio       | EveryAyah — fetched per ayah from everyayah.com, not the 117 GB HF dataset      | Phase 2     | **verified** |
-| Reciter names, full-surah audio | mp3quran API, Quran Foundation API                                              | Phase 3     | not verified |
+| Reciter names, full-surah audio | mp3quran API v3 (Quran Foundation API not used)                                 | Phase 3     | **verified** |
 | ASR model                       | `tarteel-ai/whisper-base-ar-quran` (plus tiny and a small model for comparison) | Phase 2     | **verified** |
-| Speaker embedding model         | `speechbrain/spkrec-ecapa-voxceleb`                                             | Phase 3     | not verified |
+| Speaker embedding model         | `speechbrain/spkrec-ecapa-voxceleb`, exported to ONNX                           | Phase 3     | **verified** |
 
 ## Tanzil (verified 2026-11-16)
 
@@ -135,6 +135,47 @@ each to the commit below and writes a `SOURCE.json` next to the model.
 
 Silero VAD is the ONNX model bundled inside the `faster-whisper` package
 (MIT), so nothing extra is downloaded for it.
+
+## Speaker embedding model (verified 2026-11-17)
+
+- `speechbrain/spkrec-ecapa-voxceleb`, commit `0f99f2d0eb`, **Apache-2.0**.
+  ECAPA-TDNN trained on VoxCeleb; 192-dimensional output.
+- Its `hyperparams.yaml` fixes the input features: `Fbank(n_mels=80)` then
+  sentence-level mean normalization (no variance normalization).
+- `ml/scripts/export_speaker_model.py` downloads that pinned commit, exports
+  the embedding network to ONNX (opset 17, 83 MB) and checks that NumPy
+  features + ONNX reproduce SpeechBrain's embeddings. Measured parity: cosine
+  similarity 1.000000 on four test signals. The export is refused below 0.9999.
+- The service therefore needs ONNX Runtime only, not PyTorch.
+
+## mp3quran API (verified 2026-11-17)
+
+- `https://www.mp3quran.net/api/v3/reciters?language=ar` (and `language=eng`):
+  244 reciters. Fields: `id`, `name`, `letter`, `date`, `moshaf[]`.
+- Each `moshaf` (a recording): `name`, `rewaya_id` (1 = Hafs from Asim),
+  `moshaf_type`, `server`, `surah_total`, `surah_list`.
+- `moshaf_type` is `rewaya_id * 10 + kind`, with kind 1 = murattal,
+  2 = mujawwad, 3 = muallim (checked against the Arabic labels for six
+  reciters). Other kinds exist (a "special recitation", a dated recording) and
+  are ignored.
+- `server` is the base URL for full-surah audio: `<server><SSS>.mp3`. **This
+  URL pattern is taken from the API's own data and has not been fetched yet**;
+  it is verified in the phase that builds "continue listening".
+- **No country field.** The registry's `country` is null for every reciter.
+- No license or terms were found in the API responses. We use names and links
+  only; no audio is taken from mp3quran.
+
+## Reciter registry
+
+`ml/registry/reciters.json` (committed), built by `ml/scripts/build_registry.py`:
+35 reciters, 39 voices. Names are copied from the mp3quran API. The mapping
+from EveryAyah folders to mp3quran reciters is an explicit table in that
+script, checked by eye against both sources.
+
+Left out on purpose: folders that repeat a recording at another bitrate,
+Warsh recitations, translations, and four folders with no confident mp3quran
+match (Muhammad AbdulKareem, Aziz Alili, Karim Mansoori, Parhizgar) plus
+Mustafa Ismail, whose EveryAyah recording style could not be confirmed.
 
 ## For the remaining sources
 
