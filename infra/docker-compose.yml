@@ -39,6 +39,17 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-ansit}:${POSTGRES_PASSWORD:-ansit}@postgres:5432/${POSTGRES_DB:-ansit}
       REDIS_URL: redis://redis:6379/0
+      # Paths inside the container (a host .env may point at ../ml/...).
+      QURAN_INDEX_PATH: /app/artifacts/quran_index.json.gz
+      ASR_MODEL_PATH: /app/artifacts/asr/tarteel-base
+      SPEAKER_MODEL_PATH: /app/artifacts/speaker/resnet34.onnx
+      GALLERY_PATH: /app/artifacts/gallery.npz
+      REGISTRY_PATH: /app/registry/reciters.json
+    volumes:
+      # Models, index and gallery are built on the host (see the Makefile) and
+      # mounted read-only. Use the `baked` image target to ship them inside.
+      - ../ml/artifacts:/app/artifacts:ro
+      - ../ml/registry:/app/registry:ro
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     # Audio scratch space lives in RAM only (privacy: clips are never written to disk).

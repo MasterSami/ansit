@@ -2,7 +2,7 @@
 COMPOSE := docker compose -f infra/docker-compose.yml
 BACKEND := uv run --directory backend
 
-.PHONY: help setup lint format typecheck test check up down logs ps data index models speaker-model registry gallery migrate eval eval-audio eval-reciter
+.PHONY: help setup lint format typecheck test check up down logs ps data index models speaker-model registry gallery gallery-db migrate serve loadtest eval eval-audio eval-reciter
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -54,6 +54,16 @@ registry: ## Rebuild ml/registry/reciters.json from mp3quran + EveryAyah
 
 gallery: ## Build the reciter gallery (add RECITER=id to add/refresh one reciter)
 	uv run --project backend --group ml python ml/scripts/build_gallery.py $(if $(RECITER),--reciter $(RECITER))
+
+gallery-db: ## Load the registry + gallery into Postgres (uses DATABASE_URL; add RECITER=id for one)
+	uv run --project backend python ml/scripts/load_gallery_db.py $(if $(RECITER),--reciter $(RECITER))
+
+serve: ## Run the API locally without Docker (needs the artifacts; no Postgres/Redis required)
+	uv run --directory backend uvicorn app.main:create_app --factory --port $(or $(PORT),8000)
+
+loadtest: ## Locust load test against a running server (HOST=..., USERS=...)
+	uvx locust -f infra/locust/locustfile.py --headless --host $(or $(HOST),http://localhost:8000) \
+		-u $(or $(USERS),2) -r $(or $(USERS),2) -t $(or $(DURATION),75s) --only-summary
 
 migrate: ## Apply database migrations (uses DATABASE_URL)
 	uv run --directory backend alembic upgrade head
