@@ -16,6 +16,19 @@ jobs:
   backend:
     name: Backend (lint, type-check, tests)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: ansit_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -40,6 +53,8 @@ jobs:
         run: uv run --directory backend pytest -q
         env:
           ANSIT_REQUIRE_QURAN_DATA: "1" # matcher tests must run, never skip
+          ANSIT_REQUIRE_DB: "1" # database tests must run, never skip
+          TEST_DATABASE_URL: postgresql+asyncpg://postgres:test@localhost:5432/ansit_test
 
   backend-image:
     name: Backend image builds

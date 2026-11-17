@@ -2,7 +2,7 @@
 COMPOSE := docker compose -f infra/docker-compose.yml
 BACKEND := uv run --directory backend
 
-.PHONY: help setup lint format typecheck test check up down logs ps data index models gallery eval eval-audio
+.PHONY: help setup lint format typecheck test check up down logs ps data index models speaker-model registry gallery migrate eval eval-audio eval-reciter
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -46,8 +46,17 @@ data: ## Download Quran text + metadata from Tanzil
 index: ## Build the Quran search index artifact
 	uv run --project backend python ml/scripts/build_index.py
 
-gallery: ## Build the reciter gallery (Phase 3)
-	@echo "make gallery: implemented in Phase 3" && exit 1
+speaker-model: ## Export the speaker embedding model to ONNX (needs the `ml` group)
+	uv run --project backend --group ml python ml/scripts/export_speaker_model.py
+
+registry: ## Rebuild ml/registry/reciters.json from mp3quran + EveryAyah
+	uv run --project backend python ml/scripts/build_registry.py
+
+gallery: ## Build the reciter gallery (add RECITER=id to add/refresh one reciter)
+	uv run --project backend --group ml python ml/scripts/build_gallery.py $(if $(RECITER),--reciter $(RECITER))
+
+migrate: ## Apply database migrations (uses DATABASE_URL)
+	uv run --directory backend alembic upgrade head
 
 models: ## Download + convert the ASR models to CTranslate2 (needs the `ml` group)
 	uv run --project backend --group ml python ml/scripts/convert_models.py --all
@@ -59,3 +68,6 @@ eval-audio: ## Build the audio eval set, run it, write ml/eval/reports/phase2.md
 	uv run --project backend --group ml python ml/eval/build_audio_eval.py
 	uv run --project backend python ml/eval/audio_eval.py run
 	uv run --project backend python ml/eval/audio_eval.py report
+
+eval-reciter: ## Reciter identification evaluation (writes ml/eval/reports/phase3.md)
+	uv run --project backend python ml/eval/reciter_eval.py
