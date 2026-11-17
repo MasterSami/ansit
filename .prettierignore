@@ -3,3 +3,4 @@ ml/data/
 ml/artifacts/
 backend/.venv/
 **/uv.lock
+ml/registry/

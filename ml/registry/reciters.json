@@ -1,0 +1,972 @@
+[
+  {
+    "id": "abdul-basit",
+    "name_ar": "عبدالباسط عبدالصمد",
+    "name_en": "Abdulbasit Abdulsamad",
+    "country": null,
+    "styles": [
+      "mujawwad",
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Abdul_Basit_Murattal_64kbps",
+          "style": "murattal"
+        },
+        {
+          "folder": "Abdul_Basit_Mujawwad_128kbps",
+          "style": "mujawwad"
+        }
+      ],
+      "mp3quran_id": 51,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/abdulbasit-abdulsamad/r3/",
+          "surah_total": 114
+        },
+        {
+          "style": "mujawwad",
+          "server": "https://cdn.mp3quran.net/audio/abdulbasit-abdulsamad/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "basfar",
+    "name_ar": "عبدالله بصفر",
+    "name_en": "Abdullah Basfer",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Abdullah_Basfar_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 60,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/abdullah-basfar/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "sudais",
+    "name_ar": "عبدالرحمن السديس",
+    "name_en": "Abdulrahman Alsudaes",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Abdurrahmaan_As-Sudais_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 54,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/abdulrahman-sudais/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "shatri",
+    "name_ar": "شيخ أبو بكر الشاطري",
+    "name_en": "Shaik Abu Bakr Al Shatri",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Abu_Bakr_Ash-Shaatree_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 4,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/abubakr-shatri/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "ajmy",
+    "name_ar": "أحمد بن علي العجمي",
+    "name_en": "Ahmad Al-Ajmy",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "ahmed_ibn_ali_al_ajamy_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 5,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/ahmad-ajmi/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "alafasy",
+    "name_ar": "مشاري العفاسي",
+    "name_en": "Mishary Alafasi",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Alafasy_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 123,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/mishary-alafasy/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "ghamdi",
+    "name_ar": "سعد الغامدي",
+    "name_en": "Saad Al-Ghamdi",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Ghamadi_40kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 30,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/saad-ghamdi/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "rifai",
+    "name_ar": "هاني الرفاعي",
+    "name_en": "Hani Arrifai",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Hani_Rifai_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 89,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/hani-rifai/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "husary",
+    "name_ar": "محمود خليل الحصري",
+    "name_en": "Mahmoud Khalil Al-Hussary",
+    "country": null,
+    "styles": [
+      "muallim",
+      "mujawwad",
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Husary_64kbps",
+          "style": "murattal"
+        },
+        {
+          "folder": "Husary_Mujawwad_64kbps",
+          "style": "mujawwad"
+        },
+        {
+          "folder": "Husary_Muallim_128kbps",
+          "style": "muallim"
+        }
+      ],
+      "mp3quran_id": 118,
+      "mp3quran_audio": [
+        {
+          "style": "mujawwad",
+          "server": "https://cdn.mp3quran.net/audio/mahmoud-husary/r2/",
+          "surah_total": 114
+        },
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/mahmoud-husary/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "hudhaify",
+    "name_ar": "علي بن عبدالرحمن الحذيفي",
+    "name_en": "Ali Alhuthaifi",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Hudhaify_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 74,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/ali-hudhaifi/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "akhdar",
+    "name_ar": "إبراهيم الأخضر",
+    "name_en": "Ibrahim Al-Akdar",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Ibrahim_Akhdar_32kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 1,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/ibrahim-akhdar/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "muaiqly",
+    "name_ar": "ماهر المعيقلي",
+    "name_en": "Maher Al Meaqli",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Maher_AlMuaiqly_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 102,
+      "mp3quran_audio": [
+        {
+          "style": "mujawwad",
+          "server": "https://cdn.mp3quran.net/audio/maher-muaiqly/r3/",
+          "surah_total": 114
+        },
+        {
+          "style": "muallim",
+          "server": "https://cdn.mp3quran.net/audio/maher-muaiqly/r2/",
+          "surah_total": 38
+        },
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/maher-muaiqly/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "minshawi",
+    "name_ar": "محمد صديق المنشاوي",
+    "name_en": "Mohammed Siddiq Al-Minshawi",
+    "country": null,
+    "styles": [
+      "mujawwad",
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Minshawy_Murattal_128kbps",
+          "style": "murattal"
+        },
+        {
+          "folder": "Minshawy_Mujawwad_64kbps",
+          "style": "mujawwad"
+        }
+      ],
+      "mp3quran_id": 112,
+      "mp3quran_audio": [
+        {
+          "style": "muallim",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-minshawi/r3/",
+          "surah_total": 114
+        },
+        {
+          "style": "mujawwad",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-minshawi/r2/",
+          "surah_total": 114
+        },
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-minshawi/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "tablawi",
+    "name_ar": "محمد الطبلاوي",
+    "name_en": "Mohammad Al-Tablaway",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Mohammad_al_Tablaway_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 106,
+      "mp3quran_audio": [
+        {
+          "style": "mujawwad",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-tablawi/r2/",
+          "surah_total": 114
+        },
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-tablawi/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "ayyub",
+    "name_ar": "محمد أيوب",
+    "name_en": "Mohammed Ayyub",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Muhammad_Ayyoub_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 109,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-ayyub/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "jibreel",
+    "name_ar": "محمد جبريل",
+    "name_en": "Mohammed Jibreel",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Muhammad_Jibreel_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 111,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-jibreel/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "shuraim",
+    "name_ar": "سعود الشريم",
+    "name_en": "Saud Al-Shuraim",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Saood_ash-Shuraym_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 31,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/saud-shuraim/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "bukhatir",
+    "name_ar": "صلاح بو خاطر",
+    "name_en": "Slaah Bukhatir",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Salaah_AbdulRahman_Bukhatir_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 46,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/salah-bukhatir/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "qasim",
+    "name_ar": "عبدالمحسن القاسم",
+    "name_en": "Abdulmohsen Al-Qasim",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Muhsin_Al_Qasim_192kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 67,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/abdulmohsen-qasim/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "juhany",
+    "name_ar": "عبدالله عواد الجهني",
+    "name_en": "Abdullah Al-Johany",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Abdullaah_3awwaad_Al-Juhaynee_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 62,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/abdullah-juhani/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "budair",
+    "name_ar": "صلاح البدير",
+    "name_en": "Salah Albudair",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Salah_Al_Budair_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 43,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/salah-budair/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "matrood",
+    "name_ar": "عبدالله المطرود",
+    "name_en": "Abdullah Al-Mattrod",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Abdullah_Matroud_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 59,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/abdullah-matrood/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "neana",
+    "name_ar": "أحمد نعينع",
+    "name_en": "Ahmad Nauina",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Ahmed_Neana_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 9,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/ahmad-naina/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "yasser-dosari",
+    "name_ar": "ياسر الدوسري",
+    "name_en": "Yasser Al-Dosari",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Yasser_Ad-Dussary_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 92,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/yasser-dosari/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "qatami",
+    "name_ar": "ناصر القطامي",
+    "name_en": "Nasser Alqatami",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Nasser_Alqatami_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 86,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/nasser-qatami/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "ali-jaber",
+    "name_ar": "علي جابر",
+    "name_en": "Ali Jaber",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Ali_Jaber_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 76,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/ali-jaber/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "fares-abbad",
+    "name_ar": "فارس عباد",
+    "name_en": "Fares Abbad",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Fares_Abbad_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 81,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/fares-abbad/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "banna",
+    "name_ar": "محمود علي البنا",
+    "name_en": "Mahmoud Ali Albanna",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "mahmoud_ali_al_banna_32kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 121,
+      "mp3quran_audio": [
+        {
+          "style": "mujawwad",
+          "server": "https://cdn.mp3quran.net/audio/mahmoud-banna/r2/",
+          "surah_total": 114
+        },
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/mahmoud-banna/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "tunaiji",
+    "name_ar": "خليفة الطنيجي",
+    "name_en": "Khalifa Altunaiji",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "khalefa_al_tunaiji_64kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 24,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/khalifa-tunaiji/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "qahtani",
+    "name_ar": "خالد القحطاني",
+    "name_en": "Khaled Al-Qahtani",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Khaalid_Abdullaah_al-Qahtaanee_192kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 21,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/khalid-qahtani/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "sahl-yassin",
+    "name_ar": "سهل ياسين",
+    "name_en": "Sahl Yassin",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Sahl_Yassin_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 32,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/sahl-yassin/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "yasser-salamah",
+    "name_ar": "ياسر سلامة",
+    "name_en": "Yasser Salamah",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Yaser_Salamah_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 152,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/yasser-salama/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "alaqmi",
+    "name_ar": "أكرم العلاقمي",
+    "name_en": "Akram Alalaqmi",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Akram_AlAlaqimy_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 10,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/akram-alaqmi/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "souasi",
+    "name_ar": "علي حجاج السويسي",
+    "name_en": "Ali Hajjaj Alsouasi",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Ali_Hajjaj_AlSuesy_128kbps",
+          "style": "murattal"
+        }
+      ],
+      "mp3quran_id": 77,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/ali-souissi/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "sowaid",
+    "name_ar": "أيمن رشدي سويد",
+    "name_en": "Ayman Rushdi Swaid",
+    "country": null,
+    "styles": [
+      "muallim"
+    ],
+    "sources": {
+      "everyayah": [
+        {
+          "folder": "Ayman_Sowaid_64kbps",
+          "style": "muallim"
+        }
+      ],
+      "mp3quran_id": 21203,
+      "mp3quran_audio": [
+        {
+          "style": "muallim",
+          "server": "https://server15.mp3quran.net/a-rushdi/Almusshaf-Al-Mo-lim/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  }
+]
