@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     # Placeholder, NOT calibrated until Phase 3.
     reciter_threshold: float = Field(default=0.5, ge=-1, le=1)
 
+    quran_index_path: str = "../ml/artifacts/quran_index.json.gz"
+
     # --- audio limits ---
     min_speech_sec: float = Field(default=1.5, gt=0)
     min_clip_sec: float = Field(default=3.0, gt=0)
@@ -44,6 +46,14 @@ class Settings(BaseSettings):
     asr_compute_type: str = "int8"
     cpu_threads_asr: int = Field(default=2, ge=1)
     cpu_threads_speaker: int = Field(default=2, ge=1)
+
+    # --- speech detection and hallucination guards ---
+    # Low on purpose: Silero under-detects recitation (see app/audio/vad.py).
+    vad_threshold: float = Field(default=0.15, gt=0, lt=1)
+    vad_trim_silence: bool = False
+    asr_max_no_speech_prob: float = Field(default=0.6, ge=0, le=1)
+    asr_min_avg_logprob: float = Field(default=-1.0, le=0)
+    asr_max_compression_ratio: float = Field(default=2.4, gt=0)
 
     @field_validator("cors_origins", mode="before")
     @classmethod
