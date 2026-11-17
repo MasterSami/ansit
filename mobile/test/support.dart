@@ -118,6 +118,7 @@ class FakeApi implements AnsitApi {
   final feedback = <FeedbackReport>[];
   Object? reciterError;
   bool noReciters = false;
+  bool noAyahAudio = false;
   Completer<void>? identifyGate;
 
   @override
@@ -159,11 +160,13 @@ class FakeApi implements AnsitApi {
     return ReciterDetail(
       id: id,
       nameAr: 'مشاري العفاسي',
-      styles: const ['murattal', 'mujawwad'],
-      audioTemplates: const {
-        'murattal': 'https://audio.test/murattal/{sss}{aaa}.mp3',
-        'mujawwad': 'https://audio.test/mujawwad/{sss}{aaa}.mp3',
-      },
+      styles: noAyahAudio ? const ['murattal'] : const ['murattal', 'mujawwad'],
+      audioTemplates: noAyahAudio
+          ? const {}
+          : const {
+              'murattal': 'https://audio.test/murattal/{sss}{aaa}.mp3',
+              'mujawwad': 'https://audio.test/mujawwad/{sss}{aaa}.mp3',
+            },
     );
   }
 

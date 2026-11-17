@@ -173,8 +173,11 @@ async function listen(page: Page) {
   await page.getByRole("link", { name: "اضغط لتنصت" }).click();
   const allow = page.getByRole("button", { name: "السماح بالمايكروفون" });
   const listening = page.getByText("جارٍ الإنصات…");
-  await expect(allow.or(listening)).toBeVisible();
-  if (await allow.isVisible()) await allow.click();
+  // Retried as a unit: on first load both can be in the page for a moment.
+  await expect(async () => {
+    if (await allow.isVisible()) await allow.click({ timeout: 1_000 });
+    await expect(listening).toBeVisible({ timeout: 1_000 });
+  }).toPass();
   await expect(page.getByText("جارٍ الإنصات…")).toBeVisible();
   // The server rejects clips under 3 s, so the app keeps recording until then.
   await page.waitForTimeout(3_300);

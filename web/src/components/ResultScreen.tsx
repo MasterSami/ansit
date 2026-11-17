@@ -157,7 +157,11 @@ function MatchView({
       const audio =
         detail.ayah_audio.find((a) => a.style === wanted) ??
         detail.ayah_audio[0];
-      if (!audio) throw new Error("no audio for this reciter");
+      if (!audio) {
+        // Known voice, but no per-ayah recording to play (mp3quran-only reciters).
+        setNotice(t("player.noAyahAudio"));
+        return;
+      }
       player.play({
         reciterId: detail.id,
         reciterName: detail.name_ar,

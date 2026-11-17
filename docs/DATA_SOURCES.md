@@ -173,12 +173,19 @@ Silero VAD is the ONNX model bundled inside the `faster-whisper` package
   2 = mujawwad, 3 = muallim (checked against the Arabic labels for six
   reciters). Other kinds exist (a "special recitation", a dated recording) and
   are ignored.
-- `server` is the base URL for full-surah audio: `<server><SSS>.mp3`. **This
-  URL pattern is taken from the API's own data and has not been fetched yet**;
-  it is verified in the phase that builds "continue listening".
+- `server` is the base URL for full-surah audio: `<server><SSS>.mp3`.
+  **Fetched and decoded on 2026-11-17** for three reciters (ids 107, 137, 273;
+  surahs 13, 15, 25, 31, 32, 34, 36, 67) from `cdn.mp3quran.net`. A reciter
+  may lack some surahs (404), as `surah_list` says.
 - **No country field.** The registry's `country` is null for every reciter.
-- No license or terms were found in the API responses. We use names and links
-  only; no audio is taken from mp3quran.
+- No license or terms were found in the API responses.
+- **Use of the audio:** for three reciters that EveryAyah does not have
+  (Ahmad Talib bin Humaid, Mohammed Al-Lohaidan, Haitham Aldukhain), six
+  full-surah files each were downloaded to build voice embeddings. As with
+  EveryAyah, only embeddings are kept in the gallery; the audio stays in the
+  local, uncommitted cache and is not redistributed. For Haitham Aldukhain the
+  only Hafs recording is filed as kind 4 ("special recitation"); it is used
+  and labelled murattal.
 
 ## Reciter registry
 

@@ -76,6 +76,15 @@ RECITERS: dict[str, tuple[int, dict[str, str]]] = {
     "sowaid": (21203, {"Ayman_Sowaid_64kbps": "muallim"}),
 }
 
+# Reciters with no per-ayah recording on EveryAyah: slug -> mp3quran reciter id.
+# Their gallery voice is built from mp3quran's full-surah files, and the apps
+# cannot offer per-ayah playback for them.
+MP3QURAN_ONLY: dict[str, int] = {
+    "ahmad-talib": 137,
+    "luhaidan": 107,
+    "dukhain": 273,
+}
+
 # mp3quran labels each recording ("moshaf") in Arabic; these markers are
 # compared after reading them from the API response, see _style_of().
 HAFS_REWAYA_ID = 1
@@ -103,7 +112,8 @@ def main() -> int:
     }
 
     registry = []
-    for slug, (mq_id, sources) in RECITERS.items():
+    everyone = {**RECITERS, **{slug: (mq_id, {}) for slug, mq_id in MP3QURAN_ONLY.items()}}
+    for slug, (mq_id, sources) in everyone.items():
         if mq_id not in by_lang["ar"] or mq_id not in by_lang["eng"]:
             raise SystemExit(f"{slug}: mp3quran has no reciter {mq_id}")
         unknown = set(sources) - listed
@@ -113,15 +123,24 @@ def main() -> int:
             {"style": style, "server": moshaf["server"], "surah_total": moshaf["surah_total"]}
             for moshaf in by_lang["ar"][mq_id]["moshaf"]
             if moshaf["rewaya_id"] == HAFS_REWAYA_ID
-            and (style := _style_of(moshaf["moshaf_type"])) is not None
+            and (
+                style := _style_of(moshaf["moshaf_type"])
+                # mp3quran files some Hafs recordings under other kinds (for
+                # example "special recitation"); for reciters we only have
+                # there, those count as murattal.
+                or ("murattal" if slug in MP3QURAN_ONLY else None)
+            )
+            is not None
         ]
+        if not sources and not audio:
+            raise SystemExit(f"{slug}: no EveryAyah folder and no Hafs recording on mp3quran")
         registry.append(
             {
                 "id": slug,
                 "name_ar": by_lang["ar"][mq_id]["name"].strip(),
                 "name_en": " ".join(by_lang["eng"][mq_id]["name"].split()),
                 "country": None,
-                "styles": sorted(set(sources.values())),
+                "styles": sorted(set(sources.values()) or {a["style"] for a in audio}),
                 "sources": {
                     "everyayah": [{"folder": f, "style": s} for f, s in sources.items()],
                     "mp3quran_id": mq_id,

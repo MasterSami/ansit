@@ -137,6 +137,7 @@
   "permissionTitle": "نحتاج إذن المايكروفون لنُنصت معك",
   "playerFailed": "تعذّر تشغيل التلاوة",
   "playerLabel": "مشغّل التلاوة",
+  "playerNoAyahAudio": "لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات حتى الآن",
   "playerNowPlaying": "سورة {surah} · الآية {ayah}",
   "@playerNowPlaying": {
     "placeholders": {

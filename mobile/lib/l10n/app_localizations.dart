@@ -670,6 +670,12 @@ abstract class AppLocalizations {
   /// **'مشغّل التلاوة'**
   String get playerLabel;
 
+  /// No description provided for @playerNoAyahAudio.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات حتى الآن'**
+  String get playerNoAyahAudio;
+
   /// No description provided for @playerNowPlaying.
   ///
   /// In ar, this message translates to:

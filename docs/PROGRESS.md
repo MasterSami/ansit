@@ -633,6 +633,45 @@ read during `dispose`.
    favourites are stored but not listed; tafsir and mushaf are placeholders;
    no Dockerfile for the web app.
 
+## After Phase 6 — changes from the owner's first trial (2026-11-17)
+
+The owner ran the backend and the web app on Windows. Ayah identification
+worked; reciter accuracy was judged "very reasonable" once the gallery files
+were in place.
+
+- **Reciter recognition silently off.** Without `resnet34.onnx` and
+  `gallery.npz` the server returns no reciter. The apps showed that as "not
+  sure of the voice" with an empty reciter list. They now say recognition is
+  unavailable. README explains the `/readyz` check.
+- **Three reciters added on request**: Ahmad Talib bin Humaid, Mohammed
+  Al-Lohaidan, Haitham Aldukhain. EveryAyah does not have them, so the gallery
+  builder gained a second source: 10-second windows from six of mp3quran's
+  full-surah files per reciter. Gallery: 38 reciters, 42 voices, 5,030 clips.
+- Check on surahs the gallery never saw (36 and 67; 24 clips of 8 s per
+  reciter and condition; `ml/eval/added_reciters_check.py`), at the service's
+  settings (0.725 / 0.12):
+
+  | Reciter     | Clean: named right | Phone-like: named right | Named wrong | As a stranger: wrongly named |
+  | ----------- | ------------------ | ----------------------- | ----------- | ---------------------------- |
+  | ahmad-talib | 24 / 24            | 20 / 24                 | 0           | 0 / 48                       |
+  | luhaidan    | 24 / 24            | 22 / 24                 | 0           | 1 / 48                       |
+  | dukhain     | 24 / 24            | 14 / 24                 | 0           | 0 / 48                       |
+
+  **Caveat:** queries and gallery come from the same recording series, so
+  these are optimistic. A different recording of the same reciter is untested.
+
+- The 35 earlier reciters, re-measured with the larger gallery at the same
+  settings: 2.9% false accepts, 81.5% identified, 0.6% misidentified, 17.9%
+  unknown (before: 4.1% / 82.5% / 0.5% / 17.0%). Re-calibration would now
+  pick margin 0 (3.5% / 83.8%); the settings were left as they are.
+  `ml/eval/reports/phase3.md` now states the service's settings separately
+  from the calibration optimum.
+- **Limitation:** the three new reciters have no per-ayah audio. "Continue
+  listening" and the reciter page say so instead of playing. Playing
+  mp3quran's full-surah files is possible but not built.
+- Tests now: backend 198 passed (12 need models, skipped in CI), web 20 unit +
+  7 browser, mobile 58.
+
 ### Next
 
 Phase 7 is optional in the brief (audio-fingerprint fast path, feedback

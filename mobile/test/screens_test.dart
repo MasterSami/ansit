@@ -331,6 +331,21 @@ void main() {
       expect(find.text(t.playerFailed), findsOneWidget);
     });
 
+    testWidgets('says so when the reciter has no per-ayah audio', (
+      tester,
+    ) async {
+      final h = await pumpApp(
+        tester,
+        location: '/result/id-match',
+        history: [entryFixture()],
+        setup: (h) => h.api.noAyahAudio = true,
+      );
+      await tester.tap(find.text(t.resultContinueListening));
+      await settle(tester);
+      expect(find.text(t.playerNoAyahAudio), findsOneWidget);
+      expect(h.sink.urls, isEmpty);
+    });
+
     testWidgets('an unknown id explains and links to the history', (
       tester,
     ) async {
@@ -427,6 +442,21 @@ void main() {
       await tester.tap(find.bySemanticsLabel(t.reciterPlaySurah('الفاتحة')));
       await settle(tester);
       expect(h.sink.urls, ['https://audio.test/mujawwad/001001.mp3']);
+    });
+
+    testWidgets('explains when there is nothing to play', (tester) async {
+      final h = await pumpApp(
+        tester,
+        location: '/reciter/luhaidan',
+        setup: (h) => h.api.noAyahAudio = true,
+      );
+      expect(find.text(t.playerNoAyahAudio), findsOneWidget);
+      await tester.tap(
+        find.bySemanticsLabel(t.reciterPlaySurah('الفاتحة')),
+        warnIfMissed: false,
+      );
+      await settle(tester, 2);
+      expect(h.sink.urls, isEmpty);
     });
 
     testWidgets('remembers a favourite reciter', (tester) async {

@@ -319,6 +319,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get playerLabel => 'مشغّل التلاوة';
 
   @override
+  String get playerNoAyahAudio =>
+      'لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات حتى الآن';
+
+  @override
   String playerNowPlaying(String ayah, String surah) {
     return 'سورة $surah · الآية $ayah';
   }

@@ -169,6 +169,7 @@ class _MatchViewState extends ConsumerState<_MatchView> {
 
   Future<void> _continueListening() async {
     final failed = context.t.playerFailed;
+    final noAudio = context.t.playerNoAyahAudio;
     final reciterId =
         entry.reciterId ??
         entry.reciter?.alternatives.firstOrNull?.id ??
@@ -177,7 +178,13 @@ class _MatchViewState extends ConsumerState<_MatchView> {
       final detail = await ref.read(reciterProvider(reciterId).future);
       final wanted = entry.userReciterId == null ? entry.reciter?.style : null;
       final template =
-          detail.audioTemplates[wanted] ?? detail.audioTemplates.values.first;
+          detail.audioTemplates[wanted] ??
+          detail.audioTemplates.values.firstOrNull;
+      if (template == null) {
+        // Known voice, but no per-ayah recording to play.
+        if (mounted) setState(() => _notice = noAudio);
+        return;
+      }
       final ok = await ref
           .read(playerProvider.notifier)
           .play(

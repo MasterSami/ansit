@@ -968,5 +968,68 @@
       ]
     },
     "active": true
+  },
+  {
+    "id": "ahmad-talib",
+    "name_ar": "أحمد طالب بن حميد",
+    "name_en": "Ahmad Talib bin Humaid",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [],
+      "mp3quran_id": 137,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/ahmad-humaid/r1/",
+          "surah_total": 107
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "luhaidan",
+    "name_ar": "محمد اللحيدان",
+    "name_en": "Mohammed Al-Lohaidan",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [],
+      "mp3quran_id": 107,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/muhammad-luhaidan/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
+  },
+  {
+    "id": "dukhain",
+    "name_ar": "هيثم الدخين",
+    "name_en": "Haitham Aldukhain",
+    "country": null,
+    "styles": [
+      "murattal"
+    ],
+    "sources": {
+      "everyayah": [],
+      "mp3quran_id": 273,
+      "mp3quran_audio": [
+        {
+          "style": "murattal",
+          "server": "https://cdn.mp3quran.net/audio/haitham-dukhain/r1/",
+          "surah_total": 114
+        }
+      ]
+    },
+    "active": true
   }
 ]

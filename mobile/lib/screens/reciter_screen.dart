@@ -192,6 +192,18 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                   ),
                 ),
               ),
+            if (template == null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Semantics(
+                  liveRegion: true,
+                  child: Text(
+                    t.playerNoAyahAudio,
+                    textAlign: TextAlign.center,
+                    style: ts(13, color: c.muted),
+                  ),
+                ),
+              ),
             Expanded(
               child: surahs.isEmpty
                   ? const Center(child: CircularProgressIndicator())
@@ -254,8 +266,13 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                                 CircleIconButton(
                                   icon: Icons.play_arrow_rounded,
                                   label: t.reciterPlaySurah(surah.nameAr),
-                                  onPressed: () =>
-                                      play(surah.number, stopAtSurahEnd: true),
+                                  color: template == null ? c.track : null,
+                                  onPressed: template == null
+                                      ? null
+                                      : () => play(
+                                          surah.number,
+                                          stopAtSurahEnd: true,
+                                        ),
                                 ),
                               ],
                             ),

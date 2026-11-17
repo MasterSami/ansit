@@ -29,6 +29,7 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "backend"))
 
 from app.audio.decode import decode_audio
+from app.core.config import Settings
 from app.speaker.engine import OnnxSpeakerEngine
 from app.speaker.gallery import Gallery
 
@@ -311,6 +312,9 @@ def main() -> int:
     # ---- shipped setting: calibrated on every reciter (not an unbiased estimate) ----
     floor, margin = calibrate(queries, MARGINS, CALIBRATION_LIMIT)
     shipped = summarize(queries, floor, margin)
+    # What the service actually runs with (its configured defaults).
+    service = Settings()
+    configured = summarize(queries, service.reciter_threshold, service.reciter_min_margin)
 
     # ---- closed set ----
     closed_rows = []
@@ -537,9 +541,15 @@ was no third group to hold back for that.
 
 ## Shipped setting
 
-`RECITER_THRESHOLD = {floor:g}`, `RECITER_MIN_MARGIN = {margin:g}`, calibrated on all
-{len(reciters)} reciters. On those same clips it gives {100 * shipped["false_accept"]:.1f}% false accepts and
+Calibrating on all {len(reciters)} evaluated reciters gives threshold {floor:g} and margin
+{margin:g}: on those same clips, {100 * shipped["false_accept"]:.1f}% false accepts and
 {100 * shipped["identified"]:.1f}% identified; the two-fold figures above are the fair estimate.
+
+**The service's defaults are `RECITER_THRESHOLD = {service.reciter_threshold:g}` and
+`RECITER_MIN_MARGIN = {service.reciter_min_margin:g}`.** With those, on these clips:
+{100 * configured["false_accept"]:.1f}% false accepts, {100 * configured["identified"]:.1f}% identified,
+{100 * configured["misidentified"]:.1f}% misidentified, {100 * configured["unknown"]:.1f}% unknown.
+Tables below marked "shipped setting" use the calibrated pair above.
 
 ## Closed-set accuracy (every reciter in the gallery, no rejection)
 

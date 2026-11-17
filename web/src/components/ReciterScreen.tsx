@@ -224,6 +224,11 @@ export function ReciterScreen() {
       )}
 
       <main className="flex grow flex-col gap-2 px-5 pt-4">
+        {!template && (
+          <p role="status" className="pb-1 text-center text-[13px] text-muted">
+            {t("player.noAyahAudio")}
+          </p>
+        )}
         {ordered === null
           ? Array.from({ length: 6 }, (_, i) => (
               <Skeleton key={i} className="h-[60px]" />
@@ -255,7 +260,8 @@ export function ReciterScreen() {
                     type="button"
                     aria-label={t("reciter.playSurah", { name: surah.name_ar })}
                     onClick={() => play(surah.number, true)}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-2"
+                    disabled={!template}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-2 disabled:text-track"
                   >
                     <PlayIcon size={14} />
                   </button>
