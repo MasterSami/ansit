@@ -21,6 +21,7 @@ dependencies = [
     "alembic>=1.13",
     "onnxruntime>=1.17",
     "python-multipart>=0.0.9",
+    "truststore>=0.9",
 ]
 
 [dependency-groups]

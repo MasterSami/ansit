@@ -24,6 +24,10 @@ import numpy as np
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "backend"))
+
+from app.core.system_certs import use_system_certs_if_requested
+
+use_system_certs_if_requested()
 sys.path.insert(0, str(REPO / "ml" / "eval"))
 
 from build_audio_eval import encode, phone_like

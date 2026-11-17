@@ -12,6 +12,11 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "backend"))
+
+from app.core.system_certs import use_system_certs_if_requested
+
+use_system_certs_if_requested()
 OUT_DIR = REPO / "ml" / "artifacts" / "asr"
 
 # name -> (Hugging Face repo, pinned revision, license). Verified in docs/DATA_SOURCES.md.

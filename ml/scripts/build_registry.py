@@ -14,6 +14,11 @@ from pathlib import Path
 import httpx
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "backend"))
+
+from app.core.system_certs import use_system_certs_if_requested
+
+use_system_certs_if_requested()
 OUT = REPO / "ml" / "registry" / "reciters.json"
 MP3QURAN = "https://www.mp3quran.net/api/v3/reciters"
 
