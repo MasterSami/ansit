@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+/* Design tokens (build brief §8). Dark is the default; light follows the system
+   preference unless the user picked a theme in Settings (data-theme on <html>). */
+:root {
+  color-scheme: dark;
+  --bg: #0e1512;
+  --surface: #16201b;
+  --surface-2: #1e2a24;
+  --border: #2a3731;
+  --divider: #24302a;
+  --nav-bg: #101814;
+  --nav-border: #1f2a25;
+  --text: #f2ede3;
+  --text-muted: #a3afa8;
+  --accent: #d9b36c;
+  --accent-rgb: 217 179 108;
+  --on-accent: #0e1512;
+  --accent-soft: rgb(217 179 108 / 0.14);
+  --warning-bg: rgb(224 122 95 / 0.16);
+  --warning-text: #f0a48f;
+  --recording-dot: #e07a5f;
+  --track: #3a4842;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f4ec;
+  --surface: #ffffff;
+  --surface-2: #f1ecdf;
+  --border: #e4ded0;
+  --divider: #ebe5d8;
+  --nav-bg: #ffffff;
+  --nav-border: #e4ded0;
+  --text: #1a211d;
+  --text-muted: #5c6660;
+  --accent: #8a6620;
+  --accent-rgb: 138 102 32;
+  --on-accent: #ffffff;
+  --accent-soft: rgb(138 102 32 / 0.1);
+  --warning-bg: rgb(190 84 56 / 0.12);
+  --warning-text: #a8442a;
+  --recording-dot: #c9573b;
+  --track: #cfc8b8;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: #f7f4ec;
+    --surface: #ffffff;
+    --surface-2: #f1ecdf;
+    --border: #e4ded0;
+    --divider: #ebe5d8;
+    --nav-bg: #ffffff;
+    --nav-border: #e4ded0;
+    --text: #1a211d;
+    --text-muted: #5c6660;
+    --accent: #8a6620;
+    --accent-rgb: 138 102 32;
+    --on-accent: #ffffff;
+    --accent-soft: rgb(138 102 32 / 0.1);
+    --warning-bg: rgb(190 84 56 / 0.12);
+    --warning-text: #a8442a;
+    --recording-dot: #c9573b;
+    --track: #cfc8b8;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-divider: var(--divider);
+  --color-nav-bg: var(--nav-bg);
+  --color-nav-border: var(--nav-border);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning: var(--warning-text);
+  --color-recording: var(--recording-dot);
+  --color-track: var(--track);
+  --font-sans: var(--font-plex), system-ui, sans-serif;
+  --font-display: var(--font-amiri), serif;
+  --font-quran: var(--font-amiri-quran), var(--font-amiri), serif;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- motion ------------------------------------------------------------- */
+
+@keyframes ansit-breath {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.9;
+  }
+}
+
+@keyframes ansit-pulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes ansit-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ansit-shimmer {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+
+.ansit-ring {
+  animation: ansit-breath 3.2s ease-in-out infinite;
+}
+.ansit-ring-2 {
+  animation: ansit-breath 3.2s ease-in-out 0.6s infinite;
+}
+.ansit-pulse {
+  animation: ansit-pulse 2.4s ease-out infinite;
+}
+.ansit-pulse-2 {
+  animation: ansit-pulse 2.4s ease-out 0.8s infinite;
+}
+.ansit-pulse-3 {
+  animation: ansit-pulse 2.4s ease-out 1.6s infinite;
+}
+.ansit-bar {
+  transform-origin: center;
+  animation: ansit-bar 1.1s ease-in-out infinite;
+}
+.ansit-skeleton {
+  background: var(--surface-2);
+  animation: ansit-shimmer 1.6s ease-in-out infinite;
+}
+
+/* Respect "reduce motion": no breathing, pulsing or bouncing. */
+@media (prefers-reduced-motion: reduce) {
+  .ansit-ring,
+  .ansit-ring-2,
+  .ansit-pulse,
+  .ansit-pulse-2,
+  .ansit-pulse-3,
+  .ansit-bar,
+  .ansit-skeleton {
+    animation: none;
+  }
+  .ansit-pulse,
+  .ansit-pulse-2,
+  .ansit-pulse-3 {
+    opacity: 0.25;
+    transform: none;
+  }
+}

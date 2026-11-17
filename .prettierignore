@@ -4,3 +4,8 @@ ml/artifacts/
 backend/.venv/
 **/uv.lock
 ml/registry/
+web/.next/
+web/node_modules/
+web/package-lock.json
+web/test-results/
+web/next-env.d.ts
