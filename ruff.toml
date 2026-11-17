@@ -13,6 +13,7 @@ ignore = ["RUF001", "RUF002", "RUF003"]
 # The markdown report template has table rows that cannot be wrapped.
 "ml/eval/text_eval.py" = ["T20", "E402", "E501"]
 "ml/eval/audio_eval.py" = ["T20", "E402", "E501"]
+"ml/eval/reciter_eval.py" = ["T20", "E402", "E501"]
 
 [lint.isort]
 known-first-party = ["app"]
