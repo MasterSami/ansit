@@ -35,7 +35,7 @@ export function FeedbackSheet({
   const tc = useTranslations("common");
   const dialog = useRef<HTMLDialogElement>(null);
   const [kind, setKind] = useState<Kind>(initialKind);
-  const [reciters, setReciters] = useState<ReciterSummary[]>([]);
+  const [reciters, setReciters] = useState<ReciterSummary[] | null>(null);
   const [reciterId, setReciterId] = useState("");
   const [surah, setSurah] = useState("");
   const [ayah, setAyah] = useState("");
@@ -45,7 +45,7 @@ export function FeedbackSheet({
 
   useEffect(() => {
     dialog.current?.showModal();
-    getReciters().then(setReciters, () => undefined);
+    getReciters().then(setReciters, () => setReciters([]));
   }, []);
 
   const submit = async () => {
@@ -62,7 +62,7 @@ export function FeedbackSheet({
       body.correct_surah = surahNumber;
       body.correct_ayah = ayahNumber;
     }
-    const picked = reciters.find((reciter) => reciter.id === reciterId);
+    const picked = (reciters ?? []).find((reciter) => reciter.id === reciterId);
     if (kind === "wrong_reciter" && picked) body.correct_reciter_id = picked.id;
     try {
       await sendFeedback(body);
@@ -156,23 +156,29 @@ export function FeedbackSheet({
             </div>
           )}
 
-          {kind === "wrong_reciter" && (
-            <label className="flex flex-col gap-1.5 text-[13px] text-muted">
-              {t("chooseReciter")} ({t("optional")})
-              <select
-                className={field}
-                value={reciterId}
-                onChange={(event) => setReciterId(event.target.value)}
-              >
-                <option value="">—</option>
-                {reciters.map((reciter) => (
-                  <option key={reciter.id} value={reciter.id}>
-                    {reciter.name_ar}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          {kind === "wrong_reciter" &&
+            (reciters === null || reciters.length > 0 ? (
+              <label className="flex flex-col gap-1.5 text-[13px] text-muted">
+                {t("chooseReciter")} ({t("optional")})
+                <select
+                  className={field}
+                  value={reciterId}
+                  onChange={(event) => setReciterId(event.target.value)}
+                >
+                  <option value="">—</option>
+                  {(reciters ?? []).map((reciter) => (
+                    <option key={reciter.id} value={reciter.id}>
+                      {reciter.name_ar}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : (
+              // The server has no reciter list (voice recognition is off there).
+              <p role="status" className="text-[13px] text-warning">
+                {t("noReciters")}
+              </p>
+            ))}
 
           <p className="text-xs text-muted">{t("note")}</p>
           {state === "failed" && (

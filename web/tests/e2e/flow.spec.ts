@@ -307,6 +307,15 @@ test("shows a rate-limit message when the server says slow down", async ({
   await expect(page.getByRole("heading", { name: "تمهّل قليلًا" })).toBeVisible();
 });
 
+test("says so when the server cannot recognise reciters", async ({ page }) => {
+  await mockApi(page, { ...MATCH, reciter: null });
+  await listen(page);
+  await expect(
+    page.getByText("التعرّف على القارئ غير متاح حاليًا"),
+  ).toBeVisible();
+  await expect(page.getByText("لم نتأكد من صوت القارئ")).toHaveCount(0);
+});
+
 test("switches theme and remembers it", async ({ page }) => {
   await mockApi(page, MATCH);
   await page.goto("/settings");

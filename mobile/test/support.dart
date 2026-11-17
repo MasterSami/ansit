@@ -117,6 +117,7 @@ class FakeApi implements AnsitApi {
   final previousIds = <String?>[];
   final feedback = <FeedbackReport>[];
   Object? reciterError;
+  bool noReciters = false;
   Completer<void>? identifyGate;
 
   @override
@@ -145,10 +146,12 @@ class FakeApi implements AnsitApi {
       ayahFixture(surah: surah, ayah: ayah, nameAr: 'الرحمن');
 
   @override
-  Future<List<ReciterSummary>> reciters() async => const [
-    ReciterSummary(id: 'alafasy', nameAr: 'مشاري العفاسي'),
-    ReciterSummary(id: 'husary', nameAr: 'محمود خليل الحصري'),
-  ];
+  Future<List<ReciterSummary>> reciters() async => noReciters
+      ? const []
+      : const [
+          ReciterSummary(id: 'alafasy', nameAr: 'مشاري العفاسي'),
+          ReciterSummary(id: 'husary', nameAr: 'محمود خليل الحصري'),
+        ];
 
   @override
   Future<ReciterDetail> reciter(String id) async {

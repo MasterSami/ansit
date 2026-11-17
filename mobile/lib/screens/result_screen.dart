@@ -446,7 +446,9 @@ class _MatchViewState extends ConsumerState<_MatchView> {
                                         style: ts(17, weight: FontWeight.w700),
                                       ),
                                       Text(
-                                        t.resultUnknownHint,
+                                        reciter == null
+                                            ? t.resultReciterUnavailable
+                                            : t.resultUnknownHint,
                                         style: ts(13, color: c.muted),
                                       ),
                                     ],

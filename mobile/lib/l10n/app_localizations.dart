@@ -238,6 +238,12 @@ abstract class AppLocalizations {
   /// **'تعذّر الإرسال. حاول مرة أخرى.'**
   String get feedbackFailed;
 
+  /// No description provided for @feedbackNoReciters.
+  ///
+  /// In ar, this message translates to:
+  /// **'قائمة القرّاء غير متاحة الآن. يمكنك إرسال الملاحظة بدون اختيار قارئ.'**
+  String get feedbackNoReciters;
+
   /// No description provided for @feedbackNote.
   ///
   /// In ar, this message translates to:
@@ -789,6 +795,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'القارئ'**
   String get resultReciterSection;
+
+  /// No description provided for @resultReciterUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'التعرّف على القارئ غير متاح حاليًا'**
+  String get resultReciterUnavailable;
 
   /// No description provided for @resultSave.
   ///

@@ -93,6 +93,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get feedbackFailed => 'تعذّر الإرسال. حاول مرة أخرى.';
 
   @override
+  String get feedbackNoReciters =>
+      'قائمة القرّاء غير متاحة الآن. يمكنك إرسال الملاحظة بدون اختيار قارئ.';
+
+  @override
   String get feedbackNote =>
       'نرسل الملاحظة فقط، ولا يوجد تسجيل محفوظ مرتبط بها.';
 
@@ -384,6 +388,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get resultReciterSection => 'القارئ';
+
+  @override
+  String get resultReciterUnavailable => 'التعرّف على القارئ غير متاح حاليًا';
 
   @override
   String get resultSave => 'حفظ';

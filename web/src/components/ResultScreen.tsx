@@ -300,7 +300,11 @@ function MatchView({
                   {t("result.unknownReciter")}
                 </span>
                 <span className="text-[13px] text-muted">
-                  {t("result.unknownHint")}
+                  {t(
+                    reciter
+                      ? "result.unknownHint"
+                      : "result.reciterUnavailable",
+                  )}
                 </span>
               </div>
               <button

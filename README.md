@@ -25,6 +25,11 @@ make gallery        # reciter gallery: downloads ~620 MB of recitation, takes ~2
 To try ayah identification without waiting for the gallery, skip the last
 step and run with `RECITER_ENABLED=false`.
 
+Check what loaded at `/readyz`. If `speaker_model` or `reciter_gallery` says
+`failed`, ayahs are still identified but every reciter comes back empty, and
+the apps say that reciter recognition is unavailable. The two files it needs
+are `ml/artifacts/speaker/resnet34.onnx` and `ml/artifacts/gallery.npz`.
+
 ### 2. Run it
 
 Without Docker (no Postgres or Redis needed):

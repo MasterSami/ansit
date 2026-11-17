@@ -98,7 +98,10 @@ class _FeedbackSheetState extends ConsumerState<_FeedbackSheet> {
   Widget build(BuildContext context) {
     final c = context.colors;
     final t = context.t;
-    final reciters = ref.watch(recitersProvider).value ?? const [];
+    final recitersAsync = ref.watch(recitersProvider);
+    final reciters = recitersAsync.value ?? const <api.ReciterSummary>[];
+    // Loaded but empty, or failed: the server has no reciter list.
+    final noReciters = !recitersAsync.isLoading && reciters.isEmpty;
     final kinds = [
       ('wrong_ayah', t.feedbackWrongAyah),
       ('wrong_reciter', t.feedbackWrongReciter),
@@ -195,7 +198,15 @@ class _FeedbackSheetState extends ConsumerState<_FeedbackSheet> {
                   ),
                 ],
               ),
-            if (_kind == 'wrong_reciter')
+            if (_kind == 'wrong_reciter' && noReciters)
+              Semantics(
+                liveRegion: true,
+                child: Text(
+                  t.feedbackNoReciters,
+                  style: ts(13, color: c.warning),
+                ),
+              ),
+            if (_kind == 'wrong_reciter' && !noReciters)
               DropdownButtonFormField<api.ReciterSummary>(
                 initialValue: _reciter,
                 isExpanded: true,

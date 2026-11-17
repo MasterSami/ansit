@@ -239,6 +239,23 @@ void main() {
       expect(find.text(t.resultUnknownReciter), findsNothing);
     });
 
+    testWidgets('says so when the server cannot recognise reciters', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        location: '/result/id-match',
+        history: [entryFixture(reciter: null)],
+        setup: (h) => h.api.noReciters = true,
+      );
+      expect(find.text(t.resultReciterUnavailable), findsOneWidget);
+      expect(find.text(t.resultUnknownHint), findsNothing);
+
+      await tester.tap(find.text(t.resultAddName));
+      await settle(tester);
+      expect(find.text(t.feedbackNoReciters), findsOneWidget);
+    });
+
     testWidgets('saving marks the entry', (tester) async {
       final h = await pumpApp(
         tester,
