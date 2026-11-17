@@ -19,6 +19,7 @@ class FasterWhisperEngine:
         compute_type: str = "int8",
         cpu_threads: int = 2,
         beam_size: int = 5,
+        num_workers: int = 1,
     ) -> None:
         path = Path(model_path)
         if not (path / "model.bin").is_file():
@@ -31,6 +32,8 @@ class FasterWhisperEngine:
             device=device,
             compute_type=compute_type,
             cpu_threads=cpu_threads,
+            # How many transcriptions may run in parallel, each with `cpu_threads`.
+            num_workers=num_workers,
             local_files_only=True,
         )
 

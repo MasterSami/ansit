@@ -11,7 +11,7 @@ from typing import Literal
 
 from app.asr.engine import ASREngine, ASRResult
 from app.asr.guards import GuardConfig, GuardFlag, check_asr_result
-from app.audio.decode import SAMPLE_RATE, decode_audio
+from app.audio.decode import SAMPLE_RATE, Waveform, decode_audio
 from app.audio.vad import SpeechDetector
 from app.matcher.search import AyahMatcher, MatchResult
 
@@ -61,14 +61,15 @@ class AyahIdentifier:
     def identify(self, data: bytes) -> AyahIdentification:
         """Raises AudioError for uploads that cannot be processed at all
         (undecodable, too large, too long). Everything else is a result."""
+        started = time.perf_counter()
+        prepared = self.prepare(data)
+        result = prepared.rejected or self.transcribe_and_match(prepared)
+        result.timings_ms["total"] = (time.perf_counter() - started) * 1000
+        return result
+
+    def prepare(self, data: bytes) -> "PreparedClip":
+        """Decode and gate. `rejected` is set when no model needs to run."""
         timings: dict[str, float] = {}
-        total_start = time.perf_counter()
-
-        def finish(result: AyahIdentification) -> AyahIdentification:
-            timings["total"] = (time.perf_counter() - total_start) * 1000
-            result.timings_ms = timings
-            return result
-
         started = time.perf_counter()
         waveform = decode_audio(
             data,
@@ -78,46 +79,67 @@ class AyahIdentifier:
         timings["decode"] = (time.perf_counter() - started) * 1000
         clip_sec = len(waveform) / SAMPLE_RATE
         if clip_sec < self.limits.min_clip_sec:
-            return finish(AyahIdentification("no_match", "too_short", clip_sec=clip_sec))
+            rejected = AyahIdentification(
+                "no_match", "too_short", clip_sec=clip_sec, timings_ms=timings
+            )
+            return PreparedClip(waveform, clip_sec, 0.0, timings, rejected)
 
         started = time.perf_counter()
         activity = self.vad.detect(waveform)
         timings["vad"] = (time.perf_counter() - started) * 1000
         if activity.speech_sec < self.limits.min_speech_sec:
-            return finish(
-                AyahIdentification(
-                    "no_match", "no_speech", clip_sec=clip_sec, speech_sec=activity.speech_sec
-                )
+            rejected = AyahIdentification(
+                "no_match",
+                "no_speech",
+                clip_sec=clip_sec,
+                speech_sec=activity.speech_sec,
+                timings_ms=timings,
             )
+            return PreparedClip(waveform, clip_sec, activity.speech_sec, timings, rejected)
 
+        speech = waveform[activity.start : activity.end] if self.limits.trim_silence else waveform
+        return PreparedClip(waveform, clip_sec, activity.speech_sec, timings, None, speech)
+
+    def transcribe_and_match(self, clip: "PreparedClip") -> AyahIdentification:
+        """ASR, hallucination guards and ayah matching on a prepared clip."""
+        timings = dict(clip.timings_ms)
         started = time.perf_counter()
-        if self.limits.trim_silence:
-            waveform = waveform[activity.start : activity.end]
-        asr = self.asr.transcribe(waveform)
+        asr = self.asr.transcribe(clip.speech if clip.speech is not None else clip.waveform)
         timings["asr"] = (time.perf_counter() - started) * 1000
         flags = check_asr_result(asr, self.guards)
         if flags:
-            return finish(
-                AyahIdentification(
-                    "no_match",
-                    "no_speech" if "empty" in flags or "no_speech" in flags else "low_confidence",
-                    asr=asr,
-                    guard_flags=flags,
-                    clip_sec=clip_sec,
-                    speech_sec=activity.speech_sec,
-                )
+            return AyahIdentification(
+                "no_match",
+                "no_speech" if "empty" in flags or "no_speech" in flags else "low_confidence",
+                asr=asr,
+                guard_flags=flags,
+                clip_sec=clip.clip_sec,
+                speech_sec=clip.speech_sec,
+                timings_ms=timings,
             )
 
         started = time.perf_counter()
         match = self.matcher.search(asr.text)
         timings["match"] = (time.perf_counter() - started) * 1000
-        return finish(
-            AyahIdentification(
-                match.status,
-                match.reason,
-                match=match,
-                asr=asr,
-                clip_sec=clip_sec,
-                speech_sec=activity.speech_sec,
-            )
+        return AyahIdentification(
+            match.status,
+            match.reason,
+            match=match,
+            asr=asr,
+            clip_sec=clip.clip_sec,
+            speech_sec=clip.speech_sec,
+            timings_ms=timings,
         )
+
+
+@dataclass
+class PreparedClip:
+    """A decoded clip that passed (or failed) the cheap checks before any model runs."""
+
+    waveform: Waveform
+    clip_sec: float
+    speech_sec: float
+    timings_ms: dict[str, float]
+    rejected: AyahIdentification | None = None
+    speech: Waveform | None = None
+    """What ASR should hear: the whole clip, or the trimmed region if trimming is on."""
