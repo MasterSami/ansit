@@ -6,6 +6,10 @@ from typing import Annotated, Literal
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
+# From the Phase 3 evaluation (ml/eval/reports/phase3.md, "Shipped setting").
+RECITER_THRESHOLD_DEFAULT = 0.60
+RECITER_MARGIN_DEFAULT = 0.08
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -28,10 +32,15 @@ class Settings(BaseSettings):
     # Provisional until re-calibrated on audio in Phase 2.
     match_threshold: float = Field(default=76.0, ge=0, le=100)
     ambiguity_delta: float = Field(default=2.0, ge=0)
-    # Placeholder, NOT calibrated until Phase 3.
-    reciter_threshold: float = Field(default=0.5, ge=-1, le=1)
+    # Reciter is "identified" only if the best score reaches the threshold AND
+    # leads the runner-up by the margin. Calibrated in Phase 3 (see its report).
+    reciter_threshold: float = Field(default=RECITER_THRESHOLD_DEFAULT, ge=-1, le=1)
+    reciter_min_margin: float = Field(default=RECITER_MARGIN_DEFAULT, ge=0, le=2)
 
     quran_index_path: str = "../ml/artifacts/quran_index.json.gz"
+    speaker_model_path: str = "../ml/artifacts/speaker/ecapa.onnx"
+    gallery_path: str | None = None
+    """Gallery file to use instead of the database (development without Postgres)."""
 
     # --- audio limits ---
     min_speech_sec: float = Field(default=1.5, gt=0)
@@ -63,7 +72,7 @@ class Settings(BaseSettings):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
 
-    @field_validator("database_url", "redis_url", "asr_model_path", mode="before")
+    @field_validator("database_url", "redis_url", "asr_model_path", "gallery_path", mode="before")
     @classmethod
     def _empty_is_none(cls, value: object) -> object:
         return None if value == "" else value

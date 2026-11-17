@@ -16,6 +16,8 @@ def test_defaults_match_the_brief() -> None:
     assert settings.allow_debug is False
     assert settings.cors_origins == []
     assert settings.database_url is None
+    assert (settings.reciter_threshold, settings.reciter_min_margin) == (0.60, 0.08)
+    assert settings.gallery_path is None
     assert settings.redis_url is None
 
 
