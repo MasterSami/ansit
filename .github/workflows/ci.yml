@@ -64,11 +64,10 @@ jobs:
       - run: docker build -f infra/docker/backend.Dockerfile backend
 
   web:
-    name: Web (lint, type-check, tests)
+    name: Web (lint, type-check, tests, e2e)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # The Next.js project is created in Phase 5; until then this job is a no-op.
       - id: detect
         run: echo "present=$([ -f web/package.json ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
@@ -84,6 +83,12 @@ jobs:
           npm run lint
           npm run typecheck
           npm test
+      # Browser tests of the main flow, with the API mocked and a fake microphone.
+      - if: steps.detect.outputs.present == 'true'
+        working-directory: web
+        run: |
+          npx playwright install --with-deps chromium
+          npm run e2e -- --trace off
 
   mobile:
     name: Mobile (analyze, tests)
