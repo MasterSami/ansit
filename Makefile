@@ -2,7 +2,7 @@
 COMPOSE := docker compose -f infra/docker-compose.yml
 BACKEND := uv run --directory backend
 
-.PHONY: help setup lint format typecheck test check up down logs ps data index gallery eval
+.PHONY: help setup lint format typecheck test check up down logs ps data index models gallery eval eval-audio
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -49,5 +49,13 @@ index: ## Build the Quran search index artifact
 gallery: ## Build the reciter gallery (Phase 3)
 	@echo "make gallery: implemented in Phase 3" && exit 1
 
+models: ## Download + convert the ASR models to CTranslate2 (needs the `ml` group)
+	uv run --project backend --group ml python ml/scripts/convert_models.py --all
+
 eval: ## Run the text-only matcher evaluation (writes ml/eval/reports/phase1.md)
 	uv run --project backend python ml/eval/text_eval.py
+
+eval-audio: ## Build the audio eval set, run it, write ml/eval/reports/phase2.md (~1 h CPU)
+	uv run --project backend --group ml python ml/eval/build_audio_eval.py
+	uv run --project backend python ml/eval/audio_eval.py run
+	uv run --project backend python ml/eval/audio_eval.py report
