@@ -192,6 +192,18 @@ Warsh recitations, translations, and four folders with no confident mp3quran
 match (Muhammad AbdulKareem, Aziz Alili, Karim Mansoori, Parhizgar) plus
 Mustafa Ismail, whose EveryAyah recording style could not be confirmed.
 
+## Fonts bundled in the mobile app (verified 2026-11-17)
+
+| Font                 | Version | Licence (from the font file's own licence field) |
+| -------------------- | ------- | ------------------------------------------------ |
+| IBM Plex Sans Arabic | 1.101   | SIL Open Font License (scripts.sil.org/OFL)      |
+| Amiri                | 1.002   | SIL Open Font License (openfontlicense.org)      |
+| Amiri Quran          | 1.003   | SIL Open Font License (openfontlicense.org)      |
+
+Downloaded as TTF from Google Fonts (`fonts.gstatic.com`) into
+`mobile/assets/fonts/`. The web app loads the same families through
+`next/font`. The OFL allows bundling and redistribution with the app.
+
 ## For the remaining sources
 
 Record: exact URL or dataset id, file format and schema, license and

@@ -565,6 +565,75 @@ the reciter page worked.
 6. "Continue listening" with an unknown reciter falls back to a fixed default
    reciter (`alafasy`) if there is no guess.
 
+## Phase 6 — Mobile app
+
+Plan: [`docs/plans/phase-6.md`](plans/phase-6.md). App: [`mobile/`](../mobile/README.md).
+
+### What exists
+
+- Flutter 3.50 app (Android + iOS projects) with the brief's stack: Riverpod,
+  go_router, dio, `record`, `permission_handler`, `just_audio`, drift.
+- The same screens, copy and tokens as the web app. Arabic strings are
+  generated from the web app's `messages/ar.json` (179 strings).
+- Permission flow: in-app explainer first, then the system dialog; a refusal
+  can be retried; a permanent refusal links to the app's settings.
+- Recording goes from the microphone to memory to the upload; no audio file
+  is created on the device.
+- Haptics on start / stop / result; animations stop under reduce-motion.
+- Local history in SQLite (drift); per-ayah playback with auto-advance.
+
+### Checks (run on 2026-11-17)
+
+| Check             | Result                                                                                                                 |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `flutter analyze` | no issues                                                                                                              |
+| `flutter test`    | 55 passed: 41 widget tests (screen states and the record → upload → result flow), 14 unit tests incl. the SQLite store |
+
+The screens were also rendered to images with the real fonts through the test
+runner and compared by eye with the web app: home, permission explainer,
+listening, result (identified and unknown reciter), ambiguous result, history,
+reciter and settings all lay out correctly at 402 × 874.
+
+Two real bugs were found by the tests and fixed: the Stop button stayed
+disabled at exactly 3.0 s because of a floating-point sum, and a provider was
+read during `dispose`.
+
+### Not verified — important
+
+- **The app has never run on a phone or an emulator.** This environment cannot
+  reach the Android SDK and has no macOS. Everything that only exists on a
+  device is therefore untested: real recording (`record` PCM stream), the
+  system permission dialog, real audio playback, haptics, SQLite on device.
+- **The iOS project has never been built.** `permission_handler` needs
+  `PERMISSION_MICROPHONE=1` in the iOS `Podfile`, which Flutter only creates on
+  the first build on a Mac. Until that is added, the iOS permission request
+  will not work.
+- The `integration_test` flow exists but has not been run on a device.
+- The APK built by CI has not been installed by anyone yet.
+
+### Decisions
+
+- **PCM stream to in-memory WAV instead of AAC/Opus files** (a deviation from
+  the brief's suggested formats): no audio ever touches the phone's storage.
+  About 320 KB per 10 s clip against the 2 MB limit.
+- **iOS microphone text is one string holding Arabic and English**, not two
+  localised `InfoPlist.strings`, because adding localisations to an Xcode
+  project by hand cannot be checked here.
+- **Debug builds allow plain http** (Android cleartext, iOS local networking)
+  and show a server-address field in Settings; release builds do neither.
+
+### Open issues
+
+1. Run on real Android and iOS devices; fix whatever that shows.
+2. iOS: add the `Podfile` permission macro on a Mac; split the microphone text
+   into proper Arabic / English localisations.
+3. No app icon or splash screen yet (Flutter defaults).
+4. Release signing, store listings and privacy labels are not started.
+5. Carried over from Phase 5: the home-screen motto needs the owner's yes/no;
+   favourites are stored but not listed; tafsir and mushaf are placeholders;
+   no Dockerfile for the web app.
+
 ### Next
 
-Phase 6 — mobile app (Flutter).
+Phase 7 is optional in the brief (audio-fingerprint fast path, feedback
+report) and should wait for real-device results and real usage data.

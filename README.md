@@ -3,7 +3,7 @@
 Listens to a short Quran recitation (5–15 s) and returns the surah, the ayah and
 the reciter's name.
 
-Status: **Phases 0–5 complete**: the backend identifies surah, ayah and reciter over HTTP, and the web app (`web/`) is usable in a browser. The mobile app is next. See [`docs/PROGRESS.md`](docs/PROGRESS.md).
+Status: **Phases 0–6 complete**: the backend identifies surah, ayah and reciter over HTTP; the web app (`web/`) is usable in a browser; the Flutter app (`mobile/`) passes its tests and CI builds an Android APK, but it has not yet been run on a real phone. See [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Quick start
 
