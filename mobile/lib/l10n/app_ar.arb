@@ -1,0 +1,294 @@
+{
+  "@@locale": "ar",
+  "ambiguousAfter": "بعد ﴿{text}﴾",
+  "@ambiguousAfter": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "ambiguousAyah": "الآية {ayah}",
+  "@ambiguousAyah": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "ambiguousConfirm": "تأكيد الموضع المختار",
+  "ambiguousConfirmFailed": "تعذّر التأكيد. تحقّق من الاتصال وحاول مرة أخرى.",
+  "ambiguousExplain": "تعرّفنا على الآية بثقة، لكنها تتكرر. أنصت لثوانٍ أطول لنحدّد موضعها من الآيات المجاورة، أو اختر الموضع بنفسك.",
+  "ambiguousFirstOfSurah": "أول السورة",
+  "ambiguousHeardSection": "الآية المسموعة",
+  "ambiguousListenMore": "أنصت ١٠ ثوانٍ إضافية",
+  "ambiguousMore": "و{count}",
+  "@ambiguousMore": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ambiguousPlaces": "المواضع المحتملة",
+  "ambiguousSurahAyah": "{surah} · الآية {ayah}",
+  "@ambiguousSurahAyah": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "ambiguousTitle": "تحديد موضع الآية",
+  "appDescription": "تعرّف على السورة والآية واسم القارئ من ثوانٍ من التلاوة",
+  "appName": "أنصِت",
+  "appVerse": "﴿فَاسْتَمِعُوا لَهُ وَأَنصِتُوا﴾",
+  "commonBack": "رجوع",
+  "commonCancel": "إلغاء",
+  "commonClose": "إغلاق",
+  "commonHome": "العودة للرئيسية",
+  "commonRetry": "حاول مرة أخرى",
+  "commonSoon": "قريبًا",
+  "feedbackAyahNumber": "رقم الآية",
+  "feedbackChooseReciter": "اختر القارئ الصحيح",
+  "feedbackFailed": "تعذّر الإرسال. حاول مرة أخرى.",
+  "feedbackNote": "نرسل الملاحظة فقط، ولا يوجد تسجيل محفوظ مرتبط بها.",
+  "feedbackOptional": "اختياري",
+  "feedbackOther": "شيء آخر",
+  "feedbackReciterTitle": "من هو القارئ؟",
+  "feedbackSend": "إرسال",
+  "feedbackSending": "جارٍ الإرسال…",
+  "feedbackSurahNumber": "رقم السورة",
+  "feedbackThanks": "شكرًا، وصلتنا ملاحظتك",
+  "feedbackTitle": "ما الخطأ في النتيجة؟",
+  "feedbackWrongAyah": "الآية خاطئة",
+  "feedbackWrongReciter": "القارئ خاطئ",
+  "historyAll": "الكل",
+  "historyEmptyBody": "كل تلاوة تتعرّف عليها تُحفظ هنا على جهازك فقط.",
+  "historyEmptySavedBody": "اضغط «حفظ» في أي نتيجة لتجدها هنا.",
+  "historyEmptySavedTitle": "لا محفوظات بعد",
+  "historyEmptyTitle": "سجلّك فارغ",
+  "historyFilters": "تصفية",
+  "historyNoResultsBody": "جرّب كلمة أخرى أو غيّر التصفية.",
+  "historyNoResultsTitle": "لا نتائج",
+  "historySaved": "المحفوظة",
+  "historySavedTitle": "المحفوظات",
+  "historySearchLabel": "ابحث في السجل",
+  "historySearchPlaceholder": "ابحث بسورة أو قارئ",
+  "historyStartListening": "ابدأ الإنصات",
+  "historyTitle": "السجل",
+  "historyToday": "اليوم",
+  "historyUnknown": "قارئ غير معروف · أضِف الاسم",
+  "historyWeek": "هذا الأسبوع",
+  "homeLastHeard": "آخر ما سمعته",
+  "homeNothingYet": "لا شيء بعد. اضغط الزر وقرّب الهاتف من التلاوة.",
+  "homeOpen": "فتح النتيجة",
+  "homeSettings": "الإعدادات",
+  "homeShowHistory": "عرض السجل",
+  "homeSubtitle": "نتعرّف على السورة والآية واسم القارئ في ثوانٍ",
+  "homeSurahAyah": "سورة {surah} · الآية {ayah}",
+  "@homeSurahAyah": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "homeTapToListen": "اضغط لتنصت",
+  "listenContinuing": "نكمل الإنصات لتحديد الموضع",
+  "listenDone": "تم",
+  "listenElapsed": "مدة التسجيل",
+  "listenHint": "قرّب الهاتف من مصدر الصوت، ويكفي ٥ إلى ١٠ ثوانٍ من التلاوة",
+  "listenIdentifying": "جارٍ التعرّف…",
+  "listenIdentifyingHint": "لحظات ونخبرك بالسورة والآية والقارئ",
+  "listenInProgress": "جارٍ",
+  "listenListening": "جارٍ الإنصات…",
+  "listenStepCapture": "التقاط الصوت وتنقيته",
+  "listenStepMatch": "مطابقة النص بآيات المصحف",
+  "listenStepReciter": "التعرّف على صوت القارئ",
+  "listenSteps": "مراحل التعرّف",
+  "listenStop": "إيقاف",
+  "listenWave": "موجة الصوت",
+  "mushafBody": "قارئ المصحف الكامل قيد الإعداد وسيتوفر في تحديث قادم.",
+  "mushafTitle": "المصحف",
+  "navHistory": "السجل",
+  "navLabel": "التنقل الرئيسي",
+  "navListen": "أنصِت",
+  "navMushaf": "المصحف",
+  "navSaved": "المحفوظات",
+  "offlineBanner": "أنت غير متصل. السجل متاح، والتعرّف يحتاج اتصالًا.",
+  "permissionAllow": "السماح بالمايكروفون",
+  "permissionAnySourceBody": "راديو، مسجد، تلفاز، أو هاتف آخر",
+  "permissionAnySourceTitle": "من أي مصدر",
+  "permissionDeletedBody": "نحتفظ بالنتيجة في سجلّك فقط، لا بالتسجيل",
+  "permissionDeletedTitle": "المقطع يُحذف بعد التعرّف",
+  "permissionNotNow": "ليس الآن",
+  "permissionOnlyWhenBody": "لا استماع في الخلفية، ويتوقف تلقائيًا بعد التعرّف",
+  "permissionOnlyWhenTitle": "يعمل فقط حين تضغط «أنصِت»",
+  "permissionStep": "الخطوة ٣ من ٣",
+  "permissionSubtitle": "حتى نتعرّف على التلاوة التي تسمعها حولك",
+  "permissionTitle": "نحتاج إذن المايكروفون لنُنصت معك",
+  "playerFailed": "تعذّر تشغيل التلاوة",
+  "playerLabel": "مشغّل التلاوة",
+  "playerNowPlaying": "سورة {surah} · الآية {ayah}",
+  "@playerNowPlaying": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "playerPause": "إيقاف مؤقت",
+  "playerPlay": "تشغيل",
+  "playerStop": "إيقاف التشغيل",
+  "reciterFavourite": "إضافة إلى القرّاء المفضّلين",
+  "reciterHeardToday": "تعرّفت عليها اليوم",
+  "reciterLoadFailedTitle": "تعذّر تحميل صفحة القارئ",
+  "reciterNotFoundTitle": "القارئ غير موجود",
+  "reciterPlayAll": "استمع للمصحف كاملًا",
+  "reciterPlaySurah": "تشغيل سورة {name}",
+  "@reciterPlaySurah": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reciterStyles": "نوع التلاوة",
+  "reciterUnfavourite": "إزالة من القرّاء المفضّلين",
+  "resultAddName": "أضِف الاسم",
+  "resultAyahBadge": "الآية {ayah}",
+  "@resultAyahBadge": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "resultAyahSection": "الآية",
+  "resultContinueListening": "أكمل الاستماع من هذه الآية",
+  "resultMayAlsoBe": "قد يكون أيضًا",
+  "resultMeta": "{revelation} · {count} · الجزء {juz} · صفحة {page}",
+  "@resultMeta": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "juz": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      },
+      "revelation": {
+        "type": "String"
+      }
+    }
+  },
+  "resultReciter": "القارئ",
+  "resultReciterPage": "صفحة القارئ",
+  "resultReciterSection": "القارئ",
+  "resultSave": "حفظ",
+  "resultSaved": "محفوظة",
+  "resultShare": "مشاركة",
+  "resultShareText": "سورة {surah} · الآية {ayah}",
+  "@resultShareText": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "resultShared": "تم نسخ النتيجة",
+  "resultSurah": "سورة {name}",
+  "@resultSurah": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "resultTafsir": "التفسير",
+  "resultTextCredit": "نص المصحف من مشروع تنزيل",
+  "resultTextMatch": "تطابق النص",
+  "resultTitle": "تم التعرّف",
+  "resultUnknownHint": "لم نتأكد من صوت القارئ",
+  "resultUnknownReciter": "قارئ غير معروف",
+  "resultVoiceSimilarity": "تشابه الصوت",
+  "resultWrong": "نتيجة خاطئة؟",
+  "settingsAbout": "عن التطبيق والمصادر",
+  "settingsAppearance": "المظهر",
+  "settingsClearConfirm": "اضغط مرة أخرى للتأكيد",
+  "settingsClearHistory": "مسح السجل",
+  "settingsCleared": "تم مسح السجل",
+  "settingsCreditAsr": "نموذج التعرّف على التلاوة: Tarteel AI، ترخيص Apache 2.0.",
+  "settingsCreditAudio": "التلاوات المسموعة: EveryAyah.",
+  "settingsCreditTanzil": "نص المصحف: مشروع تنزيل (Tanzil Project)، معروض دون أي تعديل.",
+  "settingsCreditWespeaker": "نموذج بصمة الصوت: مشروع WeSpeaker، ترخيص CC BY 4.0.",
+  "settingsDark": "داكن",
+  "settingsData": "البيانات",
+  "settingsLight": "فاتح",
+  "settingsPrivacy": "الخصوصية",
+  "settingsPrivacyClip": "المقطع الصوتي يُحذف بعد التعرّف ولا يُحفظ في أي مكان.",
+  "settingsPrivacyHistory": "السجل محفوظ على هذا الجهاز فقط.",
+  "settingsPrivacyMic": "المايكروفون يعمل فقط حين تضغط «أنصِت».",
+  "settingsServer": "الخادم",
+  "settingsServerHint": "للتجربة فقط: عنوان خدمة أنصِت على شبكتك",
+  "settingsServerLabel": "عنوان الخادم",
+  "settingsServerSave": "حفظ العنوان",
+  "settingsServerSaved": "تم حفظ العنوان",
+  "settingsSystem": "حسب النظام",
+  "settingsTitle": "الإعدادات",
+  "settingsVersion": "الإصدار {version}",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "statesBadAudioBody": "لم نستطع معالجة هذا التسجيل. حاول مرة أخرى.",
+  "statesBadAudioTitle": "تعذّر قراءة المقطع",
+  "statesBusyBody": "عدد الطلبات كبير الآن. حاول بعد لحظات.",
+  "statesBusyTitle": "الخدمة مشغولة",
+  "statesDeniedBody": "لا نستطيع الإنصات بدون إذن المايكروفون. اسمح به من إعدادات التطبيق، ثم حاول مرة أخرى.",
+  "statesDeniedTitle": "المايكروفون غير مسموح",
+  "statesLowConfidenceBody": "قد يكون الصوت غير واضح. حاول من مكان أهدأ أو أنصت لمدة أطول.",
+  "statesLowConfidenceTitle": "لم نتعرّف على الآية",
+  "statesNoSpeechBody": "قرّب الهاتف من مصدر الصوت وتأكد أن التلاوة مسموعة، ثم حاول مرة أخرى.",
+  "statesNoSpeechTitle": "لم نسمع تلاوة",
+  "statesNotFoundBody": "ربما حُذفت من سجلّ هذا الجهاز.",
+  "statesNotFoundTitle": "النتيجة غير موجودة",
+  "statesOfflineBody": "تحقّق من اتصالك بالإنترنت ثم حاول مرة أخرى. سجلّك متاح بدون اتصال.",
+  "statesOfflineTitle": "لا يوجد اتصال",
+  "statesOpenHistory": "فتح السجل",
+  "statesOpenSettings": "فتح إعدادات التطبيق",
+  "statesRateBody": "وصلت للحد المسموح من المحاولات. حاول مرة أخرى بعد قليل.",
+  "statesRateTitle": "تمهّل قليلًا",
+  "statesRateWait": "يمكنك المحاولة بعد {seconds} ثانية",
+  "@statesRateWait": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "statesServerBody": "لم نتمكن من إتمام التعرّف. حاول بعد قليل.",
+  "statesServerTitle": "حدث خطأ من جهتنا",
+  "statesTooShortBody": "أنصت خمس ثوانٍ على الأقل حتى نتعرّف على الآية.",
+  "statesTooShortTitle": "المقطع قصير",
+  "statesUnavailableBody": "لم نجد مايكروفونًا يعمل على هذا الجهاز.",
+  "statesUnavailableTitle": "لا يوجد مايكروفون"
+}
