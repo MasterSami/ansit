@@ -17,7 +17,9 @@ def test_defaults_match_the_brief() -> None:
     assert settings.cors_origins == []
     assert settings.database_url is None
     assert (settings.reciter_threshold, settings.reciter_min_margin) == (0.725, 0.12)
-    assert settings.gallery_path is None
+    assert (settings.cpu_threads_asr, settings.cpu_threads_speaker) == (2, 1)
+    assert settings.max_concurrent_identify == 2
+    assert settings.trust_proxy_headers is False
     assert settings.redis_url is None
 
 

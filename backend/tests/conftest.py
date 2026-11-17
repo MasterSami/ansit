@@ -18,7 +18,8 @@ from app.matcher.search import AyahMatcher
 
 def make_settings(**overrides: object) -> Settings:
     """Settings isolated from the developer's `.env` and process environment."""
-    return Settings(_env_file=None, app_env="test", **overrides)  # type: ignore[arg-type]
+    options: dict[str, object] = {"app_env": "test", "load_models": False, **overrides}
+    return Settings(_env_file=None, **options)  # type: ignore[arg-type]
 
 
 @asynccontextmanager
