@@ -114,6 +114,83 @@ def test_a_reciter_is_scored_by_their_best_style() -> None:
     assert gallery.rank(near(unit(1), seed=4))[0].style == "murattal"
 
 
+# --- LDA projection (only for galleries with enough voices) ---
+
+NUISANCE_DIMS = 24
+
+
+def _clip(centre: np.ndarray, rng: np.random.Generator) -> Embedding:
+    clip = centre + rng.standard_normal(EMBEDDING_DIM) * 0.05
+    clip[:NUISANCE_DIMS] += rng.standard_normal(NUISANCE_DIMS) * 2.0
+    return l2_normalize(clip)
+
+
+def channel_centres(n_voices: int, seed: int = 0) -> np.ndarray:
+    return np.random.default_rng(seed).standard_normal((n_voices, EMBEDDING_DIM)) * 0.2
+
+
+def with_channel_noise(n_voices: int = 12, clips: int = 20, seed: int = 0) -> Gallery:
+    """Voices that differ a little, plus strong variation shared by all of them
+    in a few fixed dimensions (a stand-in for channel / recording conditions)."""
+    rng = np.random.default_rng(seed + 100)
+    centres = channel_centres(n_voices, seed)
+    vectors = [_clip(centres[v], rng) for v in range(n_voices) for _ in range(clips)]
+    owners = [v for v in range(n_voices) for _ in range(clips)]
+    voices = [Voice(f"r{i:02d}", "murattal") for i in range(n_voices)]
+    return Gallery(voices, np.stack(vectors), np.asarray(owners, dtype=np.intp))
+
+
+def held_out_accuracy(gallery: Gallery, seed: int = 0) -> float:
+    """Top-1 on fresh clips of the same voices, with new channel noise."""
+    rng = np.random.default_rng(seed + 999)
+    centres = channel_centres(len(gallery.voices), seed)
+    hits = 0
+    for index, voice in enumerate(gallery.voices):
+        for _ in range(20):
+            hits += gallery.rank(_clip(centres[index], rng))[0].reciter_id == voice.reciter_id
+    return hits / (20 * len(gallery.voices))
+
+
+def test_small_galleries_are_scored_in_the_original_space(gallery: Gallery) -> None:
+    assert gallery.projection is None
+
+
+def test_lda_is_fitted_for_larger_galleries_and_suppresses_channel_variation() -> None:
+    projected = with_channel_noise()
+    assert projected.projection is not None
+    assert projected.projection.shape == (EMBEDDING_DIM, len(projected.voices) - 1)
+    raw = Gallery(projected.voices, projected.embeddings, projected.voice_of_clip, use_lda=False)
+    assert raw.projection is None
+    with_lda, without = held_out_accuracy(projected), held_out_accuracy(raw)
+    assert without < 0.9  # channel variation confuses the raw space
+    assert with_lda > 0.97
+    assert with_lda > without + 0.05
+
+
+def test_stored_embeddings_and_centroids_stay_in_the_model_space() -> None:
+    gallery = with_channel_noise()
+    assert gallery.embeddings.shape[1] == EMBEDDING_DIM
+    assert gallery.centroids.shape == (len(gallery.voices), EMBEDDING_DIM)
+
+
+def test_removing_a_reciter_refits_the_projection() -> None:
+    gallery = with_channel_noise()
+    smaller = gallery.without_reciter("r03")
+    assert smaller.projection is not None
+    assert smaller.projection.shape[1] == len(gallery.voices) - 2
+    assert all(v.reciter_id != "r03" for v in smaller.voices)
+    below_minimum = with_channel_noise(n_voices=10).without_reciter("r00")
+    assert below_minimum.projection is None  # 9 voices: falls back to the raw space
+
+
+def test_without_voices_drops_one_style_only() -> None:
+    murattal, mujawwad = Voice("a", "murattal"), Voice("a", "mujawwad")
+    gallery = build({murattal: unit(1), mujawwad: unit(50), B: unit(2)})
+    only_murattal = gallery.without_voices({mujawwad})
+    assert only_murattal.voices == [murattal, B]
+    assert only_murattal.rank(near(unit(1), seed=4))[0].style == "murattal"
+
+
 def test_fewer_clips_than_top_k() -> None:
     gallery = build({A: unit(1), B: unit(2)}, clips=2)
     assert gallery.rank(near(unit(1), seed=9))[0].reciter_id == "a"
@@ -155,7 +232,7 @@ def test_rejects_malformed_input() -> None:
     owners = np.array([0, 1], dtype=np.intp)
     with pytest.raises(ValueError, match="L2-normalized"):
         Gallery([A, B], good * 3, owners)
-    with pytest.raises(ValueError, match=r"\(n, 192\)"):
+    with pytest.raises(ValueError, match=r"\(n, 256\)"):
         Gallery([A, B], good[:, :100], owners)
     with pytest.raises(ValueError, match="differ in length"):
         Gallery([A, B], good, owners[:1])
