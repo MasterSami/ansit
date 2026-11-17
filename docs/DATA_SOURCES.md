@@ -3,15 +3,15 @@
 Each source is checked by actually inspecting it (sample, schema, license) in
 the phase that first uses it. Findings are recorded here.
 
-| Need                            | Source                                                                          | Verified in | Status       |
-| ------------------------------- | ------------------------------------------------------------------------------- | ----------- | ------------ |
-| Quran text for matching         | Tanzil "simple clean"                                                           | Phase 1     | **verified** |
-| Quran text for display          | Tanzil Uthmani                                                                  | Phase 1     | **verified** |
-| Surah / juz / page metadata     | Tanzil `quran-data.xml`                                                         | Phase 1     | **verified** |
-| Per-ayah recitation audio       | EveryAyah — fetched per ayah from everyayah.com, not the 117 GB HF dataset      | Phase 2     | **verified** |
-| Reciter names, full-surah audio | mp3quran API v3 (Quran Foundation API not used)                                 | Phase 3     | **verified** |
-| ASR model                       | `tarteel-ai/whisper-base-ar-quran` (plus tiny and a small model for comparison) | Phase 2     | **verified** |
-| Speaker embedding model         | `speechbrain/spkrec-ecapa-voxceleb`, exported to ONNX                           | Phase 3     | **verified** |
+| Need                            | Source                                                                                                                                        | Verified in | Status       |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------ |
+| Quran text for matching         | Tanzil "simple clean"                                                                                                                         | Phase 1     | **verified** |
+| Quran text for display          | Tanzil Uthmani                                                                                                                                | Phase 1     | **verified** |
+| Surah / juz / page metadata     | Tanzil `quran-data.xml`                                                                                                                       | Phase 1     | **verified** |
+| Per-ayah recitation audio       | EveryAyah — fetched per ayah from everyayah.com, not the 117 GB HF dataset                                                                    | Phase 2     | **verified** |
+| Reciter names, full-surah audio | mp3quran API v3 (Quran Foundation API not used)                                                                                               | Phase 3     | **verified** |
+| ASR model                       | `tarteel-ai/whisper-base-ar-quran` (plus tiny and a small model for comparison)                                                               | Phase 2     | **verified** |
+| Speaker embedding model         | `Wespeaker/wespeaker-voxceleb-resnet34-LM` (ONNX); the brief's `speechbrain/spkrec-ecapa-voxceleb` was verified and used first, then replaced | Phase 3     | **verified** |
 
 ## Tanzil (verified 2026-11-16)
 
@@ -138,15 +138,30 @@ Silero VAD is the ONNX model bundled inside the `faster-whisper` package
 
 ## Speaker embedding model (verified 2026-11-17)
 
-- `speechbrain/spkrec-ecapa-voxceleb`, commit `0f99f2d0eb`, **Apache-2.0**.
-  ECAPA-TDNN trained on VoxCeleb; 192-dimensional output.
-- Its `hyperparams.yaml` fixes the input features: `Fbank(n_mels=80)` then
-  sentence-level mean normalization (no variance normalization).
-- `ml/scripts/export_speaker_model.py` downloads that pinned commit, exports
-  the embedding network to ONNX (opset 17, 83 MB) and checks that NumPy
-  features + ONNX reproduce SpeechBrain's embeddings. Measured parity: cosine
-  similarity 1.000000 on four test signals. The export is refused below 0.9999.
-- The service therefore needs ONNX Runtime only, not PyTorch.
+### In use: WeSpeaker ResNet34-LM
+
+- `Wespeaker/wespeaker-voxceleb-resnet34-LM`, commit `f0c48c298f`, file
+  `voxceleb_resnet34_LM.onnx` (27 MB, SHA-256 `7bb2f06e…ec068`, pinned in
+  `ml/scripts/fetch_speaker_model.py`).
+- **License: CC BY 4.0.** Attribution is required: credit the WeSpeaker
+  project (https://github.com/wenet-e2e/wespeaker). **To do in the UI phases:**
+  include this credit on the about / licenses screen.
+- ResNet34 "r-vector", trained on VoxCeleb2 dev (5,994 speakers), large-margin
+  fine-tuned; 256-dimensional output; 6.63 M parameters.
+- Input features per its `config.yaml`: Kaldi `fbank`, 80 mel bins, 25 ms
+  frames, 10 ms shift, then per-utterance mean subtraction.
+- `app/speaker/features.py` reimplements those features in NumPy. The fetch
+  script checks them against `torchaudio.compliance.kaldi.fbank`: embedding
+  cosine similarity 1.000000 on four test signals; the model is rejected
+  below 0.9999. The service needs ONNX Runtime only, not PyTorch.
+
+### Verified and used first, then replaced: SpeechBrain ECAPA-TDNN
+
+- `speechbrain/spkrec-ecapa-voxceleb`, commit `0f99f2d0eb`, Apache-2.0,
+  192-dimensional, features `Fbank(n_mels=80)` + sentence mean normalization.
+  It was exported to ONNX with exact parity and evaluated. The ResNet34 model
+  named more reciters correctly at the same false-accept rate while being
+  smaller and faster; the comparison is in `docs/plans/phase-3.md`.
 
 ## mp3quran API (verified 2026-11-17)
 

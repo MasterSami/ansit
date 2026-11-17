@@ -1,5 +1,9 @@
 # Phase 3 — reciter identification, open-set (plan)
 
+> **Partly superseded.** After review the embedding model was changed and an
+> LDA projection was added; see "Second round" at the end. The sections up to
+> there describe the first version (ECAPA-TDNN) and are kept as the record.
+
 ## What gets built
 
 | Piece         | File                                                           | What                                                    |
@@ -128,3 +132,73 @@ Shipped: `RECITER_THRESHOLD=0.60`, `RECITER_MIN_MARGIN=0.08`.
 Caveat on the phone-like numbers: the copies in the gallery are made by the
 same simulation as the phone-like test clips, so that gain is the most
 optimistic figure in the report.
+
+## Second round — lowering the "unknown" rate (owner's request)
+
+After the first review the owner asked for fewer known reciters coming back as
+unknown (27.7%) before moving on. Everything below is two-fold over the 26
+reciters, calibrated to at most 3% false accepts unless stated.
+
+| Change tried                                                           | Identified | False accept | Kept?                       |
+| ---------------------------------------------------------------------- | ---------- | ------------ | --------------------------- |
+| First version (ECAPA, studio + phone-like gallery, threshold + margin) | 71.7%      | 3.5%         | baseline                    |
+| Per-voice z-norm of scores                                             | 61.7%      | 2.9%         | no — worse                  |
+| Per-query t-norm                                                       | 58.4%      | 2.9%         | no — worse                  |
+| Symmetric s-norm                                                       | 68.8%      | 3.0%         | no — worse                  |
+| Calibrating separately per clip length                                 | 71.1%      | 3.5%         | no — unstable between folds |
+| Extra 5 s windows in the gallery                                       | 72.4%      | 3.2%         | no — no real gain           |
+| WCCN (within-class whitening fitted on the gallery)                    | 75.5%      | 3.2%         | superseded by LDA           |
+| **LDA fitted on the gallery** (classes = voices)                       | 77.8%      | 2.7%         | **yes**                     |
+| **WeSpeaker ResNet34 instead of ECAPA**, no LDA                        | 77.4%      | 3.7%         | **yes**                     |
+| **WeSpeaker ResNet34 + LDA**                                           | 82.1%      | 2.9%         | **yes**                     |
+
+These were run on embeddings computed outside the product code. The final
+numbers below come from the product code path after the change.
+
+### What changed in the product
+
+1. **Embedding model: WeSpeaker ResNet34-LM** (`Wespeaker/wespeaker-voxceleb-resnet34-LM`,
+   CC BY 4.0, ONNX published by the project) instead of SpeechBrain ECAPA-TDNN.
+   The brief named ECAPA and asked for a swappable `SpeakerEngine`; this is
+   that swap. It is also lighter: 27 MB instead of 83 MB, and 170 ms instead of
+   267 ms for an 8 s clip (p50, 4 threads). Embeddings are 256-d (was 192),
+   so the `vector` columns are 256 wide. Its features are Kaldi `fbank`,
+   reimplemented in NumPy with parity checked against torchaudio (cosine
+   1.000000). The service still needs no PyTorch.
+2. **LDA projection in the gallery.** Fitted on the gallery itself whenever it
+   is loaded or changed (classes = voices, output = voices − 1 dimensions),
+   used only for scoring. It keeps what separates reciters and discards what
+   varies inside a voice — here mostly the studio-versus-phone difference,
+   since every clip is in the gallery in both forms. Nothing is trained ahead
+   of time and stored embeddings stay in the model's own space. Galleries with
+   fewer than 10 voices skip it.
+3. **Calibration limit 4%** (was 3%), which still lands under the 5% target on
+   test reciters.
+
+### Final result (product code, two-fold)
+
+|                           | First version | Final     |
+| ------------------------- | ------------- | --------- |
+| False accept on strangers | 3.2%          | 4.1%      |
+| Named correctly           | 71.8%         | **82.5%** |
+| Named as someone else     | 0.5%          | 0.5%      |
+| Unknown                   | 27.7%         | **17.0%** |
+| Unknown, clean clips      | 20.1%         | 8.0%      |
+| Unknown, phone-like clips | 35.2%         | 26.0%     |
+| Closed-set Top-1          | 93.0%         | 95.5%     |
+| EER                       | 6.57%         | 3.08%     |
+
+Shipped: `RECITER_THRESHOLD=0.725`, `RECITER_MIN_MARGIN=0.12`.
+
+At the same false-accept level as the first version (calibrated to 3%, 2.4%
+on test) the final system names 80.9% correctly.
+
+### What did not improve, and why it matters
+
+- Phone-like clips are still unknown 26% of the time and 5 s clips 24%. More
+  audio is the most reliable fix: 12 s clips are unknown 9.6% of the time.
+- Cross-style recognition improved but remains weak (see the report).
+- The remaining caveats are unchanged: same-recording bias, simulated phone
+  audio, famous studio reciters as strangers. The second round tuned more
+  choices on the same 26 reciters, so the final figures are, if anything, a
+  little more optimistic than the first ones.

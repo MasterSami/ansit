@@ -304,24 +304,30 @@ Phase 3 — done, see below.
 
 ## Phase 3 — reciter identification (open-set) · complete, awaiting review
 
-Plan and decisions: [`plans/phase-3.md`](plans/phase-3.md) ·
+Plan, experiments and decisions: [`plans/phase-3.md`](plans/phase-3.md) ·
 Full report: [`../ml/eval/reports/phase3.md`](../ml/eval/reports/phase3.md)
+
+This section describes the second version. After the first review the owner
+asked for fewer known reciters coming back as unknown; the embedding model was
+changed and a projection added. The first version's numbers are kept in the
+plan for comparison.
 
 ### What was built
 
-- `app/speaker/` — NumPy filterbank features, ECAPA-TDNN on ONNX Runtime
-  behind a `SpeakerEngine` interface, an in-memory gallery with scoring and
-  the open-set decision, and persistence in Postgres.
+- `app/speaker/` — NumPy Kaldi filterbank features, WeSpeaker ResNet34 on
+  ONNX Runtime behind a `SpeakerEngine` interface, an in-memory gallery with
+  LDA projection, scoring and the open-set decision, and persistence in
+  Postgres.
 - `app/db/` — tables `reciters`, `gallery_clips`, `reciter_centroids` with
-  `vector(192)` columns, and the first Alembic migration.
+  `vector(256)` columns, and the first Alembic migration.
 - `ml/registry/reciters.json` — 35 reciters, 39 voices (reciter × style),
   names from the mp3quran API.
-- `ml/scripts/` — `export_speaker_model.py`, `build_registry.py`,
+- `ml/scripts/` — `fetch_speaker_model.py`, `build_registry.py`,
   `build_gallery.py`, `load_gallery_db.py`. Adding a reciter is
   `make gallery RECITER=id`; nothing is retrained.
 - `ml/eval/reciter_eval.py` and its report.
-- 31 new tests (151 total), including persistence tests against a real
-  Postgres with pgvector, which CI now runs as a service.
+- 36 new tests (156 total), including persistence tests against a real
+  Postgres with pgvector, which CI runs as a service.
 
 Still a library; both branches are joined into one request in Phase 4.
 
@@ -329,35 +335,33 @@ Still a library; both branches are joined into one request in Phase 4.
 
 | Target                                       | Result                                         | Verdict |
 | -------------------------------------------- | ---------------------------------------------- | ------- |
-| False accept ≤ 5% on out-of-gallery reciters | 3.2% (two-fold, 1,232 test clips, 26 reciters) | met     |
+| False accept ≤ 5% on out-of-gallery reciters | 4.1% (two-fold, 1,232 test clips, 26 reciters) | met     |
 
 At that setting, for a reciter who is in the gallery:
 
-|                       | All clips | Clean | Phone-like |
-| --------------------- | --------- | ----- | ---------- |
-| Named correctly       | 71.8%     | 79.2% | 64.4%      |
-| Named as someone else | 0.5%      | 0.6%  | 0.3%       |
-| Returned as unknown   | 27.7%     | 20.1% | 35.2%      |
+|                       | All clips | Clean | Phone-like | First version, all clips |
+| --------------------- | --------- | ----- | ---------- | ------------------------ |
+| Named correctly       | 82.5%     | 91.2% | 73.9%      | 71.8%                    |
+| Named as someone else | 0.5%      | 0.8%  | 0.2%       | 0.5%                     |
+| Returned as unknown   | 17.0%     | 8.0%  | 26.0%      | 27.7%                    |
 
-- Closed-set Top-1 (no rejection): 93.0%. EER: 6.57% (5.19% clean, 7.30%
+- Closed-set Top-1 (no rejection): 95.5%. EER: 3.08% (2.27% clean, 3.90%
   phone-like).
-- Longer clips help: 60.7% named correctly at 5 s, 68.1% at 8 s, 83.9% at 12 s.
-- Embedding time: 267 ms p50 on an 8 s clip with 4 threads.
-- The model runs on ONNX Runtime; parity with SpeechBrain is cosine 1.000000.
+- Longer clips help: unknown 23.8% at 5 s, 19.2% at 8 s, 9.6% at 12 s.
+- In the 12 s slice alone, false accepts are 5.6%; the 5% target holds over
+  all lengths together.
+- Embedding time: 170 ms p50 on an 8 s clip with 4 threads. Model file 27 MB.
   **The service still needs no PyTorch.**
 
 ### Hard cases, documented honestly
 
-- **Same reciter, different style.** Abdul Basit and Al-Minshawi in a style
-  the gallery lacks are named correctly in only 0–2% of clips (ranked first
-  in 14–64%). Murattal and mujawwad are close to two different voices for
-  this model. Separate centroids per style are therefore necessary, and a
-  reciter is only recognised in styles the gallery holds. Al-Husary's
-  murattal against his other two styles does much better (79.5%).
-- **Mujawwad overall** is named less often: 43.2% clean, 40.9% phone-like.
-- **Weakest reciters**: `jibreel` 29.5% and `qatami` 38.6% named correctly;
-  their own-voice scores sit close to the threshold.
-- **Most frequent confusion**: `rifai` named as `abdul-basit` (8 clips).
+- **Same reciter, different style.** With a reciter's own style removed from
+  the gallery, they are ranked first in 23–91% of clips but named (passing
+  the threshold) in only 7–34%; Al-Husary does better (70.5%). Separate
+  entries per style remain necessary.
+- **Mujawwad** is named less often: 77.3% clean, 50.0% phone-like.
+- **Weakest reciter**: `qatami`, named correctly in 52.3% of clips.
+- **Most frequent confusion**: `juhany` named as `sowaid` (6 clips).
 - **Imitators, very old recordings, mosque echo**: not measured. An imitator
   close enough to the original will be named as the original.
 
@@ -365,28 +369,32 @@ At that setting, for a reciter who is in the gallery:
 
 1. **Gallery and test clips come from the same recorded mushaf** for each
    reciter (different ayahs, same microphone and room). Another recording of
-   the same reciter will score lower. Not tested: there is no second
-   recording per reciter here.
+   the same reciter will score lower. Not tested.
 2. **The gallery's phone-like copies use the same simulation as the
-   phone-like test clips.** The phone-like figures are the most optimistic
-   ones in the report.
+   phone-like test clips.** The phone-like figures are the most optimistic.
 3. **Strangers were other famous studio reciters**, not amateurs or imitators.
-4. The calibration limit (3%) was chosen after seeing test results; see the
-   plan.
+4. **Choices were tuned on the same 26 reciters** over two rounds (model,
+   projection, calibration limit). Two-fold testing protects the threshold,
+   not those choices, so expect somewhat lower numbers on new reciters.
 
 ### Decisions
 
-- **ONNX Runtime + NumPy features instead of PyTorch** in the service.
-- **Decision rule is threshold _and_ margin** — `RECITER_THRESHOLD=0.60`,
-  `RECITER_MIN_MARGIN=0.08`. The margin is a new setting, not in the brief.
-  With the brief's threshold-only rule the same false-accept target gave
-  55.4% named correctly instead of 71.8%.
+- **Embedding model: WeSpeaker ResNet34-LM, not the brief's ECAPA-TDNN.**
+  At the same false-accept rate it named 77.4% correctly against 71.7%, and it
+  is smaller (27 MB against 83 MB) and faster (170 ms against 267 ms). License
+  CC BY 4.0, so the apps must credit the WeSpeaker project.
+- **LDA projection fitted on the gallery itself** at load time; worth about
+  5 more points. Not a trained model: recomputed in milliseconds whenever the
+  gallery changes.
+- **ONNX Runtime + NumPy features**, no PyTorch in the service.
+- **Decision rule: threshold and margin** — `RECITER_THRESHOLD=0.725`,
+  `RECITER_MIN_MARGIN=0.12`. The margin is a setting the brief does not have.
 - **Gallery stores a phone-like copy of every clip** next to the studio one.
-- **Scoring in memory, Postgres as the store.** pgvector columns are in place.
+- **Scoring in memory, Postgres as the store.**
 - **`country` is null for every reciter.** No source here provides it and it
-  was not guessed. It needs filling in by hand or from another source.
-- Score keeps the brief's equal mix of centroid and top-5 clips; the three
-  variants are within 1.8 points of each other on Top-1.
+  was not guessed.
+- Tried and rejected: score normalization (z-, t-, s-norm), per-length
+  calibration, extra short gallery windows. Numbers in the plan.
 
 ### Environment change made with approval
 
@@ -394,17 +402,17 @@ At that setting, for a reciter who is in the gallery:
 
 ### Open issues
 
-1. **About 28% of known reciters come back as unknown** at this false-accept
-   rate (35% on phone-like audio). Loosening the setting names more reciters
-   and accepts more strangers; the curves are in the report.
+1. **17% of known reciters still come back as unknown** (26% on phone-like
+   audio, 24% on 5 s clips). The reliable lever left is more audio per
+   request; loosening the threshold trades directly against false accepts.
 2. **No second recording per reciter**, so robustness to a different
    recording is unknown. This is the biggest gap for real use.
-3. **Reciter `country` is empty** (the reciter screen shows it).
-4. mp3quran full-surah URLs are stored but have not been fetched; verified
-   when "continue listening" is built.
-5. The speaker-model tests that need the ONNX file do not run in CI.
-6. Carried over: no non-Quran speech negatives; EveryAyah audio has no stated
-   license; Flutter not installed here; Tanzil attribution due in the UI.
+3. **Attribution owed in the apps**: WeSpeaker (CC BY 4.0) and Tanzil.
+4. **Reciter `country` is empty** (the reciter screen shows it).
+5. mp3quran full-surah URLs are stored but have not been fetched.
+6. The speaker-model tests that need the ONNX file do not run in CI.
+7. Carried over: no non-Quran speech negatives; EveryAyah audio has no stated
+   license; Flutter not installed here.
 
 ### Next
 
