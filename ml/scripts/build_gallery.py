@@ -31,13 +31,13 @@ from heldout import HELDOUT_SURAHS
 
 from app.audio.decode import SAMPLE_RATE, AudioError, decode_audio
 from app.matcher.quran_data import load_quran
-from app.speaker.engine import OnnxEcapaEngine
+from app.speaker.engine import EMBEDDING_DIM, OnnxSpeakerEngine
 from app.speaker.gallery import Gallery, Voice
 
 BASE_URL = "https://everyayah.com/data"
 CACHE_DIR = REPO / "ml" / "data" / "everyayah"
 REGISTRY = REPO / "ml" / "registry" / "reciters.json"
-MODEL = REPO / "ml" / "artifacts" / "speaker" / "ecapa.onnx"
+MODEL = REPO / "ml" / "artifacts" / "speaker" / "resnet34.onnx"
 OUT = REPO / "ml" / "artifacts" / "gallery.npz"
 
 SEED = 20261117
@@ -88,7 +88,7 @@ def download(folder: str, ayahs: list[tuple[int, int]]) -> list[Path]:
 
 
 def embed_voice(
-    engine: OnnxEcapaEngine, files: list[Path], augment_seed: list[int] | None
+    engine: OnnxSpeakerEngine, files: list[Path], augment_seed: list[int] | None
 ) -> np.ndarray:
     """Embeddings of each clip and, if `augment_seed` is given, of a phone-like copy."""
     rng = np.random.default_rng(augment_seed) if augment_seed is not None else None
@@ -113,7 +113,7 @@ def embed_voice(
             kbps = int(rng.integers(16, 25))
             coded = encode(degraded, "webm", "libopus", kbps * 1000)
             rows.append(engine.embed(decode_audio(coded, max_bytes=10**8, max_seconds=60)))
-    return np.stack(rows) if rows else np.zeros((0, 192), dtype=np.float32)
+    return np.stack(rows) if rows else np.zeros((0, EMBEDDING_DIM), dtype=np.float32)
 
 
 def main() -> int:
@@ -142,7 +142,7 @@ def main() -> int:
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         downloads = list(pool.map(lambda job: download(job[1], ayahs), jobs))
 
-    engine = OnnxEcapaEngine(MODEL, cpu_threads=4)
+    engine = OnnxSpeakerEngine(MODEL, cpu_threads=4)
     built: dict[Voice, np.ndarray] = {}
     for (voice, folder), files in zip(jobs, downloads, strict=True):
         seed = None if args.no_augment else [SEED, *folder.encode()]
