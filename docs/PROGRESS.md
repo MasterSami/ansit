@@ -512,6 +512,59 @@ threads): p95 1.6 s / 3.4 s / 6.6 s at 1 / 2 / 4 users, about 0.9 requests/s.
    reciter; reciter `country` empty; attribution owed in the apps (Tanzil,
    WeSpeaker); Flutter not installed here.
 
+## Phase 5 — Web app
+
+Plan: [`docs/plans/phase-5.md`](plans/phase-5.md). App: [`web/`](../web/README.md).
+
+### What exists
+
+- Next.js 16 / React 19 / Tailwind 4 app, Arabic and RTL, dark + light themes.
+- Screens: home, listen (permission explainer, recording, identifying),
+  result, ambiguous result, history / saved, reciter, settings, and a
+  "coming soon" mushaf tab; all error and empty states.
+- Local history in IndexedDB (results only), per-ayah audio player with
+  auto-advance, feedback sheet, share, PWA manifest + icons + service worker.
+
+### Checks (run on 2026-11-17)
+
+| Check                      | Result                          |
+| -------------------------- | ------------------------------- |
+| `npm run lint`             | clean                           |
+| `npm run typecheck`        | clean                           |
+| `npm test` (Vitest)        | 20 passed                       |
+| `npm run e2e` (Playwright) | 6 passed (API mocked, fake mic) |
+| `npm run build`            | succeeds, all routes static     |
+
+Real end-to-end check, done by hand once: a 12 s studio clip of Yusuf 84 was
+played into Chromium as the microphone, with the web app pointed at the real
+backend. Result page showed the right surah and ayah (text match 100%), the
+reciter as "unknown" with the correct reciter as first guess (69%). Upload to
+result page took 1.2 s and 1.9 s in two runs. Playback of per-ayah audio from
+the reciter page worked.
+
+### Not verified
+
+- **No real phone or real microphone was used.** Safari / iOS recording
+  (`audio/mp4`) is handled in code but untested.
+- The service worker and "install as app" were not exercised in a browser;
+  they only register in production builds.
+- No screen-reader pass and no automated accessibility audit.
+- The permission explainer is covered by the manual run, not by the e2e tests
+  (Chromium's fake-microphone flag reports permission as already granted in
+  that setup).
+
+### Open issues
+
+1. **No Dockerfile for the web app yet**, and it is not in `docker-compose`.
+2. **The home-screen motto is the one piece of Quran text typed in the code**
+   (in `messages/ar.json`), copied from the approved mockup. Everything else
+   comes from the API. Needs an explicit yes/no from the owner.
+3. Favourite reciters are stored locally but not listed anywhere yet.
+4. Tafsir is a disabled "soon" button; the mushaf tab is a placeholder.
+5. Listening needs HTTPS (or localhost): a browser rule, relevant to deploys.
+6. "Continue listening" with an unknown reciter falls back to a fixed default
+   reciter (`alafasy`) if there is no guess.
+
 ### Next
 
-Phase 5 — web app (Next.js). Not started; waiting for review.
+Phase 6 — mobile app (Flutter).

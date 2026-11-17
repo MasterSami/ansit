@@ -3,7 +3,7 @@
 Listens to a short Quran recitation (5–15 s) and returns the surah, the ayah and
 the reciter's name.
 
-Status: **Phases 0–4 complete**: the backend identifies surah, ayah and reciter over HTTP. The web and mobile apps are next. See [`docs/PROGRESS.md`](docs/PROGRESS.md).
+Status: **Phases 0–5 complete**: the backend identifies surah, ayah and reciter over HTTP, and the web app (`web/`) is usable in a browser. The mobile app is next. See [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Quick start
 
@@ -56,7 +56,7 @@ API reference: [`docs/API.md`](docs/API.md).
 | ---------- | ------------------------------------------------------------------------ |
 | `backend/` | FastAPI service (Python 3.11+, uv, ruff, mypy, pytest)                   |
 | `ml/`      | Offline scripts: data download, index build, gallery build, evaluation   |
-| `web/`     | Next.js app (Phase 5)                                                    |
+| `web/`     | Next.js web app (PWA)                                                    |
 | `mobile/`  | Flutter app (Phase 6)                                                    |
 | `infra/`   | docker-compose, Dockerfiles, load tests                                  |
 | `docs/`    | Plans per phase, progress log, API and data-source notes, design mockups |
