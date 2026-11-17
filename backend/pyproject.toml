@@ -17,6 +17,9 @@ dependencies = [
     "numpy>=1.26",
     "faster-whisper>=1.1",
     "av>=12",
+    "pgvector>=0.3",
+    "alembic>=1.13",
+    "onnxruntime>=1.17",
 ]
 
 [dependency-groups]
@@ -34,6 +37,10 @@ ml = [
     "torch>=2.4",
     "transformers>=4.44,<5",
     "scipy>=1.13",
+    "torchaudio>=2.4",
+    "speechbrain>=1.0",
+    "onnx>=1.16",
+    "onnxscript>=0.1",
 ]
 
 [tool.uv]
@@ -41,6 +48,7 @@ package = false
 
 [tool.uv.sources]
 torch = { index = "pytorch-cpu" }
+torchaudio = { index = "pytorch-cpu" }
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
@@ -63,7 +71,7 @@ module = "app.*"
 strict = true
 
 [[tool.mypy.overrides]]
-module = "faster_whisper.*"
+module = ["faster_whisper.*", "onnxruntime.*", "pgvector.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
