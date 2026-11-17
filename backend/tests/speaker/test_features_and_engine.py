@@ -4,12 +4,12 @@ import numpy as np
 import pytest
 
 from app.audio.decode import SAMPLE_RATE, Waveform
-from app.speaker.engine import EMBEDDING_DIM, OnnxEcapaEngine
-from app.speaker.features import HOP, N_MELS, fbank
+from app.speaker.engine import EMBEDDING_DIM, OnnxSpeakerEngine
+from app.speaker.features import FRAME_LENGTH, FRAME_SHIFT, N_MELS, fbank
 from tests.audio.helpers import tone
 
 REPO = Path(__file__).resolve().parents[3]
-MODEL = REPO / "ml" / "artifacts" / "speaker" / "ecapa.onnx"
+MODEL = REPO / "ml" / "artifacts" / "speaker" / "resnet34.onnx"
 
 
 def voiced(seconds: float, pitch: float, seed: int) -> Waveform:
@@ -27,7 +27,7 @@ def voiced(seconds: float, pitch: float, seed: int) -> Waveform:
 def test_fbank_shape_and_dtype() -> None:
     features = fbank(tone(2.0))
     assert features.dtype == np.float32
-    assert features.shape == (1 + 2 * SAMPLE_RATE // HOP, N_MELS)
+    assert features.shape == (1 + (2 * SAMPLE_RATE - FRAME_LENGTH) // FRAME_SHIFT, N_MELS)
 
 
 def test_fbank_is_mean_normalized_over_time() -> None:
@@ -36,25 +36,20 @@ def test_fbank_is_mean_normalized_over_time() -> None:
 
 
 def test_fbank_is_volume_invariant() -> None:
-    """Log-mel minus its mean removes overall gain (as long as nothing clips to the floor)."""
+    """Log-mel minus its mean removes overall gain."""
     signal = voiced(2.0, 120, seed=2)
     assert np.allclose(fbank(signal), fbank(signal * 0.25), atol=1e-2)
 
 
-def test_fbank_tracks_frequency() -> None:
-    low = fbank(tone(1.0, 300.0)).var(axis=0)  # which mel bin moves... use energy instead
-    del low
-    low_bin = int(np.argmax(_mel_energy(tone(1.0, 300.0))))
-    high_bin = int(np.argmax(_mel_energy(tone(1.0, 3000.0))))
-    assert low_bin < high_bin
-
-
-def _mel_energy(signal: Waveform) -> np.ndarray:
+def test_mel_filters_cover_the_band_in_order() -> None:
     from app.speaker import features as f
 
-    padded = np.pad(signal.astype(np.float64), f.N_FFT // 2)
-    frame = padded[: f.N_FFT] * f._window()
-    return np.asarray((np.abs(np.fft.rfft(frame)) ** 2) @ f._mel_filterbank().T)
+    filters = f._mel_filterbank()
+    assert filters.shape == (N_MELS, f.N_FFT // 2)
+    assert (filters >= 0).all() and float(np.max(filters)) <= 1.0
+    peaks = filters.argmax(axis=1)
+    assert (np.diff(peaks) >= 0).all()  # centre frequencies increase
+    assert peaks[0] <= 3 and peaks[-1] >= f.N_FFT // 2 - 12
 
 
 def test_fbank_rejects_too_short_input() -> None:
@@ -62,46 +57,51 @@ def test_fbank_rejects_too_short_input() -> None:
         fbank(np.zeros(100, dtype=np.float32))
 
 
-def test_fbank_matches_speechbrain() -> None:
-    """Parity with the reference implementation; needs the `ml` dependency group."""
+def test_fbank_matches_kaldi_reference() -> None:
+    """Parity with torchaudio's Kaldi implementation; needs the `ml` dependency group."""
     torch = pytest.importorskip("torch")
-    features = pytest.importorskip("speechbrain.lobes.features")
-    processing = pytest.importorskip("speechbrain.processing.features")
+    torchaudio = pytest.importorskip("torchaudio")
 
     signal = voiced(4.0, 150, seed=3)
-    with torch.no_grad():
-        reference = features.Fbank(n_mels=80)(torch.from_numpy(signal)[None])
-        reference = processing.InputNormalization(norm_type="sentence", std_norm=False)(
-            reference, torch.ones(1)
-        )
+    reference = torchaudio.compliance.kaldi.fbank(
+        torch.from_numpy(signal)[None] * 32768,
+        num_mel_bins=80,
+        frame_length=25,
+        frame_shift=10,
+        dither=0.0,
+        energy_floor=0.0,
+        sample_frequency=SAMPLE_RATE,
+    )
+    reference = (reference - reference.mean(0, keepdim=True)).numpy()
     ours = fbank(signal)
-    assert ours.shape == tuple(reference.shape[1:])
-    assert float(np.abs(ours - reference[0].numpy()).max()) < 5e-3
+    assert ours.shape == reference.shape
+    assert float(np.abs(ours - reference).max()) < 5e-2
+    assert float(np.abs(ours - reference).mean()) < 1e-3
 
 
 # --- engine ---
 
 
 def test_missing_model_file_is_a_clear_error(tmp_path: Path) -> None:
-    with pytest.raises(FileNotFoundError, match="export_speaker_model"):
-        OnnxEcapaEngine(tmp_path / "nope.onnx")
+    with pytest.raises(FileNotFoundError, match="fetch_speaker_model"):
+        OnnxSpeakerEngine(tmp_path / "nope.onnx")
 
 
 @pytest.fixture(scope="module")
-def engine() -> OnnxEcapaEngine:
+def engine() -> OnnxSpeakerEngine:
     if not MODEL.is_file():
-        pytest.skip("speaker model not built; run ml/scripts/export_speaker_model.py")
-    return OnnxEcapaEngine(MODEL)
+        pytest.skip("speaker model not built; run ml/scripts/fetch_speaker_model.py")
+    return OnnxSpeakerEngine(MODEL)
 
 
-def test_embedding_is_192d_and_normalized(engine: OnnxEcapaEngine) -> None:
+def test_embedding_has_the_model_dimension_and_is_normalized(engine: OnnxSpeakerEngine) -> None:
     embedding = engine.embed(voiced(5.0, 130, seed=4))
     assert embedding.shape == (EMBEDDING_DIM,)
     assert embedding.dtype == np.float32
     assert float(np.linalg.norm(embedding)) == pytest.approx(1.0, abs=1e-5)
 
 
-def test_embedding_is_deterministic_and_length_tolerant(engine: OnnxEcapaEngine) -> None:
+def test_embedding_is_deterministic_and_length_tolerant(engine: OnnxSpeakerEngine) -> None:
     signal = voiced(8.0, 130, seed=5)
     first = engine.embed(signal)
     assert np.allclose(first, engine.embed(signal), atol=1e-6)

@@ -38,9 +38,6 @@ ml = [
     "transformers>=4.44,<5",
     "scipy>=1.13",
     "torchaudio>=2.4",
-    "speechbrain>=1.0",
-    "onnx>=1.16",
-    "onnxscript>=0.1",
 ]
 
 [tool.uv]

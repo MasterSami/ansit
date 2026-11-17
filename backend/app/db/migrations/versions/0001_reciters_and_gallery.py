@@ -14,7 +14,7 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-EMBEDDING_DIM = 192  # fixed for this migration; a model change needs a new one
+EMBEDDING_DIM = 256  # fixed for this migration; a model change needs a new one
 
 
 def upgrade() -> None:

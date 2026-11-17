@@ -46,8 +46,8 @@ data: ## Download Quran text + metadata from Tanzil
 index: ## Build the Quran search index artifact
 	uv run --project backend python ml/scripts/build_index.py
 
-speaker-model: ## Export the speaker embedding model to ONNX (needs the `ml` group)
-	uv run --project backend --group ml python ml/scripts/export_speaker_model.py
+speaker-model: ## Download + verify the speaker embedding model (needs the `ml` group)
+	uv run --project backend --group ml python ml/scripts/fetch_speaker_model.py
 
 registry: ## Rebuild ml/registry/reciters.json from mp3quran + EveryAyah
 	uv run --project backend python ml/scripts/build_registry.py

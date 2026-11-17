@@ -10,7 +10,7 @@ import onnxruntime as ort
 from app.audio.decode import SAMPLE_RATE, Waveform
 from app.speaker.features import fbank
 
-EMBEDDING_DIM = 192
+EMBEDDING_DIM = 256
 Embedding = npt.NDArray[np.float32]
 
 
@@ -27,17 +27,18 @@ class SpeakerEngine(Protocol):
         ...
 
 
-class OnnxEcapaEngine:
-    """ECAPA-TDNN (speechbrain/spkrec-ecapa-voxceleb) exported to ONNX.
+class OnnxSpeakerEngine:
+    """WeSpeaker ResNet34 (VoxCeleb, large-margin fine-tuned) on ONNX Runtime, CPU.
 
-    192-dimensional, L2-normalized embeddings. Runs on ONNX Runtime, CPU.
+    256-dimensional, L2-normalized embeddings. The model file is fetched and
+    verified by ml/scripts/fetch_speaker_model.py.
     """
 
     def __init__(self, model_path: str | Path, *, cpu_threads: int = 2) -> None:
         path = Path(model_path)
         if not path.is_file():
             raise FileNotFoundError(
-                f"no speaker model at {path} - run ml/scripts/export_speaker_model.py"
+                f"no speaker model at {path} - run ml/scripts/fetch_speaker_model.py"
             )
         options = ort.SessionOptions()
         options.intra_op_num_threads = cpu_threads
@@ -45,10 +46,11 @@ class OnnxEcapaEngine:
         self._session = ort.InferenceSession(
             str(path), sess_options=options, providers=["CPUExecutionProvider"]
         )
+        self._input = self._session.get_inputs()[0].name
 
     def embed(self, waveform_16k: Waveform) -> Embedding:
         features = fbank(waveform_16k)[None, :, :]
-        (output,) = self._session.run(None, {"feats": features})
+        (output,) = self._session.run(None, {self._input: features})
         embedding = np.asarray(output).reshape(-1)
         if embedding.shape != (EMBEDDING_DIM,):
             raise RuntimeError(f"unexpected embedding shape {embedding.shape}")
