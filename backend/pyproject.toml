@@ -20,6 +20,7 @@ dependencies = [
     "pgvector>=0.3",
     "alembic>=1.13",
     "onnxruntime>=1.17",
+    "python-multipart>=0.0.9",
 ]
 
 [dependency-groups]

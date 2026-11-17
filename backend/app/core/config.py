@@ -22,6 +22,19 @@ class Settings(BaseSettings):
     allow_debug: bool = False
     cors_origins: Annotated[list[str], NoDecode] = Field(default_factory=list)
     rate_limit_per_min: int = Field(default=20, ge=1)
+    trust_proxy_headers: bool = False
+    """Take the client IP from X-Forwarded-For. Only behind a proxy you control."""
+
+    load_models: bool = True
+    """Load the index, models and gallery at startup. Off only in tests."""
+    reciter_enabled: bool = True
+    """Run the reciter branch. When off, every reciter is reported as unknown."""
+    max_concurrent_identify: int = Field(default=2, ge=1)
+    """How many identify requests may run the models at the same time. Each one
+    uses CPU_THREADS_ASR + CPU_THREADS_SPEAKER threads."""
+    identify_queue_timeout_sec: float = Field(default=10.0, gt=0)
+    ambiguous_ttl_sec: int = Field(default=300, ge=10)
+    """How long an ambiguous result's candidate positions are kept for "listen longer"."""
 
     # --- stores (unset = not used / not checked by /readyz) ---
     database_url: str | None = None
@@ -39,8 +52,10 @@ class Settings(BaseSettings):
 
     quran_index_path: str = "../ml/artifacts/quran_index.json.gz"
     speaker_model_path: str = "../ml/artifacts/speaker/resnet34.onnx"
-    gallery_path: str | None = None
-    """Gallery file to use instead of the database (development without Postgres)."""
+    gallery_path: str | None = "../ml/artifacts/gallery.npz"
+    registry_path: str | None = "../ml/registry/reciters.json"
+    """Gallery and registry files, used when the database has no gallery
+    (development without Postgres)."""
 
     # --- audio limits ---
     min_speech_sec: float = Field(default=1.5, gt=0)
@@ -49,12 +64,15 @@ class Settings(BaseSettings):
     max_upload_mb: float = Field(default=2.0, gt=0)
 
     # --- models ---
-    asr_model_path: str | None = None
+    asr_model_path: str | None = "../ml/artifacts/asr/tarteel-base"
     asr_beam_size: int = Field(default=5, ge=1)
     asr_device: Literal["cpu", "cuda"] = "cpu"
     asr_compute_type: str = "int8"
+    # The two branches of a request run at the same time. Measured on 4 vCPU
+    # (Phase 4 load test): 2 ASR threads is faster than 3 or 4 once the speaker
+    # branch runs alongside, and leaves room for a second request in parallel.
     cpu_threads_asr: int = Field(default=2, ge=1)
-    cpu_threads_speaker: int = Field(default=2, ge=1)
+    cpu_threads_speaker: int = Field(default=1, ge=1)
 
     # --- speech detection and hallucination guards ---
     # Low on purpose: Silero under-detects recitation (see app/audio/vad.py).
@@ -72,7 +90,14 @@ class Settings(BaseSettings):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
 
-    @field_validator("database_url", "redis_url", "asr_model_path", "gallery_path", mode="before")
+    @field_validator(
+        "database_url",
+        "redis_url",
+        "asr_model_path",
+        "gallery_path",
+        "registry_path",
+        mode="before",
+    )
     @classmethod
     def _empty_is_none(cls, value: object) -> object:
         return None if value == "" else value
