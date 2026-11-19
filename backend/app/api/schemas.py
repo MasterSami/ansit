@@ -153,6 +153,19 @@ class AyahDetailOut(BaseModel):
     text_attribution: str = TEXT_ATTRIBUTION
 
 
+class TafsirOut(BaseModel):
+    surah: int
+    ayah: int
+    text: str = Field(description="Verbatim tafsir text from the named source.")
+    source_key: str
+    book: str
+    author: str
+    publisher: str
+    version: str
+    source_url: str
+    attribution: str
+
+
 # ------------------------------------------------------------------ reciters
 
 

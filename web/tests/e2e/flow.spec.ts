@@ -136,9 +136,31 @@ async function mockApi(page: Page, identify: object | number): Promise<Mock> {
     }
     if (path.startsWith("/v1/ayahs/")) {
       const [, , , surah, ayah] = path.split("/");
+      const selectedSurah = Number(surah);
+      const selectedAyah = Number(ayah);
       return json(route, {
-        ayah: { ...AMBIGUOUS.ayah, surah: Number(surah), ayah: Number(ayah) },
+        ayah: {
+          ...AMBIGUOUS.ayah,
+          surah: selectedSurah,
+          surah_name_ar: selectedSurah === 67 ? "الملك" : "الرحمن",
+          ayah: selectedAyah,
+        },
         context: [],
+      });
+    }
+    if (path.startsWith("/v1/tafsir/")) {
+      const [, , , surah, ayah] = path.split("/");
+      return json(route, {
+        surah: Number(surah),
+        ayah: Number(ayah),
+        text: "شرح من المصدر للاختبار",
+        source_key: "arabic_moyassar",
+        book: "التفسير الميسر",
+        author: "نخبة من العلماء",
+        publisher: "مجمع الملك فهد لطباعة المصحف الشريف",
+        version: "غير منشور من المصدر",
+        source_url: "https://quranenc.com/ar/browse/arabic_moyassar/67/1",
+        attribution: "المصدر QuranEnc.com",
       });
     }
     if (path === "/v1/reciters") {
@@ -170,7 +192,7 @@ async function mockApi(page: Page, identify: object | number): Promise<Mock> {
  */
 async function listen(page: Page) {
   await page.goto("/");
-  await page.getByRole("link", { name: "اضغط لتنصت" }).click();
+  await page.getByRole("link", { name: "جرّب التعرّف على التلاوة" }).click();
   const allow = page.getByRole("button", { name: "السماح بالمايكروفون" });
   const listening = page.getByText("جارٍ الإنصات…");
   // Retried as a unit: on first load both can be in the page for a moment.
@@ -248,6 +270,59 @@ test("identifies a recitation and keeps it in the local history", async ({
       "textConfidence",
     ].sort(),
   );
+});
+
+test("opens the identified ayah tafsir on demand", async ({ page }) => {
+  await mockApi(page, MATCH);
+  await page.goto("/");
+  await page.evaluate(
+    (response) =>
+      new Promise<void>((resolve, reject) => {
+        const open = indexedDB.open("ansit", 1);
+        open.onerror = () => reject(open.error);
+        open.onupgradeneeded = () => {
+          open.result
+            .createObjectStore("history", { keyPath: "id" })
+            .createIndex("createdAt", "createdAt");
+        };
+        open.onsuccess = () => {
+          const tx = open.result.transaction("history", "readwrite");
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+          tx.objectStore("history").put({
+            id: response.id,
+            createdAt: Date.now(),
+            status: response.status,
+            ayah: response.ayah,
+            textConfidence: response.text_confidence,
+            candidates: response.candidates,
+            repeatedCount: response.repeated_count,
+            reciter: response.reciter,
+            saved: false,
+          });
+        };
+      }),
+    MATCH,
+  );
+  await page.goto(`/result?id=${MATCH.id}`);
+
+  await page.getByRole("button", { name: "التفسير" }).click();
+  await expect(page.getByText("شرح من المصدر للاختبار")).toBeVisible();
+  await expect(page.getByText(/غير منشور من المصدر/)).toBeVisible();
+});
+
+test("opens a mushaf ayah and its tafsir", async ({ page }) => {
+  await mockApi(page, MATCH);
+  await page.goto("/mushaf");
+
+  await page.getByLabel("السورة").selectOption("67");
+  await page.getByLabel("الآية").fill("1");
+  await page.getByRole("button", { name: "عرض الآية" }).click();
+  await expect(
+    page.getByRole("heading", { name: "سورة الملك · الآية ١" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "عرض التفسير" }).click();
+  await expect(page.getByText("شرح من المصدر للاختبار")).toBeVisible();
 });
 
 test("sends feedback about a wrong result", async ({ page }) => {

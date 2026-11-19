@@ -14,6 +14,7 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     locale: "ar",
+    permissions: ["microphone"],
     viewport: { width: 402, height: 874 },
     launchOptions: {
       ...(existsSync(localChromium) ? { executablePath: localChromium } : {}),

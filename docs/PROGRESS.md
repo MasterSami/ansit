@@ -676,3 +676,21 @@ were in place.
 
 Phase 7 is optional in the brief (audio-fingerprint fast path, feedback
 report) and should wait for real-device results and real usage data.
+
+## Phase 8 — Tafsir and reciter library · in progress
+
+- Added lazy per-ayah Tafsir al-Muyassar retrieval from QuranEnc, with source
+  details and attribution in the result and Mushaf screens.
+- QuranEnc's public endpoint does not expose an edition version for this
+  translation. The UI discloses that fact; the source's reuse terms request
+  the edition version, so publishing the translation remains subject to
+  resolving that metadata gap.
+- Added a searchable reciter library with Egyptian, Saudi, and other-country
+  filters, populated only from the existing verified audio catalog. Entries
+  lacking audio are not represented as playable or recognition-enabled.
+- Corrected the browser-flow home CTA selector to match the current landing
+  page. Targeted browser verification is still pending due to local Playwright
+  web-server startup behavior.
+- Remaining: source/license confirmation for tafsir version, curate additional
+  reciter entries only when audio and provenance can be verified, and complete
+  the browser-flow run.

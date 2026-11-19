@@ -71,7 +71,7 @@ export function LandingPage() {
           <a href="#how">كيف يعمل</a>
           <a href="#reciters">مكتبة القرّاء</a>
         </nav>
-        <Link className="landing-nav-cta" href="/mushaf">اكتشف أنصت <ArrowIcon /></Link>
+        <Link className="landing-nav-cta" href="/reciters">مكتبة القراء <ArrowIcon /></Link>
       </header>
 
       <main>
@@ -174,7 +174,7 @@ export function LandingPage() {
 
         <section className="landing-reciter-section landing-shell" id="reciters" aria-labelledby="reciters-title">
           <div className="landing-reciter-heading"><div><SectionKicker>أصوات نحب الاستماع إليها</SectionKicker><h2 id="reciters-title">من مكتبة القرّاء.</h2></div><p>تعرّف على بعض القرّاء المتاحين ضمن مكتبة أنصت، واستكشف التلاوات من داخل التطبيق.</p></div>
-          <div className="landing-reciter-row">{featuredReciters.map((reciter) => <div className="landing-reciter" key={reciter.id}><Image className="landing-reciter-photo" src={reciter.image} alt={`صورة القارئ ${reciter.name}`} width={84} height={84} unoptimized /><strong>{reciter.name}</strong></div>)}<Link className="landing-reciter-more" href="/mushaf"><span>+</span><small>اكتشف المكتبة</small></Link></div>
+          <div className="landing-reciter-row">{featuredReciters.map((reciter) => <div className="landing-reciter" key={reciter.id}><Image className="landing-reciter-photo" src={reciter.image} alt={`صورة القارئ ${reciter.name}`} width={84} height={84} unoptimized /><strong>{reciter.name}</strong></div>)}<Link className="landing-reciter-more" href="/reciters"><span>+</span><small>اكتشف المكتبة</small></Link></div>
         </section>
 
         <section className="landing-final-cta landing-shell" aria-labelledby="final-title">

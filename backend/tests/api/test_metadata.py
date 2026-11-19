@@ -4,7 +4,10 @@ import uuid
 from typing import Any
 
 import httpx
+import pytest
 
+from app.api import tafsir as tafsir_api
+from app.api.schemas import TafsirOut
 from tests.api.conftest import Harness, api_client
 
 # --------------------------------------------------------------------- quran
@@ -79,6 +82,71 @@ async def test_ayah_not_found(api: httpx.AsyncClient) -> None:
     assert response.status_code == 404
     assert response.json()["error"] == {"code": "not_found", "message": "Surah 1 has no ayah 8."}
     assert (await api.get("/v1/ayahs/2/1", params={"context": 9})).status_code == 422
+
+
+async def test_tafsir_returns_requested_ayah_and_attribution(
+    api: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    async def fake_tafsir(surah: int, ayah: int) -> TafsirOut:
+        return TafsirOut(
+            surah=surah,
+            ayah=ayah,
+            text="نص المصدر كما ورد",
+            source_key="arabic_moyassar",
+            book="التفسير الميسر",
+            author="نخبة من العلماء",
+            publisher="مجمع الملك فهد لطباعة المصحف الشريف",
+            version="test-version",
+            source_url=f"https://quranenc.com/ar/browse/arabic_moyassar/{surah}/{ayah}",
+            attribution="QuranEnc.com",
+        )
+
+    monkeypatch.setattr(tafsir_api, "_get_tafsir", fake_tafsir)
+    response = await api.get("/v1/tafsir/55/13")
+    assert response.status_code == 200
+    body = response.json()
+    assert (body["surah"], body["ayah"]) == (55, 13)
+    assert body["text"] == "نص المصدر كما ورد"
+    assert body["book"] == "التفسير الميسر"
+    assert body["author"] == "نخبة من العلماء"
+    assert body["version"] == "test-version"
+    assert "max-age=" in response.headers["cache-control"]
+
+
+async def test_tafsir_rejects_invalid_reference_and_source(api: httpx.AsyncClient) -> None:
+    missing_ayah = await api.get("/v1/tafsir/1/8")
+    assert missing_ayah.status_code == 404
+    wrong_source = await api.get("/v1/tafsir/1/1", params={"source": "unknown"})
+    assert wrong_source.status_code == 404
+
+
+async def test_tafsir_provider_preserves_text_and_caches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    key = (tafsir_api.SOURCE_KEY, 3, 5)
+    tafsir_api._cache.pop(key, None)
+    calls: list[str] = []
+
+    async def fake_fetch(url: str) -> dict[str, Any]:
+        calls.append(url)
+        return {
+            "result": {
+                "sura": "3",
+                "aya": "5",
+                "translation": "نصٌ حرفيٌّ من المصدر",
+            }
+        }
+
+    monkeypatch.setattr(tafsir_api, "_fetch_json", fake_fetch)
+    first = await tafsir_api._get_tafsir(3, 5)
+    second = await tafsir_api._get_tafsir(3, 5)
+    assert first.text == "نصٌ حرفيٌّ من المصدر"
+    assert first.version == "غير منشور من المصدر"
+    assert first.surah == 3 and first.ayah == 5
+    assert second == first
+    assert len(calls) == 1
+    assert calls[0].endswith("/arabic_moyassar/3/5")
+    tafsir_api._cache.pop(key, None)
 
 
 async def test_metadata_is_unavailable_until_the_index_loads() -> None:
@@ -160,6 +228,7 @@ async def test_openapi_documents_the_v1_endpoints(api: httpx.AsyncClient) -> Non
         "/v1/surahs",
         "/v1/surahs/{number}",
         "/v1/ayahs/{surah}/{ayah}",
+        "/v1/tafsir/{surah}/{ayah}",
         "/v1/reciters",
         "/v1/reciters/{reciter_id}",
         "/v1/feedback",

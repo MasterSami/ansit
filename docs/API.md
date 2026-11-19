@@ -150,6 +150,15 @@ timings, `client` and app version.
 | GET    | `/v1/surahs`                         | All 114 surahs: `number`, `name_ar`, `name_en`, `ayah_count`, `revelation`; plus `text_attribution`.                                                                                                 |
 | GET    | `/v1/surahs/{number}`                | The same for one surah, plus `first_page`, `first_juz` and `basmala_uthmani` (null for surahs 1 and 9).                                                                                              |
 | GET    | `/v1/ayahs/{surah}/{ayah}?context=N` | The ayah (same object as in identify), `basmala_uthmani` (set on ayah 1 of surahs that open with one), and `context.before` / `context.after`: up to `N` (0–5) neighbouring ayahs in the same surah. |
+| GET    | `/v1/tafsir/{surah}/{ayah}?source=arabic_moyassar` | One tafsir entry for a validated surah and ayah. Fetched on demand from QuranEnc and cached for six hours. |
+
+The tafsir response includes the verbatim text, book, authoring committee,
+publisher, version disclosure, source URL, and attribution. QuranEnc's reuse
+terms require keeping content unmodified, crediting publisher and source,
+retaining the edition version, reporting corrections, and adopting new editions.
+The API does not publish a version for this tafsir, so ANSIT reports that
+plainly. Confirm the edition identifier with the publisher before treating
+republication as fully compliant. The client requests only one ayah at a time.
 
 Ayah text is the Tanzil Uthmani text, unmodified. **Wherever it is shown, the
 app must credit Tanzil Project and link to tanzil.net**; `text_attribution`

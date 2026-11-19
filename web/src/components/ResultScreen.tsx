@@ -9,7 +9,9 @@ import {
   type Candidate,
   getAyah,
   getReciter,
+  getTafsir,
   type ReciterSummary,
+  type Tafsir,
 } from "@/lib/api";
 import { getEntry, type HistoryEntry, updateEntry } from "@/lib/history";
 import {
@@ -119,6 +121,10 @@ function MatchView({
     "wrong_ayah" | "wrong_reciter" | null
   >(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [tafsirOpen, setTafsirOpen] = useState(false);
+  const [tafsir, setTafsir] = useState<Tafsir | null>(null);
+  const [tafsirLoading, setTafsirLoading] = useState(false);
+  const [tafsirFailed, setTafsirFailed] = useState(false);
   const { ayah, reciter } = entry;
 
   const named: { id: string; name: string } | null = entry.userReciter
@@ -180,6 +186,21 @@ function MatchView({
       userReciter: { id: picked.id, name_ar: picked.name_ar },
     });
     if (next) onChange(next);
+  };
+
+  const toggleTafsir = () => {
+    const opening = !tafsirOpen;
+    setTafsirOpen(opening);
+    if (opening) loadTafsir();
+  };
+
+  const loadTafsir = () => {
+    if (tafsir || tafsirLoading) return;
+    setTafsirFailed(false);
+    setTafsirLoading(true);
+    getTafsir(ayah.surah, ayah.ayah)
+      .then(setTafsir, () => setTafsirFailed(true))
+      .finally(() => setTafsirLoading(false));
   };
 
   return (
@@ -251,6 +272,53 @@ function MatchView({
           >
             {t("result.textCredit")}
           </a>
+          {tafsirOpen && (
+            <section
+              aria-live="polite"
+              className="flex flex-col gap-2 border-t border-divider pt-4"
+            >
+              {tafsirLoading && (
+                <p className="text-sm text-muted">
+                  {t("result.tafsirLoading")}
+                </p>
+              )}
+              {tafsirFailed && (
+                <div className="flex items-center justify-between gap-3 text-sm text-muted">
+                  <span>{t("result.tafsirFailed")}</span>
+                  <button
+                    type="button"
+                    className="font-semibold text-accent"
+                    onClick={loadTafsir}
+                  >
+                    {t("common.retry")}
+                  </button>
+                </div>
+              )}
+              {tafsir && (
+                <>
+                  <h2 className="font-semibold">{tafsir.book}</h2>
+                  <p dir="rtl" lang="ar" className="text-[15px] leading-8">
+                    {tafsir.text}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {t("result.tafsirAuthor", {
+                      author: tafsir.author,
+                      publisher: tafsir.publisher,
+                      version: tafsir.version,
+                    })}
+                  </p>
+                  <a
+                    href={tafsir.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="self-start text-xs text-accent underline underline-offset-4"
+                  >
+                    {tafsir.attribution}
+                  </a>
+                </>
+              )}
+            </section>
+          )}
         </Card>
 
         <Card
@@ -344,7 +412,10 @@ function MatchView({
         </Card>
 
         {notice && (
-          <p role="status" className="text-center text-[13px] text-muted lg:col-start-2">
+          <p
+            role="status"
+            className="text-center text-[13px] text-muted lg:col-start-2"
+          >
             {notice}
           </p>
         )}
@@ -356,9 +427,9 @@ function MatchView({
           </PrimaryButton>
           <div className="grid grid-cols-3 gap-2.5">
             <ActionTile
-              disabled
               label={t("result.tafsir")}
-              hint={t("common.soon")}
+              pressed={tafsirOpen}
+              onClick={toggleTafsir}
             >
               <BookIcon />
             </ActionTile>

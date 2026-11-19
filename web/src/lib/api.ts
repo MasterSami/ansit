@@ -18,6 +18,19 @@ export interface Ayah {
   ayah_count: number;
 }
 
+export interface Tafsir {
+  surah: number;
+  ayah: number;
+  text: string;
+  source_key: string;
+  book: string;
+  author: string;
+  publisher: string;
+  version: string;
+  source_url: string;
+  attribution: string;
+}
+
 export interface Candidate {
   surah: number;
   surah_name_ar: string;
@@ -180,6 +193,16 @@ export async function getSurahs(): Promise<Surah[]> {
 
 export async function getAyah(surah: number, ayah: number): Promise<Ayah> {
   return (await request<{ ayah: Ayah }>(`/v1/ayahs/${surah}/${ayah}`)).ayah;
+}
+
+export function getTafsir(
+  surah: number,
+  ayah: number,
+  source = "arabic_moyassar",
+): Promise<Tafsir> {
+  return request<Tafsir>(
+    `/v1/tafsir/${surah}/${ayah}?source=${encodeURIComponent(source)}`,
+  );
 }
 
 export async function getReciters(): Promise<ReciterSummary[]> {
