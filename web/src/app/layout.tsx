@@ -5,6 +5,7 @@ import { Providers } from "@/components/Providers";
 import { THEME_BOOTSTRAP } from "@/lib/theme";
 
 import "./globals.css";
+import "./landing.css";
 
 // UI text, display (wordmark, surah names) and ayah text, per the design tokens.
 const plex = IBM_Plex_Sans_Arabic({
