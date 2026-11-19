@@ -10,7 +10,7 @@ const featuredReciters = [
   { id: "muaiqly", name: "ماهر المعيقلي", image: "https://quranmedia.online/images/reciters/maher-al-muaiqly/image/180x180.jpg.webp" },
   { id: "shuraim", name: "سعود الشريم", image: "https://quranmedia.online/images/reciters/saud-al-shuraim/image/180x180.jpg.webp" },
   { id: "neana", name: "أحمد نعينع", image: "https://quranmedia.online/images/reciters/ahmed-naina/image/180x180.jpg.webp" },
-  { id: "yasser", name: "ياسر الدوسري", image: "https://quranmedia.online/images/reciters/yasser-al-dosari/image/180x180.jpg.webp" },
+  { id: "yasser", name: "ياسر الدوسري", image: "https://storage.googleapis.com/way2quran_storage/imgs/yasser-al-dosary.jpg" },
 ];
 
 const waveHeights = [14, 24, 32, 19, 40, 28, 48, 22, 36, 16, 29, 42, 20, 34, 15];
@@ -187,7 +187,7 @@ export function LandingPage() {
 
       <footer className="landing-footer landing-shell">
         <Link className="landing-brand" href="/" aria-label="أنصت — الرئيسية"><BrandMark /><span className="landing-brand-copy"><strong>أنصِت</strong><small>التقنية في خدمة القرآن</small></span></Link>
-        <p>مبادرة خيرية تسعى لخدمة القرآن الكريم والسنة النبوية.<br /><span className="landing-credit">تصميم وبرمجة وتدريب: م. أحمد سامي التحيوي</span></p>
+        <p>مبادرة خيرية تسعى لخدمة القرآن الكريم والسنة النبوية.<br /><span className="landing-credit">تم التصميم والبرمجة والتدريب بواسطة م. أحمد سامي التحيوي</span></p>
         <div><Link href="/mushaf">افتح التطبيق</Link><Link href="/settings">الإعدادات</Link></div>
       </footer>
     </div>
