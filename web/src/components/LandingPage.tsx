@@ -68,7 +68,7 @@ export function LandingPage() {
           <a href="#how">كيف يعمل</a>
           <a href="#reciters">مكتبة القرّاء</a>
         </nav>
-        <Link className="landing-nav-cta" href="/app">اكتشف أنصت <ArrowIcon /></Link>
+        <Link className="landing-nav-cta" href="/mushaf">اكتشف أنصت <ArrowIcon /></Link>
       </header>
 
       <main>
@@ -166,7 +166,7 @@ export function LandingPage() {
 
         <section className="landing-reciter-section landing-shell" id="reciters" aria-labelledby="reciters-title">
           <div className="landing-reciter-heading"><div><SectionKicker>أصوات نحب الاستماع إليها</SectionKicker><h2 id="reciters-title">من مكتبة القرّاء.</h2></div><p>تعرّف على بعض القرّاء المتاحين ضمن مكتبة أنصت، واستكشف التلاوات من داخل التطبيق.</p></div>
-          <div className="landing-reciter-row">{featuredReciters.map((reciter, index) => <div className="landing-reciter" key={reciter.id}><span className="landing-reciter-avatar" style={{ "--avatar-index": index } as React.CSSProperties}>{reciter.initials}</span><strong>{reciter.name}</strong></div>)}<Link className="landing-reciter-more" href="/app"><span>+</span><small>اكتشف المكتبة</small></Link></div>
+          <div className="landing-reciter-row">{featuredReciters.map((reciter, index) => <div className="landing-reciter" key={reciter.id}><span className="landing-reciter-avatar" style={{ "--avatar-index": index } as React.CSSProperties}>{reciter.initials}</span><strong>{reciter.name}</strong></div>)}<Link className="landing-reciter-more" href="/mushaf"><span>+</span><small>اكتشف المكتبة</small></Link></div>
         </section>
 
         <section className="landing-final-cta landing-shell" aria-labelledby="final-title">
@@ -182,7 +182,7 @@ export function LandingPage() {
       <footer className="landing-footer landing-shell">
         <Link className="landing-brand" href="/" aria-label="أنصت — الرئيسية"><BrandMark /><span className="landing-brand-copy"><strong>أنصِت</strong><small>التقنية في خدمة القرآن</small></span></Link>
         <p>مبادرة خيرية تسعى لخدمة القرآن الكريم والسنة النبوية.</p>
-        <div><Link href="/app">افتح التطبيق</Link><Link href="/settings">الإعدادات</Link></div>
+        <div><Link href="/mushaf">افتح التطبيق</Link><Link href="/settings">الإعدادات</Link></div>
       </footer>
     </div>
   );
