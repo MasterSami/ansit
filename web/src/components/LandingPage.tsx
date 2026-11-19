@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { BookIcon, MicIcon, PlayIcon, SearchIcon, ShieldIcon } from "@/components/icons";
 
 const featuredReciters = [
+  { id: "minshawi", name: "محمد صديق المنشاوي", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Elminshwey.jpg" },
+  { id: "abdul-basit", name: "عبدالباسط عبدالصمد", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Abdel_Basit_Abdel_Samad_1955.png" },
   { id: "sudais", name: "عبدالرحمن السديس", image: "https://quranmedia.online/images/reciters/abdul-rahman-al-sudais/image/180x180.jpg.webp" },
   { id: "alafasy", name: "مشاري العفاسي", image: "https://quranmedia.online/images/reciters/mishary-rashid-alafasy/image/180x180.jpg.webp" },
   { id: "muaiqly", name: "ماهر المعيقلي", image: "https://quranmedia.online/images/reciters/maher-al-muaiqly/image/180x180.jpg.webp" },
