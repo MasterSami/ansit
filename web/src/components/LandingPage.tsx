@@ -69,7 +69,6 @@ export function LandingPage() {
           <a href="#mission">رسالتنا</a>
           <a href="#ai">الذكاء الاصطناعي</a>
           <a href="#how">كيف يعمل</a>
-          <a href="#reciters">مكتبة القرّاء</a>
         </nav>
         <Link className="landing-nav-cta" href="/reciters">مكتبة القراء <ArrowIcon /></Link>
       </header>

@@ -4,64 +4,78 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { getReciters, type ReciterSummary } from "@/lib/api";
-import { toArabicDigits } from "@/lib/numerals";
+import {
+  CURATED_RECITERS,
+  RECITER_IMAGES,
+  RECITER_IMAGE_SOURCES,
+} from "@/lib/reciterCatalog";
 import { Avatar, Screen, StateMessage } from "./ui";
 import { AlertIcon } from "./icons";
 
-type Group = "all" | "egypt" | "saudi" | "other";
-const EGYPTIAN = new Set([
-  "abdul-basit",
-  "husary",
-  "minshawi",
-  "tablawi",
-  "jibreel",
-  "neana",
-  "banna",
-]);
-const SAUDI = new Set([
-  "sudais",
-  "muaiqly",
-  "shuraim",
-  "juhany",
-  "budair",
-  "qasim",
-  "yasser-dosari",
-  "ahmad-talib",
-]);
-const LABELS: Record<Group, string> = {
-  all: "كل القراء",
-  egypt: "مدرسة التلاوة المصرية",
-  saudi: "قراء السعودية",
-  other: "قراء من بلدان أخرى",
-};
+interface LibraryEntry extends ReciterSummary {
+  image?: string;
+  sourceUrl?: string;
+  imageCredit?: string;
+  audioUrl?: string;
+  inApp: boolean;
+}
+
+function normalizeName(name: string): string {
+  return name
+    .replace(/[ً-ٰٟ]/g, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ـ/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 export function ReciterLibraryScreen() {
   const [reciters, setReciters] = useState<ReciterSummary[] | null>(null);
-  const [group, setGroup] = useState<Group>("all");
   const [query, setQuery] = useState("");
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     getReciters().then(setReciters, () => setFailed(true));
   }, []);
-  const visible = useMemo(
-    () =>
-      (reciters ?? []).filter((r) => {
-        const isEgypt = EGYPTIAN.has(r.id) || r.country === "Egypt";
-        const isSaudi = SAUDI.has(r.id) || r.country === "Saudi Arabia";
-        const inGroup =
-          group === "all" ||
-          (group === "egypt" && isEgypt) ||
-          (group === "saudi" && isSaudi) ||
-          (group === "other" && !isEgypt && !isSaudi);
-        return (
-          inGroup &&
-          `${r.name_ar} ${r.name_en}`
-            .toLocaleLowerCase()
-            .includes(query.trim().toLocaleLowerCase())
-        );
-      }),
-    [reciters, group, query],
-  );
+
+  const entries = useMemo(() => {
+    if (!reciters) return [];
+    const availableNames = new Set(
+      reciters.map((r) => normalizeName(r.name_ar)),
+    );
+    const apiEntries: LibraryEntry[] = reciters.map((r) => {
+      const curated = CURATED_RECITERS.find((c) => c.id === r.id);
+      const imageSource = RECITER_IMAGE_SOURCES[r.id];
+      return {
+        ...r,
+        image: curated?.image ?? RECITER_IMAGES[r.id],
+        sourceUrl: curated?.sourceUrl ?? imageSource?.url,
+        imageCredit: curated?.imageCredit ?? imageSource?.credit,
+        inApp: true,
+      };
+    });
+    const additions: LibraryEntry[] = CURATED_RECITERS.filter(
+      (r) => !availableNames.has(normalizeName(r.name_ar)),
+    ).map((r) => ({
+      id: r.id,
+      name_ar: r.name_ar,
+      name_en: r.name_en,
+      country: null,
+      styles: [],
+      image: r.image,
+      sourceUrl: r.sourceUrl,
+      imageCredit: r.imageCredit,
+      audioUrl: r.audioUrl,
+      inApp: false,
+    }));
+    return [...apiEntries, ...additions]
+      .filter((r) =>
+        `${r.name_ar} ${r.name_en}`
+          .toLocaleLowerCase()
+          .includes(query.trim().toLocaleLowerCase()),
+      )
+      .sort((a, b) => a.name_ar.localeCompare(b.name_ar, "ar"));
+  }, [reciters, query]);
 
   return (
     <Screen className="pb-8">
@@ -71,32 +85,24 @@ export function ReciterLibraryScreen() {
         </Link>
         <h1 className="mt-4 text-2xl font-bold">مكتبة القراء</h1>
         <p className="mt-2 text-sm leading-7 text-muted">
-          تصفّح القراء المتاحين في أنصت. ظهور القارئ هنا يعني أن لديه تسجيلات
-          صوتية موثقة في المكتبة، ولا يعني بالضرورة أن التعرّف الآلي عليه مفعّل.
+          كل القراء في قائمة واحدة. زر الاستماع داخل التطبيق يظهر للقراء الذين
+          لديهم تلاوات مفهرسة؛ أما الروابط الخارجية فتفتح التسجيلات المنشورة في
+          مصادرها.
         </p>
         <input
           aria-label="ابحث عن قارئ"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder="ابحث باسم القارئ"
           className="mt-4 h-12 w-full rounded-xl border border-border bg-surface px-4"
         />
+        {reciters && (
+          <p className="mt-2 text-xs text-muted" aria-live="polite">
+            {entries.length} قارئًا
+          </p>
+        )}
       </header>
-      <nav
-        aria-label="تصنيفات القراء"
-        className="mt-4 flex gap-2 overflow-x-auto px-5"
-      >
-        {(Object.keys(LABELS) as Group[]).map((key) => (
-          <button
-            key={key}
-            onClick={() => setGroup(key)}
-            aria-pressed={group === key}
-            className={`shrink-0 rounded-full px-4 py-2 text-sm ${group === key ? "bg-accent text-on-accent" : "bg-surface text-muted"}`}
-          >
-            {LABELS[key]}
-          </button>
-        ))}
-      </nav>
+
       {failed ? (
         <StateMessage
           icon={<AlertIcon size={40} />}
@@ -105,27 +111,53 @@ export function ReciterLibraryScreen() {
         />
       ) : reciters === null ? (
         <p className="p-8 text-center text-muted">جارٍ تحميل القراء…</p>
-      ) : visible.length === 0 ? (
+      ) : entries.length === 0 ? (
         <p className="p-8 text-center text-muted">لا توجد نتائج مطابقة.</p>
       ) : (
         <ul className="mt-4 grid gap-2 px-5">
-          {visible.map((r) => (
-            <li key={r.id}>
-              <Link
-                href={`/reciter?id=${encodeURIComponent(r.id)}`}
-                className="flex min-h-16 items-center gap-3 rounded-2xl border border-border bg-surface px-3"
-              >
-                <Avatar name={r.name_ar} size="md" />
-                <span className="min-w-0 grow">
-                  <strong className="block">{r.name_ar}</strong>
-                  <span className="text-xs text-muted">
-                    {r.country || "قارئ"} · {r.styles.length} أنماط تلاوة
-                  </span>
-                </span>
+          {entries.map((reciter) => (
+            <li
+              key={reciter.id}
+              className="flex min-h-[76px] items-center gap-3 rounded-2xl border border-border bg-surface px-3 py-2"
+            >
+              <Avatar name={reciter.name_ar} size="md" image={reciter.image} />
+              <span className="min-w-0 grow">
+                <strong className="block text-[15px]">{reciter.name_ar}</strong>
                 <span className="text-xs text-muted">
-                  {toArabicDigits(r.styles.length)} ›
+                  {reciter.inApp
+                    ? `${reciter.styles.length} أنماط متاحة في أنصت`
+                    : reciter.audioUrl
+                      ? "تسجيل متاح من المصدر الصوتي"
+                      : "إضافة تعريفية؛ الصوت غير مفهرس بعد"}
                 </span>
-              </Link>
+                {reciter.sourceUrl && reciter.imageCredit && (
+                  <a
+                    href={reciter.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block text-[10px] text-muted underline underline-offset-2"
+                  >
+                    مصدر الصورة: {reciter.imageCredit}
+                  </a>
+                )}
+              </span>
+              {reciter.inApp ? (
+                <Link
+                  href={`/reciter?id=${encodeURIComponent(reciter.id)}`}
+                  className="shrink-0 rounded-full bg-accent-soft px-3 py-2 text-xs font-semibold text-accent"
+                >
+                  استمع
+                </Link>
+              ) : reciter.audioUrl ? (
+                <a
+                  href={reciter.audioUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="shrink-0 rounded-full bg-accent-soft px-3 py-2 text-xs font-semibold text-accent"
+                >
+                  استمع
+                </a>
+              ) : null}
             </li>
           ))}
         </ul>

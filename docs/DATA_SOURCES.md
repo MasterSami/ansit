@@ -238,3 +238,19 @@ Downloaded as TTF from Google Fonts (`fonts.gstatic.com`) into
 
 Record: exact URL or dataset id, file format and schema, license and
 attribution terms, and anything that differs from the build brief.
+
+## Reciter directory additions (2026-11-19)
+
+- Names and per-surah MP3 server/availability: MP3Quran public v3 reciters API,
+  documented at <https://www.mp3quran.net/eng/api>. Only entries whose Hafs
+  moshaf lists the linked surah have an external listen action. These directory
+  additions do not by themselves enable speaker recognition; that still
+  requires an evaluated gallery profile.
+- Haramain imam names: official Presidency list at
+  <https://prh.gov.sa/ar/component/content/article?Itemid=440&id=226>.
+- Photo portraits are remote embeds from the source page named on each curated
+  library card. Image rights remain with those publishers/contributors; the
+  app links back to the source and does not copy the images into the repository.
+- Kamil Yusuf Al-Bahtimi portrait: Wikimedia Commons file page records the
+  image as public domain in its source jurisdiction:
+  <https://commons.wikimedia.org/wiki/File:Kamil_Yusuf_Al-Bahtimi.jpg>.

@@ -325,6 +325,31 @@ test("opens a mushaf ayah and its tafsir", async ({ page }) => {
   await expect(page.getByText("شرح من المصدر للاختبار")).toBeVisible();
 });
 
+test("shows one searchable reciter list with the requested additions", async ({
+  page,
+}) => {
+  await mockApi(page, MATCH);
+  await page.goto("/reciters");
+
+  await expect(page.getByText("كامل يوسف البهتيمي")).toBeVisible();
+  await expect(page.getByText("الشحات محمد أنور")).toBeVisible();
+  await expect(page.getByText("بدر بن محمد التركي")).toBeVisible();
+  await expect(page.getByText("الوليد بن خالد الشمسان")).toBeVisible();
+  await expect(page.getByLabel("تصنيفات القراء")).toHaveCount(0);
+  await expect(page.getByLabel("ابحث عن قارئ")).toBeVisible();
+  await page.getByLabel("ابحث عن قارئ").fill("الشمسان");
+  await expect(page.getByText("كامل يوسف البهتيمي")).toHaveCount(0);
+  await expect(page.getByText("الوليد بن خالد الشمسان")).toBeVisible();
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const header = page.locator(".landing-header");
+  await expect(header.getByRole("link", { name: /مكتبة القراء/ })).toHaveCount(
+    1,
+  );
+  await expect(header.locator(".landing-nav-cta")).toHaveCount(1);
+});
+
 test("sends feedback about a wrong result", async ({ page }) => {
   const mock = await mockApi(page, MATCH);
   await listen(page);
