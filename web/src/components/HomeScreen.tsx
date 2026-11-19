@@ -88,9 +88,20 @@ export function HomeScreen() {
           </Link>
         </div>
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-bold">{t("home.tapToListen")}</h1>
+          <h1 className="text-2xl font-bold">{t("home.headline")}</h1>
           <p className="max-w-[280px] text-[15px] text-muted">
             {t("home.subtitle")}
+          </p>
+        </div>
+        <div className="w-full max-w-[330px] rounded-2xl border border-border bg-surface/75 px-4 py-3 text-center">
+          <p className="text-[13px] font-semibold text-accent">
+            {t("home.missionTitle")}
+          </p>
+          <p className="mt-1 text-[12px] leading-6 text-muted">
+            {t("home.missionBody")}
+          </p>
+          <p className="mt-2 border-t border-border pt-2 text-[12px] leading-6 text-muted">
+            {t("home.aiNote")}
           </p>
         </div>
       </main>
