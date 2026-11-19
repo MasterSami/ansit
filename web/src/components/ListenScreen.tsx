@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -225,9 +226,14 @@ export function ListenScreen() {
   return (
     <Screen className="listen-web-screen">
       <header className="listen-web-header flex items-center justify-between px-6 pt-14">
-        <span className="font-display text-[26px] font-bold text-accent">
+        <Link href="/" className="listen-web-brand font-display text-[26px] font-bold text-accent">
           {t("app.name")}
-        </span>
+        </Link>
+        <nav className="listen-web-nav" aria-label="التنقل الرئيسي">
+          <Link href="/">الرئيسية</Link>
+          <Link href="/mushaf">المصحف</Link>
+          <Link href="/history">سجل الاستماع</Link>
+        </nav>
         <span
           className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-[13px] font-medium"
           role="timer"
