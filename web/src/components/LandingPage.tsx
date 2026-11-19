@@ -1,15 +1,16 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { BookIcon, MicIcon, PlayIcon, ShieldIcon } from "@/components/icons";
+import { BookIcon, MicIcon, PlayIcon, SearchIcon, ShieldIcon } from "@/components/icons";
 
 const featuredReciters = [
-  { id: "sudais", name: "عبدالرحمن السديس", initials: "ع س" },
-  { id: "alafasy", name: "مشاري العفاسي", initials: "م ع" },
-  { id: "muaiqly", name: "ماهر المعيقلي", initials: "م م" },
-  { id: "shuraim", name: "سعود الشريم", initials: "س ش" },
-  { id: "neana", name: "أحمد نعينع", initials: "أ ن" },
-  { id: "yasser", name: "ياسر الدوسري", initials: "ي د" },
+  { id: "sudais", name: "عبدالرحمن السديس", image: "https://quranmedia.online/images/reciters/abdul-rahman-al-sudais/image/180x180.jpg.webp" },
+  { id: "alafasy", name: "مشاري العفاسي", image: "https://quranmedia.online/images/reciters/mishary-rashid-alafasy/image/180x180.jpg.webp" },
+  { id: "muaiqly", name: "ماهر المعيقلي", image: "https://quranmedia.online/images/reciters/maher-al-muaiqly/image/180x180.jpg.webp" },
+  { id: "shuraim", name: "سعود الشريم", image: "https://quranmedia.online/images/reciters/saud-al-shuraim/image/180x180.jpg.webp" },
+  { id: "neana", name: "أحمد نعينع", image: "https://quranmedia.online/images/reciters/ahmed-naina/image/180x180.jpg.webp" },
+  { id: "yasser", name: "ياسر الدوسري", image: "https://quranmedia.online/images/reciters/yasser-al-dosari/image/180x180.jpg.webp" },
 ];
 
 const waveHeights = [14, 24, 32, 19, 40, 28, 48, 22, 36, 16, 29, 42, 20, 34, 15];
@@ -74,8 +75,13 @@ export function LandingPage() {
       <main>
         <section className="landing-hero landing-shell" aria-labelledby="hero-title">
           <div className="landing-hero-copy">
+            <div className="landing-quran-verse">
+              <span>قال الله تعالى</span>
+              <p>وَإِذَا قُرِئَ الْقُرْآنُ فَاسْتَمِعُوا لَهُ وَأَنْصِتُوا لَعَلَّكُمْ تُرْحَمُونَ</p>
+              <small>سورة الأعراف · ٢٠٤</small>
+            </div>
             <p className="landing-eyebrow"><span className="landing-eyebrow-dot" />مبادرة خيرية لخدمة القرآن الكريم والسنة النبوية</p>
-            <h1 id="hero-title">حين تمرّ بك آية،<br /><span>يساعدك أنصت أن تصل إليها.</span></h1>
+            <h1 id="hero-title">من صوت التلاوة،<br /><span>إلى موضع الآية.</span></h1>
             <p className="landing-hero-lead">
               أنصت مبادرة تقنية خيرية تسخّر أدوات الذكاء الاصطناعي لتيسير التعرّف على آيات القرآن الكريم وتلاوات القرّاء؛ لتكون التقنية وسيلة تقرّبك من كتاب الله وتعينك على متابعة ما تسمع.
             </p>
@@ -83,6 +89,7 @@ export function LandingPage() {
               <Link className="landing-button landing-button-primary" href="/listen"><MicIcon size={20} />جرّب التعرّف على التلاوة<ArrowIcon /></Link>
               <a className="landing-button landing-button-quiet" href="#mission">تعرّف على رسالتنا</a>
             </div>
+            <div className="landing-android-note"><span>قريبًا</span> تطبيق أنصت على Android</div>
             <div className="landing-hero-trust">
               <span><ShieldIcon size={17} />خصوصيتك أولوية</span>
               <span><BookIcon size={17} />خدمة القرآن غايتنا</span>
@@ -108,7 +115,6 @@ export function LandingPage() {
         </section>
 
         <section className="landing-manifesto landing-shell" aria-label="رسالة أنصت">
-          <span className="landing-manifesto-mark">﴿</span>
           <p>نؤمن أن التقنية حين تُسخّر للخير، يمكن أن تفتح أبوابًا جديدة للمعرفة والنفع.</p>
           <span className="landing-manifesto-caption">أنصت — التقنية في خدمة القرآن</span>
         </section>
@@ -138,7 +144,7 @@ export function LandingPage() {
             <div className="landing-ai-flow">
               <article><span className="landing-ai-number">01</span><div className="landing-ai-icon"><MicIcon size={23} /></div><h3>استقبال مقطع صوتي</h3><p>تبدأ أنت الاستماع وتمنح إذن استخدام الميكروفون، فيلتقط التطبيق جزءًا قصيرًا من التلاوة.</p></article>
               <div className="landing-ai-connector"><ArrowIcon /></div>
-              <article><span className="landing-ai-number">02</span><div className="landing-ai-icon"><Waveform compact /></div><h3>تحليل ومطابقة</h3><p>تحلل الأنظمة خصائص المقطع وتقارنه ببيانات الآيات والتلاوات المتاحة للعثور على تطابق مناسب.</p></article>
+              <article><span className="landing-ai-number">02</span><div className="landing-ai-icon"><SearchIcon size={24} /></div><h3>تحليل ومطابقة</h3><p>تحلل الأنظمة خصائص المقطع وتقارنه ببيانات الآيات والتلاوات المتاحة للعثور على تطابق مناسب.</p></article>
               <div className="landing-ai-connector"><ArrowIcon /></div>
               <article><span className="landing-ai-number">03</span><div className="landing-ai-icon"><BookIcon size={23} /></div><h3>الوصول إلى الآية</h3><p>تظهر السورة والآية عند توافر نتيجة مناسبة، ويظهر اسم القارئ عندما تكون مطابقة صوته متاحة وموثوقة.</p></article>
             </div>
@@ -166,7 +172,7 @@ export function LandingPage() {
 
         <section className="landing-reciter-section landing-shell" id="reciters" aria-labelledby="reciters-title">
           <div className="landing-reciter-heading"><div><SectionKicker>أصوات نحب الاستماع إليها</SectionKicker><h2 id="reciters-title">من مكتبة القرّاء.</h2></div><p>تعرّف على بعض القرّاء المتاحين ضمن مكتبة أنصت، واستكشف التلاوات من داخل التطبيق.</p></div>
-          <div className="landing-reciter-row">{featuredReciters.map((reciter, index) => <div className="landing-reciter" key={reciter.id}><span className="landing-reciter-avatar" style={{ "--avatar-index": index } as React.CSSProperties}>{reciter.initials}</span><strong>{reciter.name}</strong></div>)}<Link className="landing-reciter-more" href="/mushaf"><span>+</span><small>اكتشف المكتبة</small></Link></div>
+          <div className="landing-reciter-row">{featuredReciters.map((reciter) => <div className="landing-reciter" key={reciter.id}><Image className="landing-reciter-photo" src={reciter.image} alt={`صورة القارئ ${reciter.name}`} width={84} height={84} unoptimized /><strong>{reciter.name}</strong></div>)}<Link className="landing-reciter-more" href="/mushaf"><span>+</span><small>اكتشف المكتبة</small></Link></div>
         </section>
 
         <section className="landing-final-cta landing-shell" aria-labelledby="final-title">
@@ -181,7 +187,7 @@ export function LandingPage() {
 
       <footer className="landing-footer landing-shell">
         <Link className="landing-brand" href="/" aria-label="أنصت — الرئيسية"><BrandMark /><span className="landing-brand-copy"><strong>أنصِت</strong><small>التقنية في خدمة القرآن</small></span></Link>
-        <p>مبادرة خيرية تسعى لخدمة القرآن الكريم والسنة النبوية.</p>
+        <p>مبادرة خيرية تسعى لخدمة القرآن الكريم والسنة النبوية.<br /><span className="landing-credit">تصميم وبرمجة وتدريب: م. أحمد سامي التحيوي</span></p>
         <div><Link href="/mushaf">افتح التطبيق</Link><Link href="/settings">الإعدادات</Link></div>
       </footer>
     </div>
