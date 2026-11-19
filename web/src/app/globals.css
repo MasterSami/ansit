@@ -202,3 +202,130 @@ a {
     transform: none;
   }
 }
+
+
+/* Responsive desktop workspace for the listening flow */
+.listen-web-screen {
+  width: min(1200px, calc(100% - 80px));
+  max-width: none !important;
+  min-height: 100vh;
+  margin-inline: auto;
+  background: transparent;
+}
+.listen-web-header {
+  min-height: 92px;
+  padding: 18px 0 !important;
+  border-bottom: 1px solid var(--border);
+}
+.listen-web-brand { text-decoration: none; }
+.listen-web-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.listen-web-nav a { transition: color .2s ease; }
+.listen-web-nav a:hover { color: var(--accent); }
+.listen-web-main {
+  display: grid;
+  grid-template-columns: minmax(300px, .95fr) minmax(380px, 1.05fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  justify-items: stretch;
+  gap: 24px 64px !important;
+  padding: 64px 5% !important;
+}
+.listen-web-main > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: center;
+  transform: scale(1.13);
+}
+.listen-web-copy {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  align-items: flex-start !important;
+  text-align: right !important;
+}
+.listen-web-copy p { max-width: 520px !important; }
+.listen-web-steps {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  max-width: 560px;
+}
+.listen-web-footer {
+  padding: 20px 0 35px !important;
+}
+.listen-web-explainer {
+  width: min(1050px, calc(100% - 80px));
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: center;
+  gap: 24px;
+  padding-block: 40px;
+}
+.listen-web-explainer > div:nth-child(2) {
+  display: grid;
+  grid-template-columns: .75fr 1.25fr;
+  align-items: center;
+  gap: 22px 48px;
+}
+.listen-web-explainer > div:nth-child(2) > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  justify-self: center;
+}
+.listen-web-explainer > div:nth-child(2) > :nth-child(2),
+.listen-web-explainer > div:nth-child(2) > :nth-child(3) {
+  grid-column: 2;
+}
+.listen-web-explainer > footer {
+  width: min(520px, 100%);
+  justify-self: center;
+}
+.listen-web-problem {
+  width: min(900px, calc(100% - 80px));
+  min-height: 100vh;
+  padding-block: 50px;
+}
+@media (max-width: 760px) {
+  .listen-web-screen,
+  .listen-web-explainer,
+  .listen-web-problem {
+    width: 100%;
+    max-width: 430px !important;
+    min-height: 100dvh;
+  }
+  .listen-web-header {
+    min-height: 76px;
+    padding: 34px 24px 0 !important;
+  }
+  .listen-web-nav { display: none; }
+  .listen-web-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px !important;
+    padding: 24px !important;
+  }
+  .listen-web-main > :first-child { transform: none; }
+  .listen-web-copy { align-items: center !important; text-align: center !important; }
+  .listen-web-steps { max-width: none; }
+  .listen-web-footer { padding: 0 24px 40px !important; }
+  .listen-web-explainer {
+    display: flex;
+    gap: 0;
+    padding: 56px 24px 36px;
+  }
+  .listen-web-explainer > div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+  }
+  .listen-web-problem { padding-bottom: 40px; }
+}
