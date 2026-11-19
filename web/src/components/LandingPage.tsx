@@ -89,7 +89,7 @@ export function LandingPage() {
               <Link className="landing-button landing-button-primary" href="/listen"><MicIcon size={20} />جرّب التعرّف على التلاوة<ArrowIcon /></Link>
               <a className="landing-button landing-button-quiet" href="#mission">تعرّف على رسالتنا</a>
             </div>
-            <div className="landing-android-note"><span>قريبًا</span> تطبيق أنصت على Android</div>
+            <div className="landing-android-note"><span>قريبًا</span> تطبيق أنصت للهواتف بنظام Android</div>
             <div className="landing-hero-trust">
               <span><ShieldIcon size={17} />خصوصيتك أولوية</span>
               <span><BookIcon size={17} />خدمة القرآن غايتنا</span>
