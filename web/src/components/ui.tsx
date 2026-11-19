@@ -115,13 +115,15 @@ export function Avatar({
 export function Screen({
   children,
   className = "",
+  wide = false,
 }: {
   children: ReactNode;
   className?: string;
+  wide?: boolean;
 }) {
   return (
     <div
-      className={`mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-bg ${className}`}
+      className={`mx-auto flex min-h-dvh w-full ${wide ? "max-w-6xl" : "max-w-[430px]"} flex-col bg-bg ${className}`}
     >
       {children}
     </div>
