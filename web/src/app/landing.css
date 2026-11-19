@@ -198,3 +198,19 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-page *, .landing-page *::before, .landing-page *::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; }
 }
+
+/* Landing page refinements */
+.landing-quran-verse { max-width:620px; margin-bottom:24px; padding:18px 22px; border:1px solid var(--land-line); border-right:3px solid var(--land-gold); border-radius:12px; background:rgba(216,185,120,.045); }
+.landing-quran-verse>span { color:var(--land-gold); font-size:11px; }
+.landing-quran-verse p { margin:7px 0 5px; color:#f1e8d5; font-family:var(--font-amiri-quran),serif; font-size:clamp(18px,2vw,24px); line-height:1.9; }
+.landing-quran-verse small { color:var(--land-muted); font-size:10px; }
+.landing-android-note { display:flex; align-items:center; gap:10px; margin-top:22px; color:#d6ded5; font-size:12px; }
+.landing-android-note span { padding:4px 9px; border:1px solid rgba(216,185,120,.3); border-radius:20px; color:var(--land-gold); font-size:10px; }
+.landing-reciter-photo { width:84px; height:84px; flex-shrink:0; object-fit:cover; border:1px solid rgba(216,185,120,.34); border-radius:50%; background:#1a2a20; }
+.landing-credit { display:inline-block; margin-top:8px; color:#d6c49c; font-size:11px; line-height:1.9; }
+@media (max-width:680px) {
+  .landing-quran-verse { margin-bottom:22px; padding:15px; }
+  .landing-quran-verse p { font-size:19px; }
+  .landing-android-note { justify-content:center; }
+  .landing-reciter-photo { width:70px; height:70px; }
+}
