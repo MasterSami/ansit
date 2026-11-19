@@ -28,7 +28,7 @@ const amiriQuran = Amiri_Quran({
 
 export const metadata: Metadata = {
   title: "أنصِت",
-  description: "تعرّف على السورة والآية واسم القارئ من ثوانٍ من التلاوة",
+  description: "أنصِت، منصة خيرية مدعومة بالذكاء الاصطناعي للتعرّف على آيات القرآن الكريم وقرّائه.",
   applicationName: "أنصِت",
   appleWebApp: {
     capable: true,
