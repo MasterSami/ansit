@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -223,11 +224,16 @@ export function ListenScreen() {
 
   const identifying = phase.name === "identifying";
   return (
-    <Screen>
-      <header className="flex items-center justify-between px-6 pt-14">
-        <span className="font-display text-[26px] font-bold text-accent">
+    <Screen className="listen-web-screen">
+      <header className="listen-web-header flex items-center justify-between px-6 pt-14">
+        <Link href="/" className="listen-web-brand font-display text-[26px] font-bold text-accent">
           {t("app.name")}
-        </span>
+        </Link>
+        <nav className="listen-web-nav" aria-label="التنقل الرئيسي">
+          <Link href="/">الرئيسية</Link>
+          <Link href="/mushaf">المصحف</Link>
+          <Link href="/history">سجل الاستماع</Link>
+        </nav>
         <span
           className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-[13px] font-medium"
           role="timer"
@@ -241,7 +247,7 @@ export function ListenScreen() {
         </span>
       </header>
 
-      <main className="flex grow flex-col items-center justify-center gap-9 px-6 py-6">
+      <main className="listen-web-main flex grow flex-col items-center justify-center gap-9 px-6 py-6">
         <SoundWave
           levels={levels}
           live={phase.name === "recording"}
@@ -249,7 +255,7 @@ export function ListenScreen() {
         />
 
         <div
-          className="flex flex-col items-center gap-2 text-center"
+          className="listen-web-copy flex flex-col items-center gap-2 text-center"
           aria-live="polite"
         >
           <h1 className="text-2xl font-bold">
@@ -266,7 +272,7 @@ export function ListenScreen() {
 
         <ol
           aria-label={t("listen.steps")}
-          className="flex w-full flex-col gap-3.5 rounded-[18px] border border-border bg-surface p-4"
+          className="listen-web-steps flex w-full flex-col gap-3.5 rounded-[18px] border border-border bg-surface p-4"
         >
           <Step
             label={t("listen.stepCapture")}
@@ -283,7 +289,7 @@ export function ListenScreen() {
         </ol>
       </main>
 
-      <footer className="flex flex-col items-center px-6 pb-10">
+      <footer className="listen-web-footer flex flex-col items-center px-6 pb-10">
         {identifying ? (
           <QuietButton onClick={cancelUpload}>{t("common.cancel")}</QuietButton>
         ) : (
@@ -407,7 +413,7 @@ function PermissionExplainer({ onAllow }: { onAllow: () => void }) {
     ],
   ];
   return (
-    <Screen className="px-6 pt-14 pb-9">
+    <Screen className="listen-web-screen listen-web-explainer px-6 pt-14 pb-9">
       <div className="flex items-center justify-between">
         <span className="font-display text-[26px] font-bold text-accent">
           {t("app.name")}
@@ -482,7 +488,7 @@ function Problem({
 }) {
   const t = useTranslations("common");
   return (
-    <Screen className="pb-10">
+    <Screen className="listen-web-screen listen-web-problem pb-10">
       <StateMessage icon={icon} title={title} body={body} tone={tone}>
         {children}
       </StateMessage>

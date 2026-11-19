@@ -12,6 +12,29 @@ the phase that first uses it. Findings are recorded here.
 | Reciter names, full-surah audio | mp3quran API v3 (Quran Foundation API not used)                                                                                               | Phase 3     | **verified** |
 | ASR model                       | `tarteel-ai/whisper-base-ar-quran` (plus tiny and a small model for comparison)                                                               | Phase 2     | **verified** |
 | Speaker embedding model         | `Wespeaker/wespeaker-voxceleb-resnet34-LM` (ONNX); the brief's `speechbrain/spkrec-ecapa-voxceleb` was verified and used first, then replaced | Phase 3     | **verified** |
+| Arabic per-ayah tafsir          | QuranEnc `arabic_moyassar` (Al-Tafsir Al-Muyassar)                                                                                              | Phase 7     | Terms verified; version unresolved |
+
+## QuranEnc Al-Tafsir Al-Muyassar (verified 2026-11-19)
+
+- API: `https://quranenc.com/api/v1/translation/aya/arabic_moyassar/{surah}/{ayah}`.
+- Live API verified 2026-11-19: the single-ayah response provides the requested
+  coordinate and verbatim text but no edition version. The general translation
+  list does not contain this tafsir key.
+- Work: *Al-Tafsir Al-Muyassar* (التفسير الميسر), prepared by a group of scholars
+  (نخبة من العلماء), King Fahd Complex for the Printing of the Holy Quran.
+- QuranEnc explicitly permits downloading and republication if the text remains
+  unmodified, publisher and source are credited, edition/version information is
+  retained, corrections are reported, and new editions are adopted. The API
+  returns one ayah by its surah and ayah coordinates; ANSIT validates the
+  coordinates against its existing 114-surah Quran index before requesting it.
+- The app loads a single requested ayah and caches it for six hours. It retains
+  the provider text as received and links each display to its QuranEnc source
+  page. **Open item:** QuranEnc's reuse terms require a version number, but its
+  API does not publish one. Obtain the official edition number or written
+  guidance from QuranEnc before treating republication as fully compliant.
+- Primary terms and API documentation: https://quranenc.com/ar/home/api.
+- Work/authoring attribution cross-check: https://qurancomplex.gov.sa/ (the
+  complex's scholarly journal cites the work as prepared by a group of scholars).
 
 ## Tanzil (verified 2026-11-16)
 
@@ -215,3 +238,19 @@ Downloaded as TTF from Google Fonts (`fonts.gstatic.com`) into
 
 Record: exact URL or dataset id, file format and schema, license and
 attribution terms, and anything that differs from the build brief.
+
+## Reciter directory additions (2026-11-19)
+
+- Names and per-surah MP3 server/availability: MP3Quran public v3 reciters API,
+  documented at <https://www.mp3quran.net/eng/api>. Only entries whose Hafs
+  moshaf lists the linked surah have an external listen action. These directory
+  additions do not by themselves enable speaker recognition; that still
+  requires an evaluated gallery profile.
+- Haramain imam names: official Presidency list at
+  <https://prh.gov.sa/ar/component/content/article?Itemid=440&id=226>.
+- Photo portraits are remote embeds from the source page named on each curated
+  library card. Image rights remain with those publishers/contributors; the
+  app links back to the source and does not copy the images into the repository.
+- Kamil Yusuf Al-Bahtimi portrait: Wikimedia Commons file page records the
+  image as public domain in its source jurisdiction:
+  <https://commons.wikimedia.org/wiki/File:Kamil_Yusuf_Al-Bahtimi.jpg>.

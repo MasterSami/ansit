@@ -1,9 +1,10 @@
 /** Small building blocks shared by the screens. */
 
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
+import Image from "next/image";
+import { useState, type ComponentProps, type ReactNode } from "react";
 
-import { initials } from "@/lib/text";
+import { BookIcon } from "./icons";
 
 const ICON_BUTTON =
   "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-text";
@@ -88,25 +89,42 @@ export function QuietLink({
   );
 }
 
-/** Initials avatar: reciters are never shown with photos. */
+/** A reciter portrait with a neutral book mark when no verified image exists. */
 export function Avatar({
   name,
   size,
+  image,
 }: {
   name: string;
   size: "sm" | "md" | "lg";
+  image?: string;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
   const box = {
     sm: "h-10 w-10 text-sm border-transparent bg-divider",
     md: "h-[52px] w-[52px] text-[17px] bg-divider border-[rgb(var(--accent-rgb)/0.4)]",
     lg: "h-24 w-24 text-3xl border-2 border-accent bg-surface",
   }[size];
+  const imageSize = size === "lg" ? 96 : size === "md" ? 52 : 40;
   return (
     <div
       aria-hidden="true"
-      className={`flex shrink-0 items-center justify-center rounded-full border font-bold text-accent ${box}`}
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border text-accent ${box}`}
+      title={name}
     >
-      {initials(name)}
+      {image && !imageFailed ? (
+        <Image
+          src={image}
+          alt=""
+          fill
+          sizes={`${imageSize}px`}
+          unoptimized
+          className="object-cover"
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <BookIcon size={size === "lg" ? 32 : size === "md" ? 22 : 18} />
+      )}
     </div>
   );
 }
@@ -115,13 +133,15 @@ export function Avatar({
 export function Screen({
   children,
   className = "",
+  wide = false,
 }: {
   children: ReactNode;
   className?: string;
+  wide?: boolean;
 }) {
   return (
     <div
-      className={`mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-bg ${className}`}
+      className={`mx-auto flex min-h-dvh w-full ${wide ? "max-w-6xl" : "max-w-[430px]"} flex-col bg-bg ${className}`}
     >
       {children}
     </div>

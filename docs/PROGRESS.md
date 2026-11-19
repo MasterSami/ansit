@@ -676,3 +676,29 @@ were in place.
 
 Phase 7 is optional in the brief (audio-fingerprint fast path, feedback
 report) and should wait for real-device results and real usage data.
+
+## Phase 8 — Tafsir and reciter library · in progress
+
+- Added lazy per-ayah Tafsir al-Muyassar retrieval from QuranEnc, with source
+  details and attribution in the result and Mushaf screens.
+- QuranEnc's public endpoint does not expose an edition version for this
+  translation. The UI discloses that fact; the source's reuse terms request
+  the edition version, so publishing the translation remains subject to
+  resolving that metadata gap.
+- Reworked the reciter library into one searchable list, with no country tabs,
+  and removed the duplicate library link from the landing navigation.
+- Added Kamil Yusuf Al-Bahtimi, Al-Shahat Muhammad Anwar, and prominent older
+  Egyptian reciters, plus listed imams from both Harams. The Haramain names
+  follow the Presidency roster (including Al-Waleed bin Khalid Al-Shamsan).
+- Added source portraits and source credits where portraits were verified;
+  missing images use a neutral Quran-book icon, never initials.
+- Verified direct MP3Quran surah files for entries that have them. Records with
+  no verified audio remain directory entries and do not become enabled for
+  reciter recognition. Kamil and Al-Shahat link to their available SoundCloud
+  recordings; these are not used as recognition data.
+- The landing-library link fix and list changes pass web type-check, ESLint,
+  and the browser regression for search, the requested names, and a single
+  landing navigation link.
+- Remaining: source/license confirmation for the tafsir edition version, verify
+  portrait links on more devices, and gather/reference additional audio where
+  currently absent.

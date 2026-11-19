@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.formparsers import MultiPartParser
 
-from app.api import feedback, health, identify, quran, reciters
+from app.api import feedback, health, identify, quran, reciters, tafsir
 from app.api.errors import install_error_handlers
 from app.core.config import Settings, get_settings
 from app.core.dependencies import ExternalDeps
@@ -116,5 +116,6 @@ def create_app(
     app.include_router(identify.router)
     app.include_router(quran.router)
     app.include_router(reciters.router)
+    app.include_router(tafsir.router)
     app.include_router(feedback.router)
     return app

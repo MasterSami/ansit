@@ -9,7 +9,9 @@ import {
   type Candidate,
   getAyah,
   getReciter,
+  getTafsir,
   type ReciterSummary,
+  type Tafsir,
 } from "@/lib/api";
 import { getEntry, type HistoryEntry, updateEntry } from "@/lib/history";
 import {
@@ -70,7 +72,7 @@ export function ResultScreen() {
   if (entry === undefined) return <ResultSkeleton />;
   if (entry === null) {
     return (
-      <Screen className="pb-10">
+      <Screen wide className="pb-10">
         <StateMessage
           icon={<AlertIcon size={40} />}
           title={t("states.notFoundTitle")}
@@ -92,7 +94,7 @@ export function ResultScreen() {
 
 function ResultSkeleton() {
   return (
-    <Screen className="gap-3.5 px-5 pt-[52px]">
+    <Screen wide className="gap-3.5 px-5 pt-[52px]">
       <div className="flex justify-between">
         <Skeleton className="h-11 w-11 rounded-full" />
         <Skeleton className="h-11 w-11 rounded-full" />
@@ -119,6 +121,10 @@ function MatchView({
     "wrong_ayah" | "wrong_reciter" | null
   >(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [tafsirOpen, setTafsirOpen] = useState(false);
+  const [tafsir, setTafsir] = useState<Tafsir | null>(null);
+  const [tafsirLoading, setTafsirLoading] = useState(false);
+  const [tafsirFailed, setTafsirFailed] = useState(false);
   const { ayah, reciter } = entry;
 
   const named: { id: string; name: string } | null = entry.userReciter
@@ -182,9 +188,24 @@ function MatchView({
     if (next) onChange(next);
   };
 
+  const toggleTafsir = () => {
+    const opening = !tafsirOpen;
+    setTafsirOpen(opening);
+    if (opening) loadTafsir();
+  };
+
+  const loadTafsir = () => {
+    if (tafsir || tafsirLoading) return;
+    setTafsirFailed(false);
+    setTafsirLoading(true);
+    getTafsir(ayah.surah, ayah.ayah)
+      .then(setTafsir, () => setTafsirFailed(true))
+      .finally(() => setTafsirLoading(false));
+  };
+
   return (
-    <Screen>
-      <header className="flex items-center justify-between px-5 pt-[52px]">
+    <Screen wide>
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-8 sm:px-8 lg:pt-10">
         <IconLink href="/" label={t("common.back")}>
           <BackIcon />
         </IconLink>
@@ -194,10 +215,10 @@ function MatchView({
         </IconButton>
       </header>
 
-      <main className="flex grow flex-col gap-3.5 px-5 pt-5">
+      <main className="mx-auto grid w-full max-w-6xl grow grid-cols-1 content-start items-start gap-5 px-5 pt-6 sm:px-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.85fr)] lg:gap-6">
         <Card
           aria-label={t("result.ayahSection")}
-          className="flex flex-col gap-4 p-5"
+          className="flex flex-col gap-4 p-5 lg:col-start-1 lg:row-span-3"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
@@ -251,11 +272,58 @@ function MatchView({
           >
             {t("result.textCredit")}
           </a>
+          {tafsirOpen && (
+            <section
+              aria-live="polite"
+              className="flex flex-col gap-2 border-t border-divider pt-4"
+            >
+              {tafsirLoading && (
+                <p className="text-sm text-muted">
+                  {t("result.tafsirLoading")}
+                </p>
+              )}
+              {tafsirFailed && (
+                <div className="flex items-center justify-between gap-3 text-sm text-muted">
+                  <span>{t("result.tafsirFailed")}</span>
+                  <button
+                    type="button"
+                    className="font-semibold text-accent"
+                    onClick={loadTafsir}
+                  >
+                    {t("common.retry")}
+                  </button>
+                </div>
+              )}
+              {tafsir && (
+                <>
+                  <h2 className="font-semibold">{tafsir.book}</h2>
+                  <p dir="rtl" lang="ar" className="text-[15px] leading-8">
+                    {tafsir.text}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {t("result.tafsirAuthor", {
+                      author: tafsir.author,
+                      publisher: tafsir.publisher,
+                      version: tafsir.version,
+                    })}
+                  </p>
+                  <a
+                    href={tafsir.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="self-start text-xs text-accent underline underline-offset-4"
+                  >
+                    {tafsir.attribution}
+                  </a>
+                </>
+              )}
+            </section>
+          )}
         </Card>
 
         <Card
           aria-label={t("result.reciterSection")}
-          className="flex flex-col gap-3.5 px-5 py-4"
+          className="flex flex-col gap-3.5 px-5 py-4 lg:col-start-2"
         >
           {named ? (
             <div className="flex items-center gap-3.5">
@@ -344,21 +412,24 @@ function MatchView({
         </Card>
 
         {notice && (
-          <p role="status" className="text-center text-[13px] text-muted">
+          <p
+            role="status"
+            className="text-center text-[13px] text-muted lg:col-start-2"
+          >
             {notice}
           </p>
         )}
 
-        <div className="mt-auto flex flex-col gap-2.5 pb-4">
+        <div className="mt-auto flex flex-col gap-2.5 pb-4 lg:col-start-2 lg:mt-0">
           <PrimaryButton onClick={continueListening}>
             <PlayIcon size={16} />
             {t("result.continueListening")}
           </PrimaryButton>
           <div className="grid grid-cols-3 gap-2.5">
             <ActionTile
-              disabled
               label={t("result.tafsir")}
-              hint={t("common.soon")}
+              pressed={tafsirOpen}
+              onClick={toggleTafsir}
             >
               <BookIcon />
             </ActionTile>
@@ -462,18 +533,18 @@ function AmbiguousView({
   };
 
   return (
-    <Screen>
-      <header className="flex items-center gap-3 px-5 pt-[52px]">
+    <Screen wide>
+      <header className="mx-auto flex w-full max-w-6xl items-center gap-3 px-5 pt-8 sm:px-8 lg:pt-10">
         <IconLink href="/" label={t("common.back")}>
           <BackIcon />
         </IconLink>
         <span className="text-base font-semibold">{t("ambiguous.title")}</span>
       </header>
 
-      <main className="flex grow flex-col gap-3.5 px-5 pt-5">
+      <main className="mx-auto grid w-full max-w-6xl grow grid-cols-1 content-start items-start gap-5 px-5 pt-6 sm:px-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.85fr)] lg:gap-6">
         <Card
           aria-label={t("ambiguous.heardSection")}
-          className="flex flex-col gap-3.5 p-5"
+          className="flex flex-col gap-3.5 p-5 lg:col-start-1 lg:row-span-3"
         >
           <div className="flex items-center justify-between gap-3">
             <h1 className="font-display text-[28px] font-bold text-accent">
@@ -499,7 +570,7 @@ function AmbiguousView({
         <div
           role="radiogroup"
           aria-label={t("ambiguous.places")}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-2 lg:col-start-2 lg:row-start-1"
         >
           {candidates.map((candidate, i) => {
             const on = i === picked;
@@ -552,7 +623,7 @@ function AmbiguousView({
         </div>
 
         {reciterLabel && reciter && (
-          <div className="flex items-center gap-3 rounded-[18px] border border-border bg-surface px-4 py-3">
+          <div className="flex items-center gap-3 rounded-[18px] border border-border bg-surface px-4 py-3 lg:col-start-2">
             <Avatar name={reciterLabel} size="sm" />
             <span className="grow text-sm font-semibold">{reciterLabel}</span>
             {reciter.similarity !== null && (
@@ -563,7 +634,7 @@ function AmbiguousView({
           </div>
         )}
 
-        <div className="mt-auto flex flex-col gap-2 pb-9">
+        <div className="mt-auto flex flex-col gap-2 pb-9 lg:col-start-2 lg:mt-0">
           {state === "failed" && (
             <p role="alert" className="text-center text-[13px] text-warning">
               {t("ambiguous.confirmFailed")}
