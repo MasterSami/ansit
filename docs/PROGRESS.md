@@ -490,7 +490,7 @@ threads): p95 1.6 s / 3.4 s / 6.6 s at 1 / 2 / 4 users, about 0.9 requests/s.
 - **Thread counts set by measurement**: 2 ASR threads beat 3 and 4.
 - **Gallery from Postgres when it holds one, otherwise from files**, so the
   service also runs without Postgres or Redis (`make serve`).
-- **Rate limiter fails open** if Redis is configured but unreachable.
+- **Rate limiter uses a per-process fallback** if Redis is configured but unreachable; global enforcement is degraded until Redis recovers.
 - **`X-Forwarded-For` is ignored unless `TRUST_PROXY_HEADERS=true`.**
 - **Unknown reciter returns best guesses as `alternatives`** but no name.
 - **Locust instead of k6** (k6 is not available here; the brief allows either).
