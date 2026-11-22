@@ -99,8 +99,8 @@ function ResultSkeleton() {
         <Skeleton className="h-11 w-11 rounded-full" />
         <Skeleton className="h-11 w-11 rounded-full" />
       </div>
-      <Skeleton className="mt-2 h-[300px] rounded-3xl" />
-      <Skeleton className="h-[130px] rounded-3xl" />
+      <Skeleton className="mt-2 h-[300px] rounded-xl" />
+      <Skeleton className="h-[130px] rounded-xl" />
       <Skeleton className="mt-auto mb-9 h-[54px] rounded-full" />
     </Screen>
   );
@@ -234,7 +234,7 @@ function MatchView({
                 })}
               </span>
             </div>
-            <span className="rounded-full bg-accent-soft px-3 py-1.5 text-sm font-bold whitespace-nowrap text-accent">
+            <span className="rounded-md bg-rubric-soft px-3 py-1.5 text-sm font-semibold whitespace-nowrap text-rubric">
               {t("result.ayahBadge", { ayah: toArabicDigits(ayah.ayah) })}
             </span>
           </div>
@@ -334,7 +334,7 @@ function MatchView({
                 </span>
                 <span className="text-[17px] font-bold">{named.name}</span>
                 <Link
-                  href={`/reciter?id=${named.id}&surah=${ayah.surah}`}
+                  href={`/reciters/${named.id}?surah=${ayah.surah}`}
                   className="flex min-h-6 items-center text-[13px] font-semibold text-accent"
                 >
                   {reciter?.style && !entry.userReciter
@@ -397,11 +397,11 @@ function MatchView({
                 {alternatives.slice(0, named ? 1 : 2).map((alt) => (
                   <Link
                     key={alt.id}
-                    href={`/reciter?id=${alt.id}&surah=${ayah.surah}`}
+                    href={`/reciters/${alt.id}?surah=${ayah.surah}`}
                     className="flex min-h-6 items-center gap-2"
                   >
                     <span className="truncate">{alt.name_ar}</span>
-                    <span className="rounded-full bg-divider px-2 py-0.5 text-xs text-muted">
+                    <span className="rounded-md bg-divider px-2 py-0.5 text-xs text-muted">
                       {formatPercent(alt.similarity)}
                     </span>
                   </Link>
@@ -484,7 +484,7 @@ function ActionTile({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={pressed}
-      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-[18px] border border-border bg-surface text-[13px] font-medium disabled:text-muted ${
+      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-xl border border-border bg-surface text-[13px] font-medium disabled:text-muted ${
         pressed ? "text-accent" : ""
       }`}
     >
@@ -552,7 +552,7 @@ function AmbiguousView({
                 ? t("result.surah", { name: ayah.surah_name_ar })
                 : t("app.name")}
             </h1>
-            <span className="rounded-full bg-warning-bg px-3 py-1.5 text-[13px] font-semibold whitespace-nowrap text-warning">
+            <span className="rounded-md bg-warning-bg px-3 py-1.5 text-[13px] font-semibold whitespace-nowrap text-warning">
               {repeatedTimes(total)}
             </span>
           </div>
@@ -581,7 +581,7 @@ function AmbiguousView({
                 role="radio"
                 aria-checked={on}
                 onClick={() => setPicked(i)}
-                className={`flex min-h-[60px] items-center justify-between gap-3 rounded-2xl border px-4 py-2.5 text-start ${
+                className={`flex min-h-[60px] items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-start ${
                   on
                     ? "border-accent bg-[rgb(var(--accent-rgb)/0.1)]"
                     : "border-border bg-surface"
@@ -623,7 +623,7 @@ function AmbiguousView({
         </div>
 
         {reciterLabel && reciter && (
-          <div className="flex items-center gap-3 rounded-[18px] border border-border bg-surface px-4 py-3 lg:col-start-2">
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 lg:col-start-2">
             <Avatar name={reciterLabel} size="sm" />
             <span className="grow text-sm font-semibold">{reciterLabel}</span>
             {reciter.similarity !== null && (

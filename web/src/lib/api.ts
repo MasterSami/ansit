@@ -82,10 +82,14 @@ export interface ReciterSummary {
   name_en: string;
   country: string | null;
   styles: Style[];
+  /** True when the voice gallery holds this reciter. Absent on older servers. */
+  recognition_enabled?: boolean;
 }
 
 export interface ReciterDetail extends ReciterSummary {
   ayah_audio: { style: Style; url_template: string; url: string | null }[];
+  /** Full-surah recordings; `{sss}` is the zero-padded surah number. */
+  surah_audio?: { style: Style; url_template: string; surah_total: number }[];
 }
 
 export interface FeedbackBody {

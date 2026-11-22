@@ -1,0 +1,683 @@
+/* Reciter library, reciter profile, install prompt and offline page. */
+
+/* --- shared pieces ------------------------------------------------------ */
+
+.portrait {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+.portrait img {
+  object-fit: cover;
+  transition: transform var(--slow) var(--ease);
+}
+.portrait-initials {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+.badge-on {
+  border-color: color-mix(in srgb, var(--success) 45%, transparent);
+  color: var(--success);
+}
+.badge-muted {
+  color: var(--text-muted);
+}
+
+/* Tabs as underlined labels, not pills. */
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tabs button {
+  position: relative;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding-inline: 14px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.tabs button:hover {
+  color: var(--text);
+}
+.tabs button[aria-selected="true"] {
+  color: var(--text);
+  font-weight: 600;
+}
+.tabs button[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 14px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--rubric);
+}
+
+/* --- library ------------------------------------------------------------ */
+
+.library {
+  padding-block: 28px 40px;
+}
+.library h1,
+.profile h1,
+.profile h2,
+.offline h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.library-head {
+  display: grid;
+  gap: 20px;
+}
+.library-head h1 {
+  margin-top: 10px;
+  font-size: clamp(28px, 4vw, 46px);
+}
+.library-head p:not(.kicker) {
+  max-width: 44em;
+  margin-top: 10px;
+  color: var(--text-muted);
+}
+.library-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding-inline: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-muted);
+}
+.library-search:focus-within {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.library-search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+.library-search input::placeholder {
+  color: var(--text-muted);
+}
+.library-search input::-webkit-search-cancel-button {
+  display: none;
+}
+.library-search button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 4px;
+}
+.library-search button:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.library-tabs {
+  margin-top: 24px;
+}
+.library-count {
+  margin-top: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.library-grid {
+  display: grid;
+  gap: 0;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.reciter-card {
+  display: flex;
+  gap: 16px;
+  height: 100%;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+.reciter-card:hover strong {
+  color: var(--accent);
+}
+.reciter-card:hover .portrait img {
+  transform: scale(1.04);
+}
+.reciter-card-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.reciter-card-text strong {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: color var(--fast) var(--ease);
+}
+.reciter-card-en,
+.profile-name-en {
+  color: var(--text-muted);
+  font-family: var(--font-latin);
+  font-style: italic;
+  /* Latin text in a right-to-left page: keep it on the reading edge. */
+  text-align: end;
+}
+.reciter-card-en {
+  font-size: 14px;
+  unicode-bidi: plaintext;
+}
+.reciter-card-meta {
+  color: var(--rubric);
+  font-size: 12px;
+  font-weight: 500;
+}
+.reciter-card-bio {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.8;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.reciter-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+@media (min-width: 700px) {
+  .library {
+    padding-block: 48px 64px;
+  }
+  .library-head {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+    align-items: end;
+    gap: 48px;
+  }
+  .library-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 48px;
+  }
+}
+@media (min-width: 1100px) {
+  .library-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* --- profile ------------------------------------------------------------ */
+
+.profile {
+  padding-block: 20px 40px;
+}
+.profile-crumbs a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.profile-crumbs a:hover {
+  color: var(--text);
+}
+.profile-head {
+  display: grid;
+  gap: 24px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--text);
+}
+.profile-portrait {
+  width: min(200px, 52vw) !important;
+}
+.profile-head h1 {
+  margin-top: 10px;
+  font-size: clamp(30px, 5vw, 54px);
+}
+.profile-name-en {
+  font-size: clamp(17px, 2vw, 22px);
+}
+.profile-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 32px;
+  margin-top: 20px;
+}
+.profile-facts dt {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.profile-facts dd {
+  font-size: 15px;
+  font-weight: 500;
+}
+.profile-intro {
+  max-width: 40em;
+  margin-top: 20px;
+  font-size: 17px;
+  line-height: 1.95;
+}
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.profile-credit {
+  margin-top: 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.profile-credit a,
+.profile-sources a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.profile-body {
+  display: grid;
+  gap: 40px;
+  padding-top: 32px;
+}
+.profile h2 {
+  font-size: 24px;
+}
+.profile h3 {
+  margin-top: 28px;
+  color: var(--rubric);
+  font-size: 13px;
+  font-weight: 600;
+}
+.profile-prose {
+  display: grid;
+  gap: 16px;
+  max-width: 42em;
+  margin-top: 14px;
+  font-size: 16px;
+  line-height: 2.05;
+}
+.profile-empty {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.profile-milestones {
+  display: grid;
+  margin-top: 8px;
+}
+.profile-milestones li {
+  position: relative;
+  padding: 10px 0;
+  padding-inline-start: 20px;
+  border-bottom: 1px solid var(--divider);
+  font-size: 15px;
+}
+.profile-milestones li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 2px;
+  top: 1.25em;
+  width: 6px;
+  height: 6px;
+  background: var(--rubric);
+  transform: rotate(45deg);
+}
+.profile-sources {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.profile-sources a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.profile-sources a:hover {
+  color: var(--text);
+}
+
+.profile-listen {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.profile-listen .tabs {
+  margin-top: 10px;
+}
+.profile-listen-note {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.profile-play-all {
+  width: 100%;
+  margin-top: 12px;
+}
+.surah-list {
+  max-height: 460px;
+  margin-top: 14px;
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+  overscroll-behavior: contain;
+}
+.surah-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.surah-number {
+  min-width: 2.2em;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.surah-name {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  line-height: 1.5;
+}
+.surah-name strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+.surah-name small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.surah-list li.is-heard small {
+  color: var(--rubric);
+}
+.surah-list button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.surah-list button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.profile-related {
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.profile-related ul {
+  display: grid;
+  gap: 4px 32px;
+  margin-top: 16px;
+}
+.profile-related a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+}
+.profile-related a > span:last-child {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+}
+.profile-related strong {
+  font-weight: 600;
+}
+.profile-related small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.profile-related a:hover strong {
+  color: var(--accent);
+}
+
+@media (min-width: 700px) {
+  .profile {
+    padding-block: 28px 64px;
+  }
+  .profile-head {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+    padding-bottom: 40px;
+  }
+  .profile-portrait {
+    width: 240px !important;
+  }
+  .profile-related ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1000px) {
+  .profile-body {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+    gap: 64px;
+    align-items: start;
+  }
+  .profile-side {
+    position: sticky;
+    top: 92px;
+  }
+  .profile-related ul {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* --- installing and updating ------------------------------------------- */
+
+.install-band {
+  padding-block: var(--space-7);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.install-band-inner {
+  display: grid;
+  gap: 20px;
+  align-items: center;
+}
+.install-band h2 {
+  font-size: clamp(22px, 2.6vw, 32px);
+}
+.install-band p:not(.kicker) {
+  max-width: 44em;
+  margin-top: 10px;
+  color: var(--text-muted);
+}
+.install-band-note {
+  font-size: 14px;
+}
+@media (min-width: 800px) {
+  .install-band-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 48px;
+  }
+  .install-band-note {
+    max-width: 18em !important;
+  }
+}
+
+.install-dialog {
+  width: min(440px, calc(100% - 32px));
+  margin: auto;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+.install-dialog::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+.install-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.install-dialog h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.install-dialog-head button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  place-items: center;
+  color: var(--text-muted);
+}
+.install-dialog ol {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding-inline-start: 1.4em;
+  list-style: arabic-indic;
+}
+.install-dialog li svg {
+  display: inline;
+  vertical-align: -3px;
+}
+.install-dialog p {
+  margin-top: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.update-toast {
+  position: fixed;
+  inset-inline: 12px;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 460px;
+  margin-inline: auto;
+  padding: 10px 14px;
+  border: 1px solid var(--text);
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 14px;
+  animation: ansit-rise var(--slow) var(--ease) both;
+}
+.update-toast span {
+  flex: 1;
+}
+.update-toast-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: var(--text-muted);
+}
+@media (min-width: 768px) {
+  .update-toast {
+    bottom: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .update-toast {
+    animation: none;
+  }
+}
+
+/* --- offline ------------------------------------------------------------ */
+
+.offline {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 32px var(--gutter);
+  text-align: center;
+}
+.offline > div {
+  display: grid;
+  max-width: 34em;
+  justify-items: center;
+  gap: 14px;
+}
+.offline h1 {
+  font-size: clamp(26px, 4vw, 38px);
+}
+.offline p {
+  color: var(--text-muted);
+}
+.offline ul {
+  display: grid;
+  gap: 6px;
+  margin-block: 6px;
+  text-align: start;
+  font-size: 14px;
+}
+.offline li {
+  display: flex;
+  gap: 8px;
+}
+.offline li svg {
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.offline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

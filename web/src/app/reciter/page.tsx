@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 
-import { ReciterScreen } from "@/components/ReciterScreen";
+import { LegacyReciterRedirect } from "@/components/LegacyReciterRedirect";
 
+// The old address (/reciter?id=…) still works: it forwards to the profile.
 export default function Page() {
-  // Reads query parameters, which are only known in the browser.
   return (
     <Suspense>
-      <ReciterScreen />
+      <LegacyReciterRedirect />
     </Suspense>
   );
 }
