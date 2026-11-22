@@ -1,29 +1,58 @@
 /*
- * Ansit service worker: keeps the app shell available offline.
+ * ANSIT service worker.
  *
- * - Only same-origin GET requests are handled. Requests to the API (another
- *   origin) and every POST, including audio uploads, are never touched or cached.
- * - Pages: network first, falling back to the cached copy when offline.
- * - Build assets, fonts and icons: cache first (their URLs are content-hashed).
+ * Registered as /sw.js?v=<build id>, so every deployment is a new worker with
+ * its own caches. A new worker waits until the user accepts the update (the
+ * page sends SKIP_WAITING); it never takes over mid-recording.
+ *
+ * What is cached:
+ * - the app shell pages and the offline page (on install);
+ * - build assets, fonts and icons (cache first; their URLs are content-hashed);
+ * - pages the user has visited and their route data (network first, cache as
+ *   the fallback).
+ *
+ * What is never touched: any non-GET request (audio uploads, feedback), and
+ * any other origin (the API, recitation audio, portraits). Recognition always
+ * needs the network, and the offline page says so.
  */
-const CACHE = "ansit-shell-v1";
-const PAGES = [
+const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
+const SHELL = `ansit-shell-${VERSION}`;
+const PAGES = `ansit-pages-${VERSION}`;
+const OFFLINE_URL = "/offline";
+const PRECACHE = [
   "/",
   "/listen",
-  "/result",
-  "/history",
-  "/reciter",
-  "/settings",
+  "/reciters",
   "/mushaf",
+  "/history",
+  "/settings",
+  OFFLINE_URL,
+  "/icons/icon-192.png",
 ];
+const MAX_PAGES = 80;
+
+/** Store a page and the build assets it needs, so it can run offline unvisited. */
+async function precachePage(cache, url) {
+  const response = await fetch(new Request(url, { cache: "reload" }));
+  if (!response.ok) return;
+  await cache.put(url, response.clone());
+  const type = response.headers.get("content-type") || "";
+  if (!type.includes("text/html")) return;
+  const html = await response.text();
+  const assets = new Set(html.match(/\/_next\/static\/[^"'\\\s)<>]+/g) || []);
+  await Promise.all(
+    [...assets].map((asset) => cache.add(asset).catch(() => undefined)),
+  );
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE)
-      .then((cache) => cache.addAll(PAGES))
-      .catch(() => undefined)
-      .then(() => self.skipWaiting()),
+    caches.open(SHELL).then((cache) =>
+      // One missing page must not block the offline page from being stored.
+      Promise.all(
+        PRECACHE.map((url) => precachePage(cache, url).catch(() => undefined)),
+      ),
+    ),
   );
 });
 
@@ -33,18 +62,72 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((keys) =>
         Promise.all(
-          keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)),
+          keys
+            .filter(
+              (key) =>
+                key.startsWith("ansit-") && key !== SHELL && key !== PAGES,
+            )
+            .map((key) => caches.delete(key)),
         ),
       )
       .then(() => self.clients.claim()),
   );
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
+
 function isStaticAsset(url) {
   return (
     url.pathname.startsWith("/_next/static/") ||
-    url.pathname.startsWith("/icons/")
+    url.pathname.startsWith("/icons/") ||
+    url.pathname === "/manifest.webmanifest"
   );
+}
+
+async function trim(cacheName, limit) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  await Promise.all(
+    keys
+      .slice(0, Math.max(0, keys.length - limit))
+      .map((key) => cache.delete(key)),
+  );
+}
+
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (response.ok) {
+    const cache = await caches.open(SHELL);
+    await cache.put(request, response.clone());
+  }
+  return response;
+}
+
+/** Network first; the stored copy, then the offline page, when there is none. */
+async function networkFirst(request, { fallbackToOffline }) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(PAGES);
+      await cache.put(request, response.clone());
+      trim(PAGES, MAX_PAGES);
+    }
+    return response;
+  } catch (error) {
+    const cached =
+      (await caches.match(request)) ||
+      (await caches.match(request, { ignoreSearch: true }));
+    if (cached) return cached;
+    if (fallbackToOffline) {
+      const offline = await caches.match(OFFLINE_URL);
+      if (offline) return offline;
+    }
+    throw error;
+  }
 }
 
 self.addEventListener("fetch", (event) => {
@@ -54,37 +137,15 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (isStaticAsset(url)) {
-    event.respondWith(
-      caches.match(request).then(
-        (cached) =>
-          cached ??
-          fetch(request).then((response) => {
-            if (response.ok) {
-              const copy = response.clone();
-              caches.open(CACHE).then((cache) => cache.put(request, copy));
-            }
-            return response;
-          }),
-      ),
-    );
+    event.respondWith(cacheFirst(request));
     return;
   }
-
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(url.pathname, copy));
-          }
-          return response;
-        })
-        .catch(() =>
-          caches
-            .match(url.pathname)
-            .then((cached) => cached ?? caches.match("/")),
-        ),
-    );
+    event.respondWith(networkFirst(request, { fallbackToOffline: true }));
+    return;
+  }
+  // Route data fetched by in-app navigation.
+  if (request.headers.get("RSC") === "1") {
+    event.respondWith(networkFirst(request, { fallbackToOffline: false }));
   }
 });

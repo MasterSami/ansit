@@ -8,7 +8,7 @@ import { chromium } from "@playwright/test";
 const dir = fileURLToPath(new URL("../public/icons/", import.meta.url));
 const svg = readFileSync(`${dir}icon.svg`, "utf8");
 // Maskable icons are cropped by the OS, so the background must reach the edges.
-const maskable = svg.replace('rx="112"', 'rx="0"');
+const maskable = svg.replace('rx="96"', 'rx="0"');
 
 const local = "/opt/pw-browsers/chromium";
 const browser = await chromium.launch(
