@@ -102,6 +102,23 @@ def reciter_info(reciter_id: str, styles: tuple[str, ...]) -> ReciterInfo:
     )
 
 
+def directory_reciter(reciter_id: str) -> ReciterInfo:
+    """In the registry with full-surah audio, but with no voice in the gallery."""
+    return ReciterInfo(
+        id=reciter_id,
+        name_ar=f"اسم {reciter_id}",
+        name_en=f"Zz {reciter_id}",
+        country=None,
+        styles=("murattal",),
+        sources={
+            "everyayah": [],
+            "mp3quran_audio": [
+                {"style": "murattal", "server": "https://cdn.example/r1/", "surah_total": 107}
+            ],
+        },
+    )
+
+
 @pytest.fixture
 def harness(index: QuranIndex, matcher: AyahMatcher) -> Harness:
     asr, vad, speaker = FakeASR(), FakeVAD(), FakeSpeaker()
@@ -121,6 +138,7 @@ def harness(index: QuranIndex, matcher: AyahMatcher) -> Harness:
             "husary": reciter_info("husary", ("murattal", "mujawwad")),
             "minshawi": reciter_info("minshawi", ("murattal",)),
             "alafasy": reciter_info("alafasy", ("murattal",)),
+            "newcomer": directory_reciter("newcomer"),
         },
     )
     return Harness(services, asr, vad, speaker, index)

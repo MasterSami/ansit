@@ -12,6 +12,7 @@ from app.api.schemas import (
     ReciterDetailOut,
     ReciterListOut,
     ReciterSummaryOut,
+    SurahAudioOut,
 )
 from app.matcher.index import QuranIndex
 from app.services import ReciterInfo, Services
@@ -22,20 +23,27 @@ router = APIRouter(prefix="/v1", tags=["reciters"])
 EVERYAYAH = "https://everyayah.com/data/{folder}/{sss}{aaa}.mp3"
 
 
-def _summary(info: ReciterInfo) -> ReciterSummaryOut:
+def _recognised(services: Services) -> set[str]:
+    """Reciters the voice gallery actually holds. Being in the registry is not enough."""
+    return {voice.reciter_id for voice in services.gallery.voices} if services.gallery else set()
+
+
+def _summary(info: ReciterInfo, recognised: set[str]) -> ReciterSummaryOut:
     return ReciterSummaryOut(
         id=info.id,
         name_ar=info.name_ar,
         name_en=info.name_en,
         country=info.country,
         styles=list(info.styles),
+        recognition_enabled=info.id in recognised,
     )
 
 
 @router.get("/reciters", response_model=ReciterListOut)
 async def list_reciters(services: Annotated[Services, Depends(get_services)]) -> ReciterListOut:
     ordered = sorted(services.reciters.values(), key=lambda r: r.name_en)
-    return ReciterListOut(reciters=[_summary(r) for r in ordered])
+    recognised = _recognised(services)
+    return ReciterListOut(reciters=[_summary(r, recognised) for r in ordered])
 
 
 @router.get(
@@ -67,4 +75,17 @@ async def get_reciter(
             else None
         )
         audio.append(AyahAudioOut(style=source["style"], url_template=template, url=url))
-    return ReciterDetailOut(**_summary(info).model_dump(), ayah_audio=audio)
+    # Full-surah files: the URL pattern was fetched and decoded (docs/DATA_SOURCES.md).
+    surah_audio = [
+        SurahAudioOut(
+            style=source["style"],
+            url_template=f"{source['server']}{{sss}}.mp3",
+            surah_total=source["surah_total"],
+        )
+        for source in info.sources.get("mp3quran_audio", [])
+    ]
+    return ReciterDetailOut(
+        **_summary(info, _recognised(services)).model_dump(),
+        ayah_audio=audio,
+        surah_audio=surah_audio,
+    )

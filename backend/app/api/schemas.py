@@ -175,6 +175,10 @@ class ReciterSummaryOut(BaseModel):
     name_en: str
     country: str | None
     styles: list[Style]
+    recognition_enabled: bool = Field(
+        default=False,
+        description="True when the voice gallery holds this reciter, so identify can name them.",
+    )
 
 
 class ReciterListOut(BaseModel):
@@ -191,8 +195,20 @@ class AyahAudioOut(BaseModel):
     )
 
 
+class SurahAudioOut(BaseModel):
+    style: Style
+    url_template: str = Field(
+        description="Full-surah recording. Replace {sss} with the zero-padded 3-digit surah."
+    )
+    surah_total: int = Field(description="How many of the 114 surahs this recording has.")
+
+
 class ReciterDetailOut(ReciterSummaryOut):
     ayah_audio: list[AyahAudioOut]
+    surah_audio: list[SurahAudioOut] = Field(
+        default_factory=list,
+        description="Full-surah recordings (mp3quran), for reciters without per-ayah audio too.",
+    )
 
 
 # ------------------------------------------------------------------ feedback

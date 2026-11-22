@@ -196,7 +196,9 @@ async def test_gallery_falls_back_to_files_when_the_database_is_empty(
 
 async def test_gallery_from_files_without_any_database(harness: Harness, tmp_path: Path) -> None:
     loaded = await run_gallery_task(write_files(harness, tmp_path), None)
-    assert loaded.gallery is not None and len(loaded.reciters) == 3
+    # Every registry entry is loaded, including one with no voice in the gallery.
+    assert loaded.gallery is not None
+    assert len(loaded.reciters) == len(harness.services.reciters)
 
 
 async def test_no_gallery_anywhere_fails_the_startup_task(tmp_path: Path) -> None:
