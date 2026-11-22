@@ -51,7 +51,7 @@ export function HistoryScreen() {
         <h1 className="text-[28px] font-bold">
           {savedTab ? t("history.savedTitle") : t("history.title")}
         </h1>
-        <label className="flex h-12 items-center gap-2.5 rounded-full border border-border bg-surface px-4 text-muted focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
+        <label className="flex h-12 items-center gap-2.5 rounded-lg border border-border bg-surface px-4 text-muted focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
           <SearchIcon size={18} />
           <span className="sr-only">{t("history.searchLabel")}</span>
           <input
@@ -124,7 +124,7 @@ export function HistoryScreen() {
       </main>
 
       <PlayerBar />
-      <BottomNav current={savedTab ? "saved" : "history"} />
+      <BottomNav current="history" />
     </Screen>
   );
 }
@@ -135,11 +135,11 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
   return (
     <Link
       href={`/result?id=${entry.id}`}
-      className="flex items-center gap-3.5 rounded-[18px] border border-border bg-surface px-3.5 py-3"
+      className="flex items-center gap-3.5 rounded-xl border border-border bg-surface px-3.5 py-3"
     >
       <div
         aria-hidden="true"
-        className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[14px] bg-accent-soft font-display text-lg font-bold text-accent"
+        className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-accent-soft font-display text-lg font-bold text-accent"
       >
         {toArabicDigits(entry.ayah.surah)}
       </div>

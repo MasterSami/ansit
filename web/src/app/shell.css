@@ -1,0 +1,164 @@
+/* Brand, top navigation and the shared page frame. */
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+}
+.brand-mark {
+  display: inline-flex;
+  color: var(--accent);
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.brand-text strong {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+}
+.brand-text small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.site-header {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  padding-top: env(safe-area-inset-top);
+}
+.site-header-always {
+  display: block;
+}
+.site-header-inner {
+  width: var(--shell);
+  min-height: 68px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.site-nav {
+  display: none;
+  align-items: stretch;
+  gap: 4px;
+  align-self: stretch;
+}
+.site-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-inline: 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+.site-nav a:hover {
+  color: var(--text);
+}
+.site-nav a[aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+}
+/* The current page is marked like a manuscript heading: a rule in red. */
+.site-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 16px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--rubric);
+}
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.site-icon-link {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--text-muted);
+}
+.site-icon-link:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+@media (min-width: 768px) {
+  .site-header {
+    display: block;
+  }
+  .site-nav {
+    display: flex;
+  }
+  /* The bottom bar belongs to phones. */
+  .bottom-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-header-always .brand-text small {
+    display: none;
+  }
+}
+
+/* Shared button shapes for pages written in plain CSS. */
+.btn {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-inline: 22px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.btn-primary:hover {
+  background: color-mix(in srgb, var(--accent) 88%, var(--text));
+}
+.btn-outline {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--text);
+}
+.btn-outline:hover {
+  border-color: var(--text);
+}
+.btn-small {
+  min-height: 40px;
+  padding-inline: 14px;
+  font-size: 13px;
+}
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+.text-link:hover {
+  color: var(--text);
+}

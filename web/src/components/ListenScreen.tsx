@@ -228,21 +228,16 @@ export function ListenScreen() {
 
   const identifying = phase.name === "identifying";
   return (
-    <Screen className="listen-web-screen">
-      <header className="listen-web-header flex items-center justify-between px-6 pt-14">
+    <Screen wide className="listen-web-screen">
+      <header className="listen-web-header flex items-center justify-between">
         <Link
           href="/"
-          className="listen-web-brand font-display text-[26px] font-bold text-accent"
+          className="listen-web-brand font-display text-[26px] font-bold text-accent md:invisible"
         >
           {t("app.name")}
         </Link>
-        <nav className="listen-web-nav" aria-label="التنقل الرئيسي">
-          <Link href="/">الرئيسية</Link>
-          <Link href="/mushaf">المصحف</Link>
-          <Link href="/history">سجل الاستماع</Link>
-        </nav>
         <span
-          className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-[13px] font-medium"
+          className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] font-medium"
           role="timer"
           aria-label={t("listen.elapsed")}
         >
@@ -254,7 +249,7 @@ export function ListenScreen() {
         </span>
       </header>
 
-      <main className="listen-web-main flex grow flex-col items-center justify-center gap-9 px-6 py-6">
+      <main className="listen-web-main grow">
         <SoundWave
           levels={levels}
           live={phase.name === "recording"}
@@ -279,7 +274,7 @@ export function ListenScreen() {
 
         <ol
           aria-label={t("listen.steps")}
-          className="listen-web-steps flex w-full flex-col gap-3.5 rounded-[18px] border border-border bg-surface p-4"
+          className="listen-web-steps flex w-full flex-col gap-3.5 rounded-xl border border-border bg-surface p-4"
         >
           <Step
             label={t("listen.stepCapture")}
@@ -296,7 +291,7 @@ export function ListenScreen() {
         </ol>
       </main>
 
-      <footer className="listen-web-footer flex flex-col items-center px-6 pb-10">
+      <footer className="listen-web-footer flex flex-col items-center">
         {identifying ? (
           <QuietButton onClick={cancelUpload}>{t("common.cancel")}</QuietButton>
         ) : (
@@ -423,7 +418,7 @@ function PermissionExplainer({ onAllow }: { onAllow: () => void }) {
     ],
   ];
   return (
-    <Screen className="listen-web-screen listen-web-explainer px-6 pt-14 pb-9">
+    <Screen wide className="listen-web-screen listen-web-explainer">
       <div className="flex items-center justify-between">
         <span className="font-display text-[26px] font-bold text-accent">
           {t("app.name")}
@@ -454,7 +449,7 @@ function PermissionExplainer({ onAllow }: { onAllow: () => void }) {
           </p>
         </div>
 
-        <ul className="flex flex-col gap-4 rounded-[20px] border border-border bg-surface p-[18px]">
+        <ul className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-[18px]">
           {promises.map(([icon, key]) => (
             <li key={key} className="flex items-start gap-3">
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-accent-soft text-accent">
@@ -498,7 +493,7 @@ function Problem({
 }) {
   const t = useTranslations("common");
   return (
-    <Screen className="listen-web-screen listen-web-problem pb-10">
+    <Screen wide className="listen-web-screen listen-web-problem pb-10">
       <StateMessage icon={icon} title={title} body={body} tone={tone}>
         {children}
       </StateMessage>

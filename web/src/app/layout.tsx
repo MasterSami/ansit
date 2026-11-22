@@ -1,23 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Amiri, Amiri_Quran, IBM_Plex_Sans_Arabic } from "next/font/google";
+import {
+  Amiri_Quran,
+  Newsreader,
+  Readex_Pro,
+  Reem_Kufi,
+} from "next/font/google";
 
 import { Providers } from "@/components/Providers";
 import { THEME_BOOTSTRAP } from "@/lib/theme";
 
 import "./globals.css";
+import "./shell.css";
 import "./landing.css";
+import "./reciters.css";
 
-// UI text, display (wordmark, surah names) and ayah text, per the design tokens.
-const plex = IBM_Plex_Sans_Arabic({
-  variable: "--font-plex",
-  subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
+// Type system: Readex Pro for interface text (Arabic and Latin), Reem Kufi
+// for the wordmark and headings, Amiri Quran for ayah text only, and
+// Newsreader for Latin names set beside Arabic ones.
+const readex = Readex_Pro({
+  variable: "--font-readex",
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
-const amiri = Amiri({
-  variable: "--font-amiri",
+const kufi = Reem_Kufi({
+  variable: "--font-kufi",
   subsets: ["arabic"],
-  weight: ["400", "700"],
+  weight: ["500", "700"],
   display: "swap",
 });
 const amiriQuran = Amiri_Quran({
@@ -26,17 +35,24 @@ const amiriQuran = Amiri_Quran({
   weight: "400",
   display: "swap",
 });
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "أنصِت",
+  title: { default: "أنصِت — من الصوت إلى الآية", template: "%s · أنصِت" },
   description: "تعرّف على السورة والآية واسم القارئ من ثوانٍ من التلاوة",
-  applicationName: "أنصِت",
+  applicationName: "ANSIT",
   appleWebApp: {
     capable: true,
-    title: "أنصِت",
-    statusBarStyle: "black-translucent",
+    title: "أنصت",
+    statusBarStyle: "default",
   },
-  icons: { icon: "/icons/icon.svg", apple: "/icons/icon-192.png" },
+  icons: { icon: "/icons/icon.svg", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -44,8 +60,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0E1512" },
-    { media: "(prefers-color-scheme: light)", color: "#F7F4EC" },
+    { media: "(prefers-color-scheme: dark)", color: "#0E111B" },
+    { media: "(prefers-color-scheme: light)", color: "#F6F1E7" },
   ],
 };
 
@@ -58,7 +74,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${plex.variable} ${amiri.variable} ${amiriQuran.variable} h-full antialiased`}
+      className={`${readex.variable} ${kufi.variable} ${amiriQuran.variable} ${newsreader.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

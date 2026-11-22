@@ -79,7 +79,7 @@ export function FeedbackSheet({
     ["other", t("other")],
   ];
   const field =
-    "h-12 w-full rounded-2xl border border-border bg-bg px-4 text-[15px] text-text placeholder:text-muted";
+    "h-12 w-full rounded-lg border border-border bg-bg px-4 text-[15px] text-text placeholder:text-muted";
 
   return (
     <dialog
@@ -118,7 +118,7 @@ export function FeedbackSheet({
                 role="radio"
                 aria-checked={kind === value}
                 onClick={() => setKind(value)}
-                className={`h-11 rounded-full border px-4 text-[13px] font-semibold ${
+                className={`h-11 rounded-md border px-4 text-[13px] font-semibold ${
                   kind === value
                     ? "border-accent bg-accent text-on-accent"
                     : "border-border bg-bg text-text"

@@ -16,7 +16,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-2.5">
       <h2 className="text-[13px] font-semibold text-muted">{title}</h2>
-      <div className="flex flex-col gap-3 rounded-[20px] border border-border bg-surface p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
         {children}
       </div>
     </section>
@@ -62,7 +62,7 @@ export function SettingsScreen() {
           <div
             role="radiogroup"
             aria-label={t("settings.appearance")}
-            className="grid grid-cols-3 gap-1.5 rounded-2xl bg-bg p-1"
+            className="grid grid-cols-3 gap-1.5 rounded-lg bg-bg p-1"
           >
             {THEMES.map((choice) => (
               <button

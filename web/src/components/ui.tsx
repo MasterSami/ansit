@@ -1,3 +1,5 @@
+"use client";
+
 /** Small building blocks shared by the screens. */
 
 import Link from "next/link";
@@ -5,9 +7,10 @@ import Image from "next/image";
 import { useState, type ComponentProps, type ReactNode } from "react";
 
 import { BookIcon } from "./icons";
+import { SiteHeader } from "./SiteHeader";
 
 const ICON_BUTTON =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-text";
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-text hover:border-text";
 
 /** 44 px round icon button. Always needs a label, since it has no text. */
 export function IconButton({
@@ -40,7 +43,7 @@ export function IconLink({
 }
 
 const PRIMARY =
-  "flex h-[54px] w-full items-center justify-center gap-2.5 rounded-full bg-accent text-base font-bold text-on-accent disabled:opacity-60";
+  "flex h-[52px] w-full items-center justify-center gap-2.5 rounded-lg bg-accent text-base font-semibold text-on-accent hover:opacity-90 disabled:opacity-50";
 
 export function PrimaryButton({
   className = "",
@@ -59,7 +62,7 @@ export function PrimaryLink({
 }
 
 const QUIET =
-  "flex h-12 w-full items-center justify-center gap-2 rounded-full text-[15px]";
+  "flex h-12 w-full items-center justify-center gap-2 rounded-lg text-[15px] hover:bg-surface-2 disabled:opacity-50 disabled:hover:bg-transparent";
 
 export function QuietButton({
   tone = "muted",
@@ -109,7 +112,7 @@ export function Avatar({
   return (
     <div
       aria-hidden="true"
-      className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border text-accent ${box}`}
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg border text-accent ${box}`}
       title={name}
     >
       {image && !imageFailed ? (
@@ -129,7 +132,11 @@ export function Avatar({
   );
 }
 
-/** The app frame: a phone-width column, full height. */
+/**
+ * The app frame. On a wide screen it sits under the site navigation and uses
+ * a readable column (or the full shell when `wide`); on a phone it is the
+ * whole screen, with the bottom bar the page provides.
+ */
 export function Screen({
   children,
   className = "",
@@ -140,10 +147,17 @@ export function Screen({
   wide?: boolean;
 }) {
   return (
-    <div
-      className={`mx-auto flex min-h-dvh w-full ${wide ? "max-w-6xl" : "max-w-[430px]"} flex-col bg-bg ${className}`}
-    >
-      {children}
+    <div className="flex min-h-dvh flex-col bg-bg">
+      <SiteHeader />
+      <div
+        className={`mx-auto flex w-full grow flex-col ${
+          wide
+            ? "max-w-[430px] md:max-w-[min(1120px,calc(100%-80px))]"
+            : "max-w-[430px] md:max-w-[680px]"
+        } ${className}`}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -155,7 +169,7 @@ export function Card({
 }: ComponentProps<"section">) {
   return (
     <section
-      className={`rounded-3xl border border-border bg-surface ${className}`}
+      className={`rounded-xl border border-border bg-surface ${className}`}
       {...rest}
     >
       {children}
@@ -168,7 +182,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={`ansit-skeleton rounded-2xl ${className}`}
+      className={`ansit-skeleton rounded-lg ${className}`}
     />
   );
 }

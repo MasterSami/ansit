@@ -102,7 +102,7 @@ export function MushafScreen() {
           </p>
         )}
         {ayah && (
-          <article className="flex flex-col gap-4 rounded-3xl border border-border bg-surface p-5">
+          <article className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-5">
             <h2 className="font-semibold text-accent">
               {t("result.surah", { name: ayah.surah_name_ar })} ·{" "}
               {t("result.ayahBadge", { ayah: toArabicDigits(ayah.ayah) })}
