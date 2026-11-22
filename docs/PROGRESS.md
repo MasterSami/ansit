@@ -702,3 +702,79 @@ report) and should wait for real-device results and real usage data.
 - Remaining: source/license confirmation for the tafsir edition version, verify
   portrait links on more devices, and gather/reference additional audio where
   currently absent.
+
+## Reciter profiles, full-surah playback and PWA on the existing design (2026-11-22)
+
+Branch `feat/profiles-surah-pwa`, on top of `hardening/production-readiness`.
+
+A full visual redesign was built first (branch `redesign/identity-profiles-pwa`)
+and **rejected by the owner, who prefers the existing look**. That branch is
+left unmerged. The three functional parts were then rebuilt here with the
+existing colours, fonts, rounded cards and pill controls; `globals.css` and
+`landing.css` are unchanged.
+
+### What changed
+
+- **Recording minimum is 5 s on web and mobile.** The web button reads
+  "cancel" until then and "stop" after, so nothing is discarded silently.
+- **Reciter profiles**: `/reciters/<id>` for all 64 reciters (55 in the
+  registry, 9 directory-only): portrait, category, sourced biography,
+  recordings, recognition status, related reciters. The old `/reciter?id=`
+  address forwards to it.
+- **Library**: Arabic and English search, five category filters, a
+  recognition badge taken from the server.
+- **Full-surah playback** for reciters with no per-ayah audio, on the profile
+  page and from "continue listening" (which says it starts at the beginning
+  of the surah).
+- **API (additive):** `recognition_enabled` on reciter summaries and
+  `surah_audio` on reciter details.
+- **PWA**: manifest name ANSIT / short name أنصت, versioned service worker,
+  install control on the landing page and in Settings (Chromium prompt, iOS
+  Safari instructions), offline page, not-found page, update prompt.
+- Profile content is in `web/src/data/reciter-profiles.json`; the old
+  `reciterCatalog.ts` was folded into it.
+
+### Checks run on this branch
+
+| Check                       | Result                                      |
+| --------------------------- | ------------------------------------------- |
+| Backend: ruff, mypy, pytest | clean; 204 passed, 12 skipped (need models) |
+| Web: ESLint, tsc            | clean                                       |
+| Web: Vitest                 | 28 passed                                   |
+| Web: Playwright             | 18 passed                                   |
+| Mobile: analyze, tests      | clean; 58 passed                            |
+
+Browser verification against the production build (Chromium): no
+installability errors, no manifest errors; the service worker controls the
+page; offline, a visited profile opens from cache, an unvisited one shows the
+offline page and `/history` opens from the precache; accepting the update
+prompt moves to the new worker.
+
+### Not verified
+
+- **Installing on a real phone or desktop**: headless Chromium reports the
+  site installable but does not fire the prompt.
+- **Portraits did not load here** (this environment blocks the image hosts),
+  so the screenshots show the book-icon fallback.
+
+### Biography data: how far to trust it
+
+- 59 of 64 reciters have a sourced short biography, 33 of them a fuller one.
+  Five have none because no reliable source was found (alaqmi, dukhain,
+  ahmad-kaseb, muhammad-dibirov, omar-diaa-al-din).
+- **All facts came from web-search result summaries, not from pages opened
+  and read** (Wikipedia was unreachable here). Each profile lists its
+  sources; conflicting dates were left out. A human read-through against the
+  listed sources is needed before launch.
+- A unit test fails if any profile states a fact without a source.
+
+### Open issues
+
+1. **`hudhaify` and `ali-hudhaifi` are the same person**, entered twice in the
+   registry. This will hurt recognition of him; one should be removed.
+2. Portraits are hot-linked from news and social sites; only the Wikimedia
+   ones have a clear licence.
+3. Registry has 55 reciters; the gallery built here has 38. Reciters without a
+   gallery voice now show "not supported".
+4. The mobile app has no profiles or library.
+5. After an update, one old cache can survive until the next activation.

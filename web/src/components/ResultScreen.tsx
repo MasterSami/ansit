@@ -164,8 +164,25 @@ function MatchView({
         detail.ayah_audio.find((a) => a.style === wanted) ??
         detail.ayah_audio[0];
       if (!audio) {
-        // Known voice, but no per-ayah recording to play (mp3quran-only reciters).
-        setNotice(t("player.noAyahAudio"));
+        // No per-ayah recording (mp3quran-only reciters): play the whole
+        // surah instead, and say that it starts from the beginning.
+        const whole =
+          detail.surah_audio?.find((a) => a.style === wanted) ??
+          detail.surah_audio?.[0];
+        if (!whole) {
+          setNotice(t("player.noAyahAudio"));
+          return;
+        }
+        player.play({
+          reciterId: detail.id,
+          reciterName: detail.name_ar,
+          kind: "surah",
+          template: whole.url_template,
+          surah: ayah.surah,
+          ayah: 1,
+          stopAtSurahEnd: true,
+        });
+        setNotice(t("player.wholeSurah"));
         return;
       }
       player.play({
@@ -334,7 +351,7 @@ function MatchView({
                 </span>
                 <span className="text-[17px] font-bold">{named.name}</span>
                 <Link
-                  href={`/reciter?id=${named.id}&surah=${ayah.surah}`}
+                  href={`/reciters/${named.id}?surah=${ayah.surah}`}
                   className="flex min-h-6 items-center text-[13px] font-semibold text-accent"
                 >
                   {reciter?.style && !entry.userReciter
@@ -397,7 +414,7 @@ function MatchView({
                 {alternatives.slice(0, named ? 1 : 2).map((alt) => (
                   <Link
                     key={alt.id}
-                    href={`/reciter?id=${alt.id}&surah=${ayah.surah}`}
+                    href={`/reciters/${alt.id}?surah=${ayah.surah}`}
                     className="flex min-h-6 items-center gap-2"
                   >
                     <span className="truncate">{alt.name_ar}</span>

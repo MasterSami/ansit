@@ -13,6 +13,8 @@ import {
 } from "react";
 
 import { ayahAudioUrl, getSurahs, type Surah } from "@/lib/api";
+
+import { UpdateToast } from "./InstallPrompt";
 import messages from "../../messages/ar.json";
 
 // --------------------------------------------------------------- surah list
@@ -62,7 +64,12 @@ function useLoadSurahs(): Surah[] | null {
 export interface Track {
   reciterId: string;
   reciterName: string;
-  /** Per-ayah URL template from /v1/reciters/{id}. */
+  /**
+   * "ayah": one file per ayah, played one after another. "surah": one file
+   * for the whole surah (reciters with no per-ayah recording).
+   */
+  kind?: "ayah" | "surah";
+  /** URL template from /v1/reciters/{id}: {sss}{aaa} per ayah, {sss} per surah. */
   template: string;
   surah: number;
   ayah: number;
@@ -74,6 +81,9 @@ interface Player {
   track: Track | null;
   playing: boolean;
   failed: boolean;
+  /** Seconds played and total length of the current file (0 until known). */
+  position: number;
+  duration: number;
   play(track: Track): void;
   toggle(): void;
   stop(): void;
@@ -92,6 +102,8 @@ function usePlayerState(surahs: Surah[] | null): Player {
   const [track, setTrack] = useState<Track | null>(null);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
   const trackRef = useRef<Track | null>(null);
   const surahsRef = useRef(surahs);
 
@@ -104,6 +116,8 @@ function usePlayerState(surahs: Surah[] | null): Player {
     trackRef.current = next;
     setTrack(next);
     setFailed(false);
+    setPosition(0);
+    setDuration(0);
     audio.src = ayahAudioUrl(next.template, next.surah, next.ayah);
     audio.play().then(
       () => setPlaying(true),
@@ -128,6 +142,10 @@ function usePlayerState(surahs: Surah[] | null): Player {
     const onEnded = () => {
       const current = trackRef.current;
       if (!current) return;
+      if (current.kind === "surah") {
+        if (current.stopAtSurahEnd || current.surah >= 114) return stop();
+        return start({ ...current, surah: current.surah + 1 });
+      }
       const count = surahsRef.current?.[current.surah - 1]?.ayah_count;
       if (count === undefined) return stop();
       if (current.ayah < count)
@@ -141,11 +159,18 @@ function usePlayerState(surahs: Surah[] | null): Player {
     };
     const onPause = () => setPlaying(false);
     const onPlay = () => setPlaying(true);
+    const onTime = () => setPosition(audio.currentTime);
+    const onMeta = () =>
+      setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
+    audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("loadedmetadata", onMeta);
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("error", onError);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("play", onPlay);
     return () => {
+      audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("loadedmetadata", onMeta);
       audio.removeEventListener("ended", onEnded);
       audio.removeEventListener("error", onError);
       audio.removeEventListener("pause", onPause);
@@ -162,8 +187,17 @@ function usePlayerState(surahs: Surah[] | null): Player {
   }, []);
 
   return useMemo(
-    () => ({ track, playing, failed, play: start, toggle, stop }),
-    [track, playing, failed, start, toggle, stop],
+    () => ({
+      track,
+      playing,
+      failed,
+      position,
+      duration,
+      play: start,
+      toggle,
+      stop,
+    }),
+    [track, playing, failed, position, duration, start, toggle, stop],
   );
 }
 
@@ -177,7 +211,12 @@ function useServiceWorker(): void {
       !("serviceWorker" in navigator)
     )
       return;
-    navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    // A new address per build: each deployment installs as an update, which
+    // then waits for the user to accept it (see UpdateToast).
+    const version = process.env.NEXT_PUBLIC_BUILD_ID ?? "dev";
+    navigator.serviceWorker
+      .register(`/sw.js?v=${encodeURIComponent(version)}`)
+      .catch(() => undefined);
   }, []);
 }
 
@@ -190,6 +229,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <SurahsContext.Provider value={surahs}>
         <PlayerContext.Provider value={player}>
           {children}
+          <UpdateToast />
         </PlayerContext.Provider>
       </SurahsContext.Provider>
     </NextIntlClientProvider>

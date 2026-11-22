@@ -181,6 +181,52 @@ async function mockApi(page: Page, identify: object | number): Promise<Mock> {
             name_en: "Mishary Alafasy",
             country: null,
             styles: ["murattal"],
+            recognition_enabled: true,
+          },
+          {
+            id: "luhaidan",
+            name_ar: "محمد اللحيدان",
+            name_en: "Mohammed Al-Lohaidan",
+            country: null,
+            styles: ["murattal"],
+            recognition_enabled: false,
+          },
+        ],
+      });
+    }
+    if (path === "/v1/reciters/alafasy") {
+      return json(route, {
+        id: "alafasy",
+        name_ar: "مشاري العفاسي",
+        name_en: "Mishary Alafasy",
+        country: null,
+        styles: ["murattal"],
+        recognition_enabled: true,
+        ayah_audio: [
+          {
+            style: "murattal",
+            url_template: "https://audio.test/alafasy/{sss}{aaa}.mp3",
+            url: null,
+          },
+        ],
+        surah_audio: [],
+      });
+    }
+    if (path === "/v1/reciters/luhaidan") {
+      // Only full-surah recordings, and no voice in the gallery.
+      return json(route, {
+        id: "luhaidan",
+        name_ar: "محمد اللحيدان",
+        name_en: "Mohammed Al-Lohaidan",
+        country: null,
+        styles: ["murattal"],
+        recognition_enabled: false,
+        ayah_audio: [],
+        surah_audio: [
+          {
+            style: "murattal",
+            url_template: "https://audio.test/luhaidan/{sss}.mp3",
+            surah_total: 114,
           },
         ],
       });
@@ -370,29 +416,191 @@ test("opens a mushaf ayah and its tafsir", async ({ page }) => {
   await expect(page.getByText("شرح من المصدر للاختبار")).toBeVisible();
 });
 
-test("shows one searchable reciter list with the requested additions", async ({
+/** Record which recitation files the page asks for, without any network. */
+async function mockAudio(page: Page): Promise<string[]> {
+  const requested: string[] = [];
+  await page.route("https://audio.test/**", (route) => {
+    requested.push(route.request().url());
+    return route.fulfill({ status: 404, body: "" });
+  });
+  return requested;
+}
+
+test("reciter library: search in Arabic and English, filter by category", async ({
   page,
 }) => {
   await mockApi(page, MATCH);
   await page.goto("/reciters");
 
-  await expect(page.getByText("كامل يوسف البهتيمي")).toBeVisible();
-  await expect(page.getByText("الشحات محمد أنور")).toBeVisible();
-  await expect(page.getByText("بدر بن محمد التركي")).toBeVisible();
-  await expect(page.getByText("الوليد بن خالد الشمسان")).toBeVisible();
-  await expect(page.getByLabel("تصنيفات القراء")).toHaveCount(0);
-  await expect(page.getByLabel("ابحث عن قارئ")).toBeVisible();
-  await page.getByLabel("ابحث عن قارئ").fill("الشمسان");
-  await expect(page.getByText("كامل يوسف البهتيمي")).toHaveCount(0);
-  await expect(page.getByText("الوليد بن خالد الشمسان")).toBeVisible();
+  // Directory reciters and recognised ones are in one list.
+  await expect(
+    page.getByRole("link", { name: /كامل يوسف البهتيمي/ }),
+  ).toBeVisible();
+  const alafasy = page.getByRole("link", { name: /مشاري العفاسي/ });
+  await expect(alafasy.getByText("تعرّف صوتي")).toBeVisible();
+  // In the registry but not in the voice gallery: no recognition badge.
+  const luhaidan = page.getByRole("link", { name: /محمد اللحيدان/ });
+  await expect(luhaidan.getByText("تعرّف صوتي")).toHaveCount(0);
 
+  const search = page.getByLabel("ابحث عن قارئ");
+  await search.fill("الشمسان");
+  await expect(
+    page.getByRole("link", { name: /كامل يوسف البهتيمي/ }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /الشمسان/ })).toBeVisible();
+
+  await search.fill("minshawi");
+  await expect(page.getByRole("link", { name: /المنشاوي/ })).toBeVisible();
+  await expect(page.getByRole("status")).toContainText("١ قارئًا");
+
+  await search.fill("");
+  await page.getByRole("tab", { name: "أئمة المسجد الحرام" }).click();
+  await expect(page.getByRole("link", { name: /السديس/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /المنشاوي/ })).toHaveCount(0);
+
+  await search.fill("لا يوجد قارئ بهذا الاسم");
+  await expect(page.getByRole("status")).toContainText("لا نتائج مطابقة");
+});
+
+test("reciter profile: sourced biography, recognition status, per-ayah playback", async ({
+  page,
+}) => {
+  await mockApi(page, MATCH);
+  const audio = await mockAudio(page);
+  await page.goto("/reciters");
+  await page.getByRole("link", { name: /مشاري العفاسي/ }).click();
+  await expect(page).toHaveURL(/\/reciters\/alafasy$/);
+
+  await expect(
+    page.getByRole("heading", { level: 1, name: /مشاري/ }),
+  ).toBeVisible();
+  await expect(page.getByText("يتعرّف أنصِت على صوته")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "السيرة" })).toBeVisible();
+  // Every biography shows where it came from.
+  await expect(page.getByRole("heading", { name: "المصادر" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "تعرّف على تلاوة له" }),
+  ).toHaveAttribute("href", "/listen");
+
+  await page.getByRole("button", { name: "تشغيل سورة الملك" }).click();
+  await expect
+    .poll(() => audio)
+    .toContain("https://audio.test/alafasy/067001.mp3");
+  await expect(
+    page.getByRole("region", { name: "مشغّل التلاوة" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: /المفضّلة/ }).click();
+  await expect(
+    page.getByRole("button", { name: "في المفضّلة" }),
+  ).toHaveAttribute("aria-pressed", "true");
+});
+
+test("reciter profile: full-surah playback and honest recognition status", async ({
+  page,
+}) => {
+  await mockApi(page, MATCH);
+  const audio = await mockAudio(page);
+  await page.goto("/reciters/luhaidan");
+
+  await expect(page.getByText("غير مدعوم حاليًا")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "تعرّف على تلاوة له" }),
+  ).toHaveCount(0);
+  await expect(page.getByText("تسجيل للسورة كاملة.")).toBeVisible();
+
+  await page.getByRole("button", { name: "تشغيل سورة الرحمن" }).click();
+  await expect
+    .poll(() => audio)
+    .toContain("https://audio.test/luhaidan/055.mp3");
+});
+
+test("a directory reciter has a profile but no in-app recordings", async ({
+  page,
+}) => {
+  await mockApi(page, MATCH);
+  await page.goto("/reciters/taha-al-fashni");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "طه الفشني" }),
+  ).toBeVisible();
+  await expect(page.getByText("غير مدعوم حاليًا")).toBeVisible();
+  await expect(
+    page.getByText("لا تتوفر لدينا تسجيلات لهذا القارئ حتى الآن."),
+  ).toBeVisible();
+});
+
+test("old reciter links and unknown reciters are handled", async ({ page }) => {
+  await mockApi(page, MATCH);
+  await page.goto("/reciter?id=alafasy&surah=67");
+  await expect(page).toHaveURL(/\/reciters\/alafasy\?surah=67$/);
+  // The surah the user came from is listed first.
+  await expect(page.locator(".surah-list li").first()).toContainText("الملك");
+
+  await page.goto("/reciters/nobody-here");
+  await expect(
+    page.getByRole("heading", { name: "الصفحة غير موجودة" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "مكتبة القرّاء" })).toBeVisible();
+});
+
+test("landing page leads to listening, the library and reciter profiles", async ({
+  page,
+}) => {
+  await mockApi(page, MATCH);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const header = page.locator(".landing-header");
-  await expect(header.getByRole("link", { name: /مكتبة القراء/ })).toHaveCount(
-    1,
-  );
-  await expect(header.locator(".landing-nav-cta")).toHaveCount(1);
+  await expect(
+    header.getByRole("link", { name: /مكتبة القراء/ }),
+  ).toHaveAttribute("href", "/reciters");
+  await expect(
+    page.getByRole("link", { name: "جرّب التعرّف على التلاوة" }),
+  ).toHaveAttribute("href", "/listen");
+  await page.getByRole("link", { name: /محمد صديق المنشاوي/ }).click();
+  await expect(page).toHaveURL(/\/reciters\/minshawi$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: /المنشاوي/ }),
+  ).toBeVisible();
+});
+
+test("the app is installable and explains itself when offline", async ({
+  page,
+  context,
+}) => {
+  await mockApi(page, MATCH);
+  await page.goto("/");
+  const manifest = await (
+    await page.request.get("/manifest.webmanifest")
+  ).json();
+  expect(manifest.name).toBe("ANSIT");
+  expect(manifest.short_name).toBe("أنصت");
+  expect(manifest.display).toBe("standalone");
+  for (const icon of manifest.icons) {
+    expect((await page.request.get(icon.src)).ok(), icon.src).toBe(true);
+  }
+
+  // The service worker takes control and has stored the offline page.
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await expect
+    .poll(() =>
+      page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
+    )
+    .toBe(true);
+  await expect
+    .poll(() =>
+      page.evaluate(async () => Boolean(await caches.match("/offline"))),
+    )
+    .toBe(true);
+
+  await context.setOffline(true);
+  await page.goto("/reciters/ayyub").catch(() => undefined);
+  await expect(
+    page.getByRole("heading", { name: "لا يوجد اتصال بالإنترنت" }),
+  ).toBeVisible();
+  // The shell still opens.
+  await page.goto("/history");
+  await expect(page.getByRole("heading", { name: "السجل" })).toBeVisible();
+  await context.setOffline(false);
 });
 
 test("sends feedback about a wrong result", async ({ page }) => {

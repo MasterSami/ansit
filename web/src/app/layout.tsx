@@ -6,6 +6,7 @@ import { THEME_BOOTSTRAP } from "@/lib/theme";
 
 import "./globals.css";
 import "./landing.css";
+import "./features.css";
 
 // UI text, display (wordmark, surah names) and ayah text, per the design tokens.
 const plex = IBM_Plex_Sans_Arabic({

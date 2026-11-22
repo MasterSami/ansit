@@ -163,7 +163,9 @@
     "stop": "إيقاف التشغيل",
     "nowPlaying": "سورة {surah} · الآية {ayah}",
     "failed": "تعذّر تشغيل التلاوة",
-    "noAyahAudio": "لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات حتى الآن"
+    "noAyahAudio": "لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات حتى الآن",
+    "nowPlayingSurah": "سورة {surah}",
+    "wholeSurah": "لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات، فبدأ التشغيل من أول السورة."
   },
   "feedback": {
     "title": "ما الخطأ في النتيجة؟",
@@ -201,7 +203,8 @@
     "creditWespeaker": "نموذج بصمة الصوت: مشروع WeSpeaker، ترخيص CC BY 4.0.",
     "creditAsr": "نموذج التعرّف على التلاوة: Tarteel AI، ترخيص Apache 2.0.",
     "creditAudio": "التلاوات المسموعة: EveryAyah.",
-    "version": "الإصدار {version}"
+    "version": "الإصدار {version}",
+    "install": "التطبيق"
   },
   "mushaf": {
     "title": "المصحف",

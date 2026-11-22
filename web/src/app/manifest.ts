@@ -2,12 +2,14 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "أنصِت",
-    short_name: "أنصِت",
+    id: "/",
+    name: "ANSIT",
+    short_name: "أنصت",
     description: "تعرّف على السورة والآية واسم القارئ من ثوانٍ من التلاوة",
     lang: "ar",
     dir: "rtl",
-    start_url: "/",
+    // The installed app opens on the tool itself, not on the introduction.
+    start_url: "/listen",
     scope: "/",
     display: "standalone",
     orientation: "portrait",

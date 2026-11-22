@@ -225,3 +225,26 @@ export const StopIcon = (p: IconProps) => (
     <rect x="6" y="6" width="12" height="12" rx="2" />
   </Line>
 );
+
+export const DownloadIcon = (p: IconProps) => (
+  <Line {...p}>
+    <path d="M12 3v12" />
+    <path d="m7 10 5 5 5-5" />
+    <path d="M4 20h16" />
+  </Line>
+);
+
+export const ArrowIcon = (p: IconProps) => (
+  <Line {...p}>
+    <path d="M19 12H5" />
+    <path d="m11 6-6 6 6 6" />
+  </Line>
+);
+
+export const ExternalIcon = (p: IconProps) => (
+  <Line {...p}>
+    <path d="M14 4h6v6" />
+    <path d="M20 4 10 14" />
+    <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+  </Line>
+);

@@ -116,7 +116,14 @@
   "listenSteps": "مراحل التعرّف",
   "listenStop": "إيقاف",
   "listenWave": "موجة الصوت",
-  "mushafBody": "قارئ المصحف الكامل قيد الإعداد وسيتوفر في تحديث قادم.",
+  "mushafAyah": "الآية",
+  "mushafBody": "اختر سورة ورقم آية لعرضها وفتح تفسيرها.",
+  "mushafHideTafsir": "إخفاء التفسير",
+  "mushafLoadFailed": "تعذّر تحميل الآية أو التفسير. تحقّق من الاتصال وحاول مجددًا.",
+  "mushafLoading": "جارٍ التحميل…",
+  "mushafOpenAyah": "عرض الآية",
+  "mushafShowTafsir": "عرض التفسير",
+  "mushafSurah": "السورة",
   "mushafTitle": "المصحف",
   "navHistory": "السجل",
   "navLabel": "التنقل الرئيسي",
@@ -149,9 +156,18 @@
       }
     }
   },
+  "playerNowPlayingSurah": "سورة {surah}",
+  "@playerNowPlayingSurah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
   "playerPause": "إيقاف مؤقت",
   "playerPlay": "تشغيل",
   "playerStop": "إيقاف التشغيل",
+  "playerWholeSurah": "لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات، فبدأ التشغيل من أول السورة.",
   "reciterFavourite": "إضافة إلى القرّاء المفضّلين",
   "reciterHeardToday": "تعرّفت عليها اليوم",
   "reciterLoadFailedTitle": "تعذّر تحميل صفحة القارئ",
@@ -224,6 +240,22 @@
     }
   },
   "resultTafsir": "التفسير",
+  "resultTafsirAuthor": "{author} · {publisher} · الإصدار {version}",
+  "@resultTafsirAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "publisher": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "resultTafsirFailed": "تعذّر تحميل التفسير. تحقّق من الاتصال وحاول مجددًا.",
+  "resultTafsirLoading": "جارٍ تحميل التفسير…",
   "resultTextCredit": "نص المصحف من مشروع تنزيل",
   "resultTextMatch": "تطابق النص",
   "resultTitle": "تم التعرّف",
@@ -242,6 +274,7 @@
   "settingsCreditWespeaker": "نموذج بصمة الصوت: مشروع WeSpeaker، ترخيص CC BY 4.0.",
   "settingsDark": "داكن",
   "settingsData": "البيانات",
+  "settingsInstall": "التطبيق",
   "settingsLight": "فاتح",
   "settingsPrivacy": "الخصوصية",
   "settingsPrivacyClip": "المقطع الصوتي يُحذف بعد التعرّف ولا يُحفظ في أي مكان.",

@@ -7,6 +7,7 @@ import { clearHistory } from "@/lib/history";
 import { applyTheme, readTheme, type ThemeChoice } from "@/lib/theme";
 
 import { BackIcon } from "./icons";
+import { InstallRow } from "./InstallPrompt";
 import { IconLink, Screen } from "./ui";
 
 const THEMES: ThemeChoice[] = ["system", "dark", "light"];
@@ -105,6 +106,10 @@ export function SettingsScreen() {
               </span>
             )}
           </button>
+        </Section>
+
+        <Section title={t("settings.install")}>
+          <InstallRow />
         </Section>
 
         <Section title={t("settings.about")}>

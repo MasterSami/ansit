@@ -544,11 +544,53 @@ abstract class AppLocalizations {
   /// **'موجة الصوت'**
   String get listenWave;
 
+  /// No description provided for @mushafAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية'**
+  String get mushafAyah;
+
   /// No description provided for @mushafBody.
   ///
   /// In ar, this message translates to:
-  /// **'قارئ المصحف الكامل قيد الإعداد وسيتوفر في تحديث قادم.'**
+  /// **'اختر سورة ورقم آية لعرضها وفتح تفسيرها.'**
   String get mushafBody;
+
+  /// No description provided for @mushafHideTafsir.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء التفسير'**
+  String get mushafHideTafsir;
+
+  /// No description provided for @mushafLoadFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل الآية أو التفسير. تحقّق من الاتصال وحاول مجددًا.'**
+  String get mushafLoadFailed;
+
+  /// No description provided for @mushafLoading.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحميل…'**
+  String get mushafLoading;
+
+  /// No description provided for @mushafOpenAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض الآية'**
+  String get mushafOpenAyah;
+
+  /// No description provided for @mushafShowTafsir.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض التفسير'**
+  String get mushafShowTafsir;
+
+  /// No description provided for @mushafSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'السورة'**
+  String get mushafSurah;
 
   /// No description provided for @mushafTitle.
   ///
@@ -682,6 +724,12 @@ abstract class AppLocalizations {
   /// **'سورة {surah} · الآية {ayah}'**
   String playerNowPlaying(String ayah, String surah);
 
+  /// No description provided for @playerNowPlayingSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {surah}'**
+  String playerNowPlayingSurah(String surah);
+
   /// No description provided for @playerPause.
   ///
   /// In ar, this message translates to:
@@ -699,6 +747,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إيقاف التشغيل'**
   String get playerStop;
+
+  /// No description provided for @playerWholeSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات، فبدأ التشغيل من أول السورة.'**
+  String get playerWholeSurah;
 
   /// No description provided for @reciterFavourite.
   ///
@@ -850,6 +904,24 @@ abstract class AppLocalizations {
   /// **'التفسير'**
   String get resultTafsir;
 
+  /// No description provided for @resultTafsirAuthor.
+  ///
+  /// In ar, this message translates to:
+  /// **'{author} · {publisher} · الإصدار {version}'**
+  String resultTafsirAuthor(String author, String publisher, String version);
+
+  /// No description provided for @resultTafsirFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل التفسير. تحقّق من الاتصال وحاول مجددًا.'**
+  String get resultTafsirFailed;
+
+  /// No description provided for @resultTafsirLoading.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تحميل التفسير…'**
+  String get resultTafsirLoading;
+
   /// No description provided for @resultTextCredit.
   ///
   /// In ar, this message translates to:
@@ -957,6 +1029,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'البيانات'**
   String get settingsData;
+
+  /// No description provided for @settingsInstall.
+  ///
+  /// In ar, this message translates to:
+  /// **'التطبيق'**
+  String get settingsInstall;
 
   /// No description provided for @settingsLight.
   ///

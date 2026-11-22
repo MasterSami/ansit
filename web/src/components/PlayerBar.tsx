@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { toArabicDigits } from "@/lib/numerals";
+import { formatElapsed, toArabicDigits } from "@/lib/numerals";
 
 import { CloseIcon, PauseIcon, PlayIcon } from "./icons";
 import { usePlayer, useSurahs } from "./Providers";
@@ -10,7 +10,8 @@ import { usePlayer, useSurahs } from "./Providers";
 /** A slim bar for the recitation being played. Renders nothing when idle. */
 export function PlayerBar() {
   const t = useTranslations("player");
-  const { track, playing, failed, toggle, stop } = usePlayer();
+  const { track, playing, failed, position, duration, toggle, stop } =
+    usePlayer();
   const surahs = useSurahs();
   if (!track) return null;
   const surahName =
@@ -32,15 +33,22 @@ export function PlayerBar() {
       </button>
       <div className="flex min-w-0 grow flex-col" aria-live="polite">
         <span className="truncate text-sm font-semibold">
-          {t("nowPlaying", {
-            surah: surahName,
-            ayah: toArabicDigits(track.ayah),
-          })}
+          {track.kind === "surah"
+            ? t("nowPlayingSurah", { surah: surahName })
+            : t("nowPlaying", {
+                surah: surahName,
+                ayah: toArabicDigits(track.ayah),
+              })}
         </span>
         <span
           className={`truncate text-xs ${failed ? "text-warning" : "text-muted"}`}
         >
           {failed ? t("failed") : track.reciterName}
+          {track.kind === "surah" && duration > 0 && !failed && (
+            <span dir="ltr" className="ms-2 tabular-nums">
+              {formatElapsed(position)} / {formatElapsed(duration)}
+            </span>
+          )}
         </span>
       </div>
       <button

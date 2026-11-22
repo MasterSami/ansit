@@ -1,10 +1,24 @@
 import type { NextConfig } from "next";
 
+// Stamped into the service worker address so each build ships as an update.
+const BUILD_ID = process.env.BUILD_ID ?? String(Date.now());
+
 const nextConfig: NextConfig = {
+  env: { NEXT_PUBLIC_BUILD_ID: BUILD_ID },
   cacheComponents: true,
   partialPrefetching: true,
   async headers() {
     return [
+      {
+        // The browser must always re-check the worker, or updates never arrive.
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
       {
         source: "/:path*",
         headers: [

@@ -252,8 +252,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get listenWave => 'موجة الصوت';
 
   @override
-  String get mushafBody =>
-      'قارئ المصحف الكامل قيد الإعداد وسيتوفر في تحديث قادم.';
+  String get mushafAyah => 'الآية';
+
+  @override
+  String get mushafBody => 'اختر سورة ورقم آية لعرضها وفتح تفسيرها.';
+
+  @override
+  String get mushafHideTafsir => 'إخفاء التفسير';
+
+  @override
+  String get mushafLoadFailed =>
+      'تعذّر تحميل الآية أو التفسير. تحقّق من الاتصال وحاول مجددًا.';
+
+  @override
+  String get mushafLoading => 'جارٍ التحميل…';
+
+  @override
+  String get mushafOpenAyah => 'عرض الآية';
+
+  @override
+  String get mushafShowTafsir => 'عرض التفسير';
+
+  @override
+  String get mushafSurah => 'السورة';
 
   @override
   String get mushafTitle => 'المصحف';
@@ -328,6 +349,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String playerNowPlayingSurah(String surah) {
+    return 'سورة $surah';
+  }
+
+  @override
   String get playerPause => 'إيقاف مؤقت';
 
   @override
@@ -335,6 +361,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get playerStop => 'إيقاف التشغيل';
+
+  @override
+  String get playerWholeSurah =>
+      'لا تتوفر لهذا القارئ تلاوة مقسّمة بالآيات، فبدأ التشغيل من أول السورة.';
 
   @override
   String get reciterFavourite => 'إضافة إلى القرّاء المفضّلين';
@@ -422,6 +452,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get resultTafsir => 'التفسير';
 
   @override
+  String resultTafsirAuthor(String author, String publisher, String version) {
+    return '$author · $publisher · الإصدار $version';
+  }
+
+  @override
+  String get resultTafsirFailed =>
+      'تعذّر تحميل التفسير. تحقّق من الاتصال وحاول مجددًا.';
+
+  @override
+  String get resultTafsirLoading => 'جارٍ تحميل التفسير…';
+
+  @override
   String get resultTextCredit => 'نص المصحف من مشروع تنزيل';
 
   @override
@@ -477,6 +519,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsData => 'البيانات';
+
+  @override
+  String get settingsInstall => 'التطبيق';
 
   @override
   String get settingsLight => 'فاتح';
