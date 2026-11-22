@@ -81,6 +81,15 @@ interface Mock {
   feedback: unknown[];
 }
 
+test("serves browser security headers", async ({ page }) => {
+  const response = await page.goto("/");
+  const headers = await response?.allHeaders();
+  expect(headers?.["x-content-type-options"]).toBe("nosniff");
+  expect(headers?.["x-frame-options"]).toBe("DENY");
+  expect(headers?.["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+  expect(headers?.["permissions-policy"]).toContain("microphone=(self)");
+});
+
 async function mockApi(page: Page, identify: object | number): Promise<Mock> {
   const mock: Mock = { identify, identifyBodies: [], feedback: [] };
   const json = (route: Route, body: unknown, status = 200) =>
@@ -195,15 +204,30 @@ async function listen(page: Page) {
   await page.getByRole("link", { name: "جرّب التعرّف على التلاوة" }).click();
   const allow = page.getByRole("button", { name: "السماح بالمايكروفون" });
   const listening = page.getByText("جارٍ الإنصات…");
-  // Retried as a unit: on first load both can be in the page for a moment.
+  const identifying = page.getByText("جارٍ التعرّف…");
+  let granted = false;
+  // Recording can start automatically when permission is already granted, or
+  // finish quickly on a loaded CI worker. Accept every real post-capture state.
   await expect(async () => {
-    if (await allow.isVisible()) await allow.click({ timeout: 1_000 });
-    await expect(listening).toBeVisible({ timeout: 1_000 });
-  }).toPass();
-  await expect(page.getByText("جارٍ الإنصات…")).toBeVisible();
-  // The server rejects clips under 3 s, so the app keeps recording until then.
-  await page.waitForTimeout(3_300);
-  await page.getByRole("button", { name: "إيقاف" }).click();
+    if (!granted && (await allow.isVisible())) {
+      await allow.click({ timeout: 1_000 });
+      granted = true;
+    }
+    const active =
+      (await listening.isVisible()) ||
+      (await identifying.isVisible()) ||
+      (await page.locator(".listen-web-problem").isVisible()) ||
+      new URL(page.url()).pathname === "/result";
+    expect(active).toBeTruthy();
+  }).toPass({ timeout: 15_000 });
+
+  // The server rejects clips under 3 s; stop after the minimum when the
+  // recording is still active. A fast test/browser may already have finished.
+  if (await listening.isVisible()) {
+    await page.waitForTimeout(3_300);
+    const stop = page.getByRole("button", { name: "إيقاف" });
+    if (await stop.isVisible()) await stop.click();
+  }
 }
 
 test("identifies a recitation and keeps it in the local history", async ({
@@ -215,7 +239,9 @@ test("identifies a recitation and keeps it in the local history", async ({
   await expect(page).toHaveURL(/\/result\?id=1111/);
   await expect(page.getByRole("heading", { name: "سورة الملك" })).toBeVisible();
   await expect(page.getByText(PLACEHOLDER)).toBeVisible();
-  await expect(page.getByText("مشاري العفاسي")).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "القارئ" }).getByText("مشاري العفاسي"),
+  ).toBeVisible();
   await expect(page.getByText("٩٦٪")).toBeVisible();
   await expect(
     page.getByRole("link", { name: "نص المصحف من مشروع تنزيل" }),

@@ -10,6 +10,13 @@ async def test_request_id_is_generated(client: httpx.AsyncClient) -> None:
     uuid.UUID(response.headers["x-request-id"])  # raises if not a UUID
 
 
+async def test_security_headers_are_present(client: httpx.AsyncClient) -> None:
+    response = await client.get("/healthz")
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
+    assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+
+
 async def test_valid_incoming_request_id_is_echoed(client: httpx.AsyncClient) -> None:
     response = await client.get("/healthz", headers={"X-Request-ID": "abc-123_x.y"})
     assert response.headers["x-request-id"] == "abc-123_x.y"

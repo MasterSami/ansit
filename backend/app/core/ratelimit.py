@@ -56,6 +56,10 @@ class RedisRateLimiter:
         self.limit = limit
         self._redis = redis
         self._clock = clock
+        # A Redis outage must not disable abuse protection entirely. This
+        # process-local fallback is intentionally conservative; it does not
+        # provide cross-instance enforcement while Redis is unavailable.
+        self._fallback = MemoryRateLimiter(limit, clock)
 
     async def hit(self, key: str) -> RateDecision:
         window, retry_after = _window(self._clock())
@@ -66,7 +70,6 @@ class RedisRateLimiter:
             pipeline.expire(name, WINDOW_SEC * 2)
             count, _ = await pipeline.execute()
         except (RedisError, OSError) as exc:
-            # The limiter being down must not take identification down with it.
             log.warning("rate_limiter_unavailable", error=type(exc).__name__)
-            return RateDecision(True, retry_after)
+            return await self._fallback.hit(key)
         return RateDecision(int(count) <= self.limit, retry_after)

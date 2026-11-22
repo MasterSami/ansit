@@ -167,7 +167,11 @@ export function ListenScreen() {
   }, [phase.name, finish]);
 
   const stop = () => {
-    if (elapsed < MIN_RECORD_SEC) {
+    // State updates are scheduled on a 100 ms interval and can lag the user's
+    // click. Use the monotonic capture clock so a valid clip isn't discarded
+    // merely because the last React render has not committed yet.
+    const recordedSec = (performance.now() - startedAt.current) / 1000;
+    if (recordedSec < MIN_RECORD_SEC) {
       // Too little to identify anything: treat it as a cancel.
       recording.current?.cancel();
       recording.current = null;

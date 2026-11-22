@@ -17,6 +17,11 @@ log = get_logger("app.access")
 REQUEST_ID_HEADER = "X-Request-ID"
 _VALID_REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 _QUIET_PATHS = frozenset({"/healthz", "/readyz", "/metrics"})
+_SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+}
 
 
 def _request_id_from(headers: Headers) -> str:
@@ -46,7 +51,10 @@ class RequestContextMiddleware:
             nonlocal status
             if message["type"] == "http.response.start":
                 status = message["status"]
-                MutableHeaders(scope=message)[REQUEST_ID_HEADER] = request_id
+                headers = MutableHeaders(scope=message)
+                headers[REQUEST_ID_HEADER] = request_id
+                for name, value in _SECURITY_HEADERS.items():
+                    headers.setdefault(name, value)
             await send(message)
 
         try:
