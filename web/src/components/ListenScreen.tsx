@@ -166,19 +166,19 @@ export function ListenScreen() {
     return () => window.clearInterval(timer);
   }, [phase.name, finish]);
 
+  // Until the clip is long enough to identify, the button reads "cancel" and
+  // discards the recording; after that it reads "stop" and sends it. The user
+  // always gets what the label promised, so nothing is discarded silently.
+  const canStop = elapsed >= MIN_RECORD_SEC;
+
+  const cancelRecording = () => {
+    recording.current?.cancel();
+    recording.current = null;
+    router.push("/");
+  };
+
   const stop = () => {
-    // State updates are scheduled on a 100 ms interval and can lag the user's
-    // click. Use the monotonic capture clock so a valid clip isn't discarded
-    // merely because the last React render has not committed yet.
-    const recordedSec = (performance.now() - startedAt.current) / 1000;
-    if (recordedSec < MIN_RECORD_SEC) {
-      // Too little to identify anything: treat it as a cancel.
-      recording.current?.cancel();
-      recording.current = null;
-      router.push("/");
-    } else {
-      void finish();
-    }
+    void finish();
   };
 
   const cancelUpload = () => {
@@ -230,7 +230,10 @@ export function ListenScreen() {
   return (
     <Screen className="listen-web-screen">
       <header className="listen-web-header flex items-center justify-between px-6 pt-14">
-        <Link href="/" className="listen-web-brand font-display text-[26px] font-bold text-accent">
+        <Link
+          href="/"
+          className="listen-web-brand font-display text-[26px] font-bold text-accent"
+        >
           {t("app.name")}
         </Link>
         <nav className="listen-web-nav" aria-label="التنقل الرئيسي">
@@ -297,9 +300,12 @@ export function ListenScreen() {
         {identifying ? (
           <QuietButton onClick={cancelUpload}>{t("common.cancel")}</QuietButton>
         ) : (
-          <QuietButton onClick={stop} disabled={phase.name !== "recording"}>
-            <StopIcon size={16} />
-            {t("listen.stop")}
+          <QuietButton
+            onClick={canStop ? stop : cancelRecording}
+            disabled={phase.name !== "recording"}
+          >
+            {canStop && <StopIcon size={16} />}
+            {canStop ? t("listen.stop") : t("common.cancel")}
           </QuietButton>
         )}
       </footer>

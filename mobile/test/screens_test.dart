@@ -19,7 +19,7 @@ Future<Harness> listenAndStop(
   String location = '/listen',
 }) async {
   final h = await pumpApp(tester, location: location, setup: setup);
-  await tester.pump(const Duration(seconds: 3));
+  await tester.pump(const Duration(seconds: 5));
   await tester.tap(find.text(t.listenStop));
   await settle(tester);
   return h;
@@ -77,7 +77,7 @@ void main() {
         location: '/listen',
         setup: (h) => h.api.identifyGate = Completer(),
       );
-      await tester.pump(const Duration(seconds: 3));
+      await tester.pump(const Duration(seconds: 5));
       await tester.tap(find.text(t.listenStop));
       await settle(tester, 2);
       expect(find.text(t.listenIdentifying), findsOneWidget);

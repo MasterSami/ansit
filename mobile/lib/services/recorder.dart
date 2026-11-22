@@ -6,8 +6,9 @@ import 'package:record/record.dart';
 
 const sampleRate = 16000;
 
-/// The server rejects clips under 3 s, so stopping earlier is not offered.
-const minRecordSeconds = 3;
+/// Shorter clips often miss the words needed to match an ayah, so stopping
+/// earlier is not offered.
+const minRecordSeconds = 5;
 const maxRecordSeconds = 10;
 
 /// Records one clip into memory. Faked in tests.

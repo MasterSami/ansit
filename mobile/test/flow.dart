@@ -27,7 +27,7 @@ Future<void> recordUploadResultFlow(WidgetTester tester) async {
   await settle(tester, 2);
   expect(h.recorder.stops, 0);
 
-  await tester.pump(const Duration(seconds: 3));
+  await tester.pump(const Duration(seconds: 5));
   await tester.tap(find.text(t.listenStop));
   await settle(tester);
 

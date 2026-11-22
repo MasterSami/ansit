@@ -221,12 +221,11 @@ async function listen(page: Page) {
     expect(active).toBeTruthy();
   }).toPass({ timeout: 15_000 });
 
-  // The server rejects clips under 3 s; stop after the minimum when the
-  // recording is still active. A fast test/browser may already have finished.
+  // Clips under 5 s are not sent: until then the button reads "cancel". Wait
+  // for it to become "stop". A fast test/browser may already have finished.
   if (await listening.isVisible()) {
-    await page.waitForTimeout(3_300);
-    const stop = page.getByRole("button", { name: "إيقاف" });
-    if (await stop.isVisible()) await stop.click();
+    const stop = page.getByRole("button", { name: "إيقاف", exact: true });
+    await stop.click({ timeout: 9_000 }).catch(() => undefined);
   }
 }
 
@@ -296,6 +295,26 @@ test("identifies a recitation and keeps it in the local history", async ({
       "textConfidence",
     ].sort(),
   );
+});
+
+test("offers cancel, not stop, until the clip is long enough", async ({
+  page,
+}) => {
+  const mock = await mockApi(page, MATCH);
+  await page.goto("/listen");
+  const allow = page.getByRole("button", { name: "السماح بالمايكروفون" });
+  const listening = page.getByText("جارٍ الإنصات…");
+  await expect(async () => {
+    if (await allow.isVisible()) await allow.click({ timeout: 1_000 });
+    await expect(listening).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+
+  await expect(
+    page.getByRole("button", { name: "إيقاف", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "إلغاء", exact: true }).click();
+  await expect(page).toHaveURL(/\/$/);
+  expect(mock.identifyBodies).toHaveLength(0);
 });
 
 test("opens the identified ayah tafsir on demand", async ({ page }) => {
