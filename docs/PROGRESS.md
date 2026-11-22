@@ -298,6 +298,21 @@ The remaining misses are honest ambiguity that the ambiguity screen already
 handles, and this costs no latency or memory. Strict Top-1 stays reported
 next to it.
 
+### Follow-up: legacy Abdul Basit sample (2026-11-22)
+
+- The user-provided recording is 124.6 s, above the API's 15 s limit; the web
+  recorder is limited to 10 s. The full file was not used as an end-to-end
+  recognition test.
+- On the 10 s cut at 1:16, default Silero VAD detected 0.00 s and
+  `tarteel-base` did not match an ayah. A 0.075-threshold VAD pass detected
+  0.88 s; `deepdml-small` matched Al-Ma'idah 5:110 at 84.8. On the 13 s cut,
+  it matched 5:110 at 77.4. The first 10 s cut also matched 5:110 at 96.7.
+- This one case motivates `deepdml-small` as the default and a fallback VAD
+  restricted to 0.75–<1.5 s. It does not establish general accuracy on old
+  Egyptian recordings. The previous simulated-phone evaluation remains the
+  only multi-clip comparison: `deepdml-small` scored 81.0% Top-1 vs 73.8% for
+  `tarteel-base`, with 0.9% vs 0.3% wrong matches.
+
 ### Next
 
 Phase 3 — done, see below.

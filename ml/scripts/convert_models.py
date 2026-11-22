@@ -37,7 +37,7 @@ MODELS: dict[str, tuple[str, str, str]] = {
         "apache-2.0",
     ),
 }
-DEFAULT_MODEL = "tarteel-base"
+DEFAULT_MODEL = "deepdml-small"
 
 
 def convert(name: str, quantization: str, force: bool) -> Path:

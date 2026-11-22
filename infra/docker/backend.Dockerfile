@@ -24,7 +24,7 @@ RUN uv sync --frozen --no-dev
 FROM python:3.12-slim AS base
 ENV PATH="/opt/venv/bin:$PATH" PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
     QURAN_INDEX_PATH=/app/artifacts/quran_index.json.gz \
-    ASR_MODEL_PATH=/app/artifacts/asr/tarteel-base \
+    ASR_MODEL_PATH=/app/artifacts/asr/deepdml-small \
     SPEAKER_MODEL_PATH=/app/artifacts/speaker/resnet34.onnx \
     GALLERY_PATH=/app/artifacts/gallery.npz \
     REGISTRY_PATH=/app/registry/reciters.json
@@ -42,7 +42,7 @@ CMD ["./docker-entrypoint.sh"]
 # Models copied into the image: larger, but self-contained.
 FROM base AS baked
 COPY --from=artifacts quran_index.json.gz gallery.npz /app/artifacts/
-COPY --from=artifacts asr/tarteel-base /app/artifacts/asr/tarteel-base
+COPY --from=artifacts asr/deepdml-small /app/artifacts/asr/deepdml-small
 COPY --from=artifacts speaker/resnet34.onnx /app/artifacts/speaker/resnet34.onnx
 COPY --from=registry reciters.json /app/registry/reciters.json
 USER ansit

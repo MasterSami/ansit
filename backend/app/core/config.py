@@ -59,12 +59,13 @@ class Settings(BaseSettings):
 
     # --- audio limits ---
     min_speech_sec: float = Field(default=1.5, gt=0)
+    min_fallback_speech_sec: float = Field(default=0.75, gt=0)
     min_clip_sec: float = Field(default=3.0, gt=0)
     max_clip_sec: float = Field(default=15.0, gt=0)
     max_upload_mb: float = Field(default=2.0, gt=0)
 
     # --- models ---
-    asr_model_path: str | None = "../ml/artifacts/asr/tarteel-base"
+    asr_model_path: str | None = "../ml/artifacts/asr/deepdml-small"
     asr_beam_size: int = Field(default=5, ge=1)
     asr_device: Literal["cpu", "cuda"] = "cpu"
     asr_compute_type: str = "int8"
@@ -77,6 +78,8 @@ class Settings(BaseSettings):
     # --- speech detection and hallucination guards ---
     # Low on purpose: Silero under-detects recitation (see app/audio/vad.py).
     vad_threshold: float = Field(default=0.15, gt=0, lt=1)
+    # A second, narrow-window pass catches some sustained recitation missed above.
+    vad_fallback_threshold: float = Field(default=0.075, gt=0, lt=1)
     vad_trim_silence: bool = False
     asr_max_no_speech_prob: float = Field(default=0.6, ge=0, le=1)
     asr_min_avg_logprob: float = Field(default=-1.0, le=0)

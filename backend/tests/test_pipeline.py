@@ -43,9 +43,17 @@ def build(
     speech_sec: float = 6.0,
     trim: int = 0,
     limits: AudioLimits | None = None,
+    fallback_speech_sec: float | None = None,
 ) -> AyahIdentifier:
     vad = ScriptedVAD(speech_sec, trim)
-    return AyahIdentifier(asr, matcher, vad, limits or AudioLimits())  # type: ignore[arg-type]
+    fallback_vad = ScriptedVAD(fallback_speech_sec) if fallback_speech_sec is not None else None
+    return AyahIdentifier(
+        asr,
+        matcher,
+        vad,  # type: ignore[arg-type]
+        limits or AudioLimits(),
+        fallback_vad=fallback_vad,  # type: ignore[arg-type]
+    )
 
 
 def ayah_text(index: QuranIndex, surah: int, ayah: int) -> str:
@@ -101,6 +109,35 @@ def test_too_little_speech(index: QuranIndex, matcher: AyahMatcher) -> None:
     assert (out.status, out.reason) == ("no_match", "no_speech")
     assert asr.received == []
     assert out.speech_sec == 1.2
+
+
+def test_borderline_fallback_vad_recovers_recitation(
+    index: QuranIndex, matcher: AyahMatcher
+) -> None:
+    asr = ScriptedASR(ayah_text(index, 5, 110))
+    out = build(matcher, asr, speech_sec=0.0, fallback_speech_sec=0.88).identify(clip(8.0))
+
+    assert out.status == "match"
+    assert out.match is not None and out.match.best is not None
+    assert (out.match.best.start.surah, out.match.best.start.ayah) == (5, 110)
+    assert out.speech_sec == 0.88
+    assert len(asr.received) == 1
+
+
+@pytest.mark.parametrize("fallback_speech_sec", [0.5, 1.5, 3.0])
+def test_fallback_vad_does_not_accept_outside_borderline_window(
+    index: QuranIndex, matcher: AyahMatcher, fallback_speech_sec: float
+) -> None:
+    asr = ScriptedASR(ayah_text(index, 5, 110))
+    out = build(
+        matcher,
+        asr,
+        speech_sec=0.0,
+        fallback_speech_sec=fallback_speech_sec,
+    ).identify(clip(8.0))
+
+    assert (out.status, out.reason) == ("no_match", "no_speech")
+    assert asr.received == []
 
 
 @pytest.mark.parametrize(

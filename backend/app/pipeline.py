@@ -25,6 +25,7 @@ class AudioLimits:
     min_clip_sec: float = 3.0
     max_clip_sec: float = 15.0
     min_speech_sec: float = 1.5
+    min_fallback_speech_sec: float = 0.75
     trim_silence: bool = False
     """Cut leading/trailing non-speech before ASR. Off by default: on recitation
     the detector's idea of where speech starts and ends is unreliable, and
@@ -51,12 +52,14 @@ class AyahIdentifier:
         vad: SpeechDetector,
         limits: AudioLimits | None = None,
         guards: GuardConfig | None = None,
+        fallback_vad: SpeechDetector | None = None,
     ) -> None:
         self.asr = asr
         self.matcher = matcher
         self.vad = vad
         self.limits = limits or AudioLimits()
         self.guards = guards or GuardConfig()
+        self.fallback_vad = fallback_vad
 
     def identify(self, data: bytes) -> AyahIdentification:
         """Raises AudioError for uploads that cannot be processed at all
@@ -86,8 +89,20 @@ class AyahIdentifier:
 
         started = time.perf_counter()
         activity = self.vad.detect(waveform)
+        speech_detected = activity.speech_sec >= self.limits.min_speech_sec
+        # Only the borderline range can rescue recitation; a larger low-threshold
+        # total is more consistent with continuous noise, so keep the normal gate.
+        if not speech_detected and self.fallback_vad is not None:
+            fallback_activity = self.fallback_vad.detect(waveform)
+            if (
+                self.limits.min_fallback_speech_sec
+                <= fallback_activity.speech_sec
+                < self.limits.min_speech_sec
+            ):
+                activity = fallback_activity
+                speech_detected = True
         timings["vad"] = (time.perf_counter() - started) * 1000
-        if activity.speech_sec < self.limits.min_speech_sec:
+        if not speech_detected:
             rejected = AyahIdentification(
                 "no_match",
                 "no_speech",

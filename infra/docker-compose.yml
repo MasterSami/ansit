@@ -41,7 +41,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       # Paths inside the container (a host .env may point at ../ml/...).
       QURAN_INDEX_PATH: /app/artifacts/quran_index.json.gz
-      ASR_MODEL_PATH: /app/artifacts/asr/tarteel-base
+      ASR_MODEL_PATH: /app/artifacts/asr/deepdml-small
       SPEAKER_MODEL_PATH: /app/artifacts/speaker/resnet34.onnx
       GALLERY_PATH: /app/artifacts/gallery.npz
       REGISTRY_PATH: /app/registry/reciters.json

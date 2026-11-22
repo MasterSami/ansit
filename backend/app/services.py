@@ -66,6 +66,7 @@ def audio_limits(settings: Settings) -> AudioLimits:
         min_clip_sec=settings.min_clip_sec,
         max_clip_sec=settings.max_clip_sec,
         min_speech_sec=settings.min_speech_sec,
+        min_fallback_speech_sec=settings.min_fallback_speech_sec,
         trim_silence=settings.vad_trim_silence,
     )
 
@@ -108,12 +109,19 @@ def build_startup_tasks(
             engine.warm_up()
             vad = SpeechDetector(threshold=settings.vad_threshold)
             vad.warm_up()
+            fallback_vad = SpeechDetector(threshold=settings.vad_fallback_threshold)
+            fallback_vad.warm_up()
             assert services.index is not None  # noqa: S101 - checked above
             matcher = AyahMatcher(
                 services.index, settings.match_threshold, settings.ambiguity_delta
             )
             return AyahIdentifier(
-                engine, matcher, vad, audio_limits(settings), guard_config(settings)
+                engine,
+                matcher,
+                vad,
+                audio_limits(settings),
+                guard_config(settings),
+                fallback_vad,
             )
 
         services.identifier = await asyncio.to_thread(build)
