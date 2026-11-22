@@ -56,6 +56,30 @@ web app and the API.
 Routes use query parameters (`/result?id=…`, `/reciter?id=…`) instead of
 dynamic segments, so every page is static and the app can be hosted anywhere.
 
+## Design system
+
+Tokens are CSS variables in `src/app/globals.css` (colours, spacing, motion)
+and are mapped to Tailwind utilities there. Page-level styles are in
+`shell.css` (navigation, buttons), `landing.css` and `reciters.css` (library,
+profile, install prompt, offline page). Fonts are loaded in `src/app/layout.tsx`.
+
+## Reciter profiles
+
+`src/data/reciter-profiles.json` holds portraits, categories, biographies and
+their sources, keyed by the registry id. Edit that file to change a biography;
+no component needs to change. Rules, enforced by `tests/unit/reciters.test.ts`:
+every registry reciter has exactly one profile, and no fact appears without a
+source. After adding a reciter to the registry run
+`node scripts/sync-reciter-profiles.mjs` (it only adds, never overwrites).
+
+## Installable app (PWA)
+
+`src/app/manifest.ts`, `public/sw.js`, `src/components/InstallPrompt.tsx`.
+The service worker is registered only in production builds, at
+`/sw.js?v=<build id>`, so each deployment arrives as an update that waits for
+the user to accept it. It caches the shell, build assets and visited pages; it
+never handles uploads, the API or audio. Installing needs HTTPS (or localhost).
+
 ## Privacy
 
 - The microphone is opened only after the user taps Listen, and is released

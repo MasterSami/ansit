@@ -702,3 +702,92 @@ report) and should wait for real-device results and real usage data.
 - Remaining: source/license confirmation for the tafsir edition version, verify
   portrait links on more devices, and gather/reference additional audio where
   currently absent.
+
+## Redesign, reciter profiles and PWA (2026-11-22)
+
+Branch `redesign/identity-profiles-pwa`, on top of `hardening/production-readiness`.
+
+### What changed
+
+- **Recording minimum is 5 s on web and mobile.** The web button reads
+  "cancel" until then and "stop" after, so a recording is never discarded
+  silently (that had broken six browser tests).
+- **New visual identity** ("the manuscript"): paper, ink, lapis blue and
+  rubrication red; Reem Kufi headings, Readex Pro interface text, Amiri Quran
+  for ayahs only; squared corners and hairline rules. Light is now the
+  default; dark follows the system or the setting.
+- **Shared top navigation on wide screens**, bottom bar on phones. App screens
+  use a readable column or the full shell instead of a phone-width column.
+- **Landing page rebuilt.** Its verse (7:204) is now copied from the Tanzil
+  Uthmani file by `web/scripts/make-verses.mjs`, not typed by hand.
+- **Reciter profiles**: `/reciters/<id>` for all 64 reciters (55 in the
+  registry, 9 directory-only), a library with Arabic/English search and five
+  category filters. Content is in `web/src/data/reciter-profiles.json`.
+- **API (additive):** `recognition_enabled` on reciter summaries (true only if
+  the voice gallery holds the reciter) and `surah_audio` on reciter details.
+  The player can now play full-surah recordings, so the mp3quran-only reciters
+  are playable.
+- **PWA:** manifest (name ANSIT, short name أنصت), new icons, a versioned
+  service worker, an install button (Chromium prompt; Add-to-Home-Screen
+  instructions on iOS Safari), an offline page, and an update prompt.
+
+### Checks run on this branch
+
+| Check                       | Result                                      |
+| --------------------------- | ------------------------------------------- |
+| Backend: ruff, mypy, pytest | clean; 204 passed, 12 skipped (need models) |
+| Web: ESLint, tsc            | clean                                       |
+| Web: Vitest                 | 28 passed                                   |
+| Web: Playwright             | 18 passed                                   |
+| Web: production build       | 77 static pages                             |
+| Mobile: analyze, tests      | clean; 58 passed                            |
+
+Browser verification against the production build (Chromium):
+
+- `Page.getInstallabilityErrors`: none. Manifest parse errors: none.
+- Service worker registered and controlling the page; offline, a visited
+  profile opened from cache, an unvisited one showed the offline page, and
+  `/history` opened from the precache.
+- Update flow: registering a worker for a new build showed the prompt;
+  accepting it reloaded onto the new worker.
+- No horizontal overflow on 11 routes at 375, 390, 430, 768, 1024 and 1440 px.
+- One real identification through the new UI against the real backend
+  (12 s studio clip of 12:84): correct surah and ayah.
+
+### Not verified
+
+- **Installing on a real phone or desktop** (the install prompt itself, iOS
+  Add to Home Screen, the standalone window). Headless Chromium reports the
+  site installable but does not fire the prompt.
+- **Portraits did not load here**: this environment blocks the image hosts,
+  so every screenshot showed the initials fallback. They need a look on a
+  normal connection.
+- No screen-reader pass; no Lighthouse run.
+
+### Biography data: how far to trust it
+
+- 59 of 64 reciters have a sourced short biography; 33 of them a fuller one.
+  Five have nothing because no reliable source was found (alaqmi, dukhain,
+  ahmad-kaseb, muhammad-dibirov, omar-diaa-al-din).
+- **All facts were taken from web-search result summaries, not from pages
+  opened and read**: Wikipedia could not be reached from this environment.
+  Each profile lists its sources, conflicting dates were left out, and only
+  entries rated high-confidence got dates and full text. A human read-through
+  against the listed sources is still needed before launch.
+- A unit test fails if any profile states a fact without a source.
+
+### Open issues
+
+1. **`hudhaify` and `ali-hudhaifi` are the same person** (Ali Al-Hudhaify),
+   entered twice in the registry. Two voice identities for one reciter will
+   hurt recognition of him. One should be removed after checking the gallery.
+2. **Portraits are hot-linked from news and social sites**; only the Wikimedia
+   ones have a clear licence. Unchanged from before, still unresolved.
+3. Registry has 55 reciters; the gallery built here has 38. Reciters without a
+   gallery voice now show "not supported" instead of implying recognition.
+4. The gallery builder on this branch builds weaker voices for mp3quran-only
+   reciters (48 clips, fewer phone-like copies) than the one measured earlier.
+5. The mobile app still has the old look (green/gold, old fonts) and no
+   profiles; it shares only the 5 s minimum and the strings.
+6. After an update, one old cache can survive until the next activation.
+7. Tafsir edition-version and rate-limit gaps noted earlier still stand.
