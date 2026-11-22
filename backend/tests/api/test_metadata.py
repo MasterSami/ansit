@@ -161,11 +161,27 @@ async def test_metadata_is_unavailable_until_the_index_loads() -> None:
 
 async def test_reciter_list(api: httpx.AsyncClient) -> None:
     reciters = (await api.get("/v1/reciters")).json()["reciters"]
-    assert [r["id"] for r in reciters] == ["alafasy", "husary", "minshawi"]  # by English name
+    assert [r["id"] for r in reciters] == ["alafasy", "husary", "minshawi", "newcomer"]  # by name
     husary = reciters[1]
     assert husary["styles"] == ["murattal", "mujawwad"]
     assert husary["country"] is None
-    assert set(husary) == {"id", "name_ar", "name_en", "country", "styles"}  # no photo field
+    assert set(husary) == {"id", "name_ar", "name_en", "country", "styles", "recognition_enabled"}
+    # In the gallery: can be named. In the registry only: listed, not recognised.
+    assert husary["recognition_enabled"] is True
+    assert reciters[3]["recognition_enabled"] is False
+
+
+async def test_reciter_without_per_ayah_audio_offers_full_surahs(api: httpx.AsyncClient) -> None:
+    body = (await api.get("/v1/reciters/newcomer")).json()
+    assert body["ayah_audio"] == []
+    assert body["surah_audio"] == [
+        {
+            "style": "murattal",
+            "url_template": "https://cdn.example/r1/{sss}.mp3",
+            "surah_total": 107,
+        }
+    ]
+    assert body["recognition_enabled"] is False
 
 
 async def test_reciter_detail_with_audio_links(api: httpx.AsyncClient) -> None:
