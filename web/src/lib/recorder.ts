@@ -1,8 +1,8 @@
 /** Microphone capture with MediaRecorder, plus a live level meter. */
 
 export const MAX_RECORD_SEC = 10;
-/** The server rejects clips under 3 s; do not upload less. */
-export const MIN_RECORD_SEC = 3;
+/** Short clips are more likely to miss the words needed for ayah matching. */
+export const MIN_RECORD_SEC = 5;
 export const LEVEL_BARS = 8;
 
 const PREFERRED_TYPES = [

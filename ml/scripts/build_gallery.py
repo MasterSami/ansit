@@ -59,7 +59,7 @@ MIN_CLIPS = 30  # studio clips per voice, before phone-like copies
 MP3QURAN_CACHE = REPO / "ml" / "data" / "mp3quran"
 MP3QURAN_SURAHS = (13, 15, 25, 31, 32, 34, 35, 21, 14, 50)
 SURAHS_PER_VOICE = 6
-WINDOWS_PER_SURAH = 10
+WINDOWS_PER_SURAH = 6
 SKIP_START_SEC = 20.0  # opening formulas and any announcer
 SKIP_END_SEC = 15.0
 
@@ -102,14 +102,17 @@ def download(folder: str, ayahs: list[tuple[int, int]]) -> list[Path]:
         return [p for s, a in ayahs if (p := fetch(client, folder, s, a)) is not None]
 
 
-def download_surahs(slug: str, server: str) -> list[Path]:
+def download_surahs(
+    slug: str, server: str, style: str, *, multiple_sources: bool = False
+) -> list[Path]:
     """The first SURAHS_PER_VOICE of MP3QURAN_SURAHS that this recording has."""
     found: list[Path] = []
+    cache_dir = MP3QURAN_CACHE / slug / style if multiple_sources else MP3QURAN_CACHE / slug
     with httpx.Client(timeout=300, follow_redirects=True) as client:
         for surah in MP3QURAN_SURAHS:
             if len(found) == SURAHS_PER_VOICE:
                 break
-            path = MP3QURAN_CACHE / slug / f"{surah:03d}.mp3"
+            path = cache_dir / f"{surah:03d}.mp3"
             if not (path.exists() and path.stat().st_size > 0):
                 response = client.get(f"{server}{surah:03d}.mp3")
                 if response.status_code == 404:
@@ -158,14 +161,18 @@ def surah_clips(files: list[Path]) -> list[np.ndarray]:
 
 
 def embed_voice(
-    engine: OnnxSpeakerEngine, clips: list[np.ndarray], augment_seed: list[int] | None
+    engine: OnnxSpeakerEngine,
+    clips: list[np.ndarray],
+    augment_seed: list[int] | None,
+    *,
+    augment_stride: int = 1,
 ) -> np.ndarray:
     """Embeddings of each clip and, if `augment_seed` is given, of a phone-like copy."""
     rng = np.random.default_rng(augment_seed) if augment_seed is not None else None
     rows = []
-    for audio in clips:
+    for index, audio in enumerate(clips):
         rows.append(engine.embed(audio))
-        if rng is not None:
+        if rng is not None and index % augment_stride == 0:
             # A second view of the same clip as a phone would deliver it:
             # reverb, noise, band-limit, Opus. Without it, phone-like queries
             # score much lower against a studio-only gallery (Phase 3 report).
@@ -192,7 +199,9 @@ def main() -> int:
     if wanted - known:
         raise SystemExit(f"not in the registry: {sorted(wanted - known)}")
 
-    active = [r for r in registry if r["active"] and r["id"] in wanted]
+    # A selected inactive directory entry may have valid source audio but no
+    # gallery vectors yet. Let an explicit --reciter build its first voiceprint.
+    active = [r for r in registry if r["id"] in wanted]
     jobs = [
         (Voice(r["id"], src["style"]), src["folder"])
         for r in active
@@ -201,26 +210,32 @@ def main() -> int:
     ayahs = gallery_ayahs()
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         downloads = list(pool.map(lambda job: download(job[1], ayahs), jobs))
-    voices_clips = [
-        (voice, folder, ayah_clips(files))
+    voices_files = [
+        (voice, folder, files, "ayah")
         for (voice, folder), files in zip(jobs, downloads, strict=True)
     ]
     # Reciters that EveryAyah does not have: windows of mp3quran's full surahs.
     for r in active:
         if r["sources"]["everyayah"]:
             continue
+        multiple_sources = len(r["sources"]["mp3quran_audio"]) > 1
         for src in r["sources"]["mp3quran_audio"]:
-            files = download_surahs(r["id"], src["server"])
+            files = download_surahs(
+                r["id"], src["server"], src["style"], multiple_sources=multiple_sources
+            )
             label = f"mp3quran:{r['id']}"
-            voices_clips.append((Voice(r["id"], src["style"]), label, surah_clips(files)))
+            voices_files.append((Voice(r["id"], src["style"]), label, files, "surah"))
 
     engine = OnnxSpeakerEngine(MODEL, cpu_threads=4)
     built: dict[Voice, np.ndarray] = {}
-    for voice, folder, clips in voices_clips:
+    for voice, folder, files, clip_kind in voices_files:
+        clips = ayah_clips(files) if clip_kind == "ayah" else surah_clips(files)
         seed = None if args.no_augment else [SEED, *folder.encode()]
-        vectors = embed_voice(engine, clips, seed)
-        if len(vectors) < MIN_CLIPS * (1 if args.no_augment else 2):
-            raise SystemExit(f"{folder}: only {len(vectors)} usable clips (need {MIN_CLIPS})")
+        mp3quran_only = folder.startswith("mp3quran:")
+        vectors = embed_voice(engine, clips, seed, augment_stride=3 if mp3quran_only else 1)
+        minimum = MIN_CLIPS if mp3quran_only else MIN_CLIPS * (1 if args.no_augment else 2)
+        if len(vectors) < minimum:
+            raise SystemExit(f"{folder}: only {len(vectors)} usable clips (need {minimum})")
         built[voice] = vectors
         print(f"embedded  {voice.reciter_id:16} {voice.style:9} {len(vectors):3} clips  ({folder})")
 

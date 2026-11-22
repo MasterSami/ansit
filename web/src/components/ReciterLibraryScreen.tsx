@@ -10,7 +10,7 @@ import {
   RECITER_IMAGE_SOURCES,
 } from "@/lib/reciterCatalog";
 import { Avatar, Screen, StateMessage } from "./ui";
-import { AlertIcon } from "./icons";
+import { AlertIcon, SearchIcon } from "./icons";
 
 interface LibraryEntry extends ReciterSummary {
   image?: string;
@@ -43,11 +43,15 @@ export function ReciterLibraryScreen() {
     const availableNames = new Set(
       reciters.map((r) => normalizeName(r.name_ar)),
     );
+    const availableIds = new Set(reciters.map((r) => r.id));
     const apiEntries: LibraryEntry[] = reciters.map((r) => {
       const curated = CURATED_RECITERS.find((c) => c.id === r.id);
       const imageSource = RECITER_IMAGE_SOURCES[r.id];
       return {
         ...r,
+        // Prefer the curated full name when the API uses a shortened variant.
+        name_ar: curated?.name_ar ?? r.name_ar,
+        name_en: curated?.name_en ?? r.name_en,
         image: curated?.image ?? RECITER_IMAGES[r.id],
         sourceUrl: curated?.sourceUrl ?? imageSource?.url,
         imageCredit: curated?.imageCredit ?? imageSource?.credit,
@@ -55,7 +59,9 @@ export function ReciterLibraryScreen() {
       };
     });
     const additions: LibraryEntry[] = CURATED_RECITERS.filter(
-      (r) => !availableNames.has(normalizeName(r.name_ar)),
+      (r) =>
+        !availableIds.has(r.id) &&
+        !availableNames.has(normalizeName(r.name_ar)),
     ).map((r) => ({
       id: r.id,
       name_ar: r.name_ar,
@@ -78,28 +84,41 @@ export function ReciterLibraryScreen() {
   }, [reciters, query]);
 
   return (
-    <Screen className="pb-8">
-      <header className="px-5 pt-[52px]">
-        <Link href="/" className="text-sm text-muted">
-          ← الرئيسية
-        </Link>
-        <h1 className="mt-4 text-2xl font-bold">مكتبة القراء</h1>
-        <p className="mt-2 text-sm leading-7 text-muted">
-          كل القراء في قائمة واحدة. زر الاستماع داخل التطبيق يظهر للقراء الذين
-          لديهم تلاوات مفهرسة؛ أما الروابط الخارجية فتفتح التسجيلات المنشورة في
-          مصادرها.
-        </p>
-        <input
-          aria-label="ابحث عن قارئ"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="ابحث باسم القارئ"
-          className="mt-4 h-12 w-full rounded-xl border border-border bg-surface px-4"
-        />
+    <Screen wide className="reciter-library-screen">
+      <header className="reciter-library-header">
+        <div className="reciter-library-topbar">
+          <Link href="/" className="reciter-library-back">← الرئيسية</Link>
+          <span className="reciter-library-kicker">أنصِت · مكتبة الأصوات</span>
+        </div>
+        <div className="reciter-library-intro">
+          <div>
+            <p className="reciter-library-eyebrow">كل القراء في مكان واحد</p>
+            <h1>مكتبة القراء</h1>
+            <p className="reciter-library-description">
+              تصفّح القراء وابحث عن الاسم. علامة التعرّف توضّح الأصوات الموجودة في أنصت.
+            </p>
+          </div>
+          <label className="reciter-library-search">
+            <SearchIcon size={19} />
+            <input
+              aria-label="ابحث عن قارئ"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="ابحث باسم القارئ"
+            />
+            {query && (
+              <button type="button" onClick={() => setQuery("")} aria-label="مسح البحث">
+                ×
+              </button>
+            )}
+          </label>
+        </div>
         {reciters && (
-          <p className="mt-2 text-xs text-muted" aria-live="polite">
-            {entries.length} قارئًا
-          </p>
+          <div className="reciter-library-summary" aria-live="polite">
+            <span><strong>{entries.length}</strong> قارئ</span>
+            <span><strong>{entries.filter((entry) => entry.inApp).length}</strong> بصمة متاحة للتعرّف</span>
+            <span><strong>{entries.filter((entry) => !entry.inApp).length}</strong> في الدليل</span>
+          </div>
         )}
       </header>
 
@@ -110,54 +129,45 @@ export function ReciterLibraryScreen() {
           body="تحقق من الاتصال ثم أعد المحاولة."
         />
       ) : reciters === null ? (
-        <p className="p-8 text-center text-muted">جارٍ تحميل القراء…</p>
+        <div className="reciter-library-loading" role="status">جارٍ تحميل مكتبة القراء…</div>
       ) : entries.length === 0 ? (
-        <p className="p-8 text-center text-muted">لا توجد نتائج مطابقة.</p>
+        <div className="reciter-library-empty">لا توجد نتائج مطابقة.</div>
       ) : (
-        <ul className="mt-4 grid gap-2 px-5">
+        <ul className="reciter-library-grid">
           {entries.map((reciter) => (
-            <li
-              key={reciter.id}
-              className="flex min-h-[76px] items-center gap-3 rounded-2xl border border-border bg-surface px-3 py-2"
-            >
-              <Avatar name={reciter.name_ar} size="md" image={reciter.image} />
-              <span className="min-w-0 grow">
-                <strong className="block text-[15px]">{reciter.name_ar}</strong>
-                <span className="text-xs text-muted">
-                  {reciter.inApp
-                    ? `${reciter.styles.length} أنماط متاحة في أنصت`
-                    : reciter.audioUrl
-                      ? "تسجيل متاح من المصدر الصوتي"
-                      : "إضافة تعريفية؛ الصوت غير مفهرس بعد"}
-                </span>
+            <li key={reciter.id} className="reciter-library-card">
+              <div className="reciter-library-card-main">
+                <Avatar name={reciter.name_ar} size="lg" image={reciter.image} />
+                <div className="reciter-library-card-name">
+                  <span className={`reciter-library-badge ${reciter.inApp ? "is-available" : "is-directory"}`}>
+                    <span aria-hidden="true" />
+                    {reciter.inApp ? "بصمة متاحة" : "في الدليل"}
+                  </span>
+                  <h2>{reciter.name_ar}</h2>
+                  <p dir="ltr">{reciter.name_en}</p>
+                </div>
+              </div>
+              <div className="reciter-library-card-meta">
+                {reciter.inApp
+                  ? reciter.styles.map((style) => <span className="reciter-library-style" key={style}>{style}</span>)
+                  : <span>{reciter.audioUrl ? "له تسجيل منشور" : "لا يتوفر تسجيل مصدر حاليًا"}</span>}
+              </div>
+              <div className="reciter-library-card-footer">
                 {reciter.sourceUrl && reciter.imageCredit && (
-                  <a
-                    href={reciter.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block text-[10px] text-muted underline underline-offset-2"
-                  >
+                  <a href={reciter.sourceUrl} target="_blank" rel="noreferrer" className="reciter-library-credit">
                     مصدر الصورة: {reciter.imageCredit}
                   </a>
                 )}
-              </span>
-              {reciter.inApp ? (
-                <Link
-                  href={`/reciter?id=${encodeURIComponent(reciter.id)}`}
-                  className="shrink-0 rounded-full bg-accent-soft px-3 py-2 text-xs font-semibold text-accent"
-                >
-                  استمع
-                </Link>
-              ) : reciter.audioUrl ? (
-                <a
-                  href={reciter.audioUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="shrink-0 rounded-full bg-accent-soft px-3 py-2 text-xs font-semibold text-accent"
-                >
-                  استمع
-                </a>
-              ) : null}
+                {reciter.inApp ? (
+                  <Link href={`/reciter?id=${encodeURIComponent(reciter.id)}`} className="reciter-library-action">
+                    استمع داخل أنصت <span aria-hidden="true">←</span>
+                  </Link>
+                ) : reciter.audioUrl ? (
+                  <a href={reciter.audioUrl} target="_blank" rel="noreferrer" className="reciter-library-action">
+                    استمع للمصدر <span aria-hidden="true">↗</span>
+                  </a>
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>

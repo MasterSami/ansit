@@ -14,7 +14,7 @@
   background:
     radial-gradient(ellipse at 82% 7%, rgba(49, 94, 67, .2), transparent 32rem),
     var(--land-bg);
-  font-family: var(--font-plex), sans-serif;
+  font-family: var(--font-sans);
 }
 .landing-page * { box-sizing: border-box; }
 .landing-shell { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }

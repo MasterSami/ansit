@@ -83,7 +83,28 @@ MP3QURAN_ONLY: dict[str, int] = {
     "ahmad-talib": 137,
     "luhaidan": 107,
     "dukhain": 273,
+    "badr-turki": 254,
+    "muhammad-refaat": 241,
+    "mustafa-ismail": 125,
+    "waleed-shamsan": 21188,
+    "bandar-baleela": 217,
+    "abdullah-buaijan": 58,
+    "hussain-sheikh": 162,
+    "ali-hudhaifi": 74,
+    "abdulbari-thubaiti": 49,
+    "khalid-muhanna": 159,
+    "ahmad-hudhaifi": 205,
+    "muhammad-burhaji": 21181,
+    "abdullah-qarafi": 21136,
 }
+
+# Keep only the mujawwad source for Mustafa Ismail, which is the recording
+# offered by the curated library and avoids treating two styles as one voice.
+MP3QURAN_STYLES: dict[str, set[str]] = {"mustafa-ismail": {"mujawwad"}}
+
+# Keep catalog records hidden from identification until their gallery vectors
+# exist. Flip these off as `build_gallery.py` produces each voice.
+INACTIVE_UNTIL_GALLERY: set[str] = set()
 
 # mp3quran labels each recording ("moshaf") in Arabic; these markers are
 # compared after reading them from the API response, see _style_of().
@@ -131,6 +152,7 @@ def main() -> int:
                 or ("murattal" if slug in MP3QURAN_ONLY else None)
             )
             is not None
+            and (slug not in MP3QURAN_STYLES or style in MP3QURAN_STYLES[slug])
         ]
         if not sources and not audio:
             raise SystemExit(f"{slug}: no EveryAyah folder and no Hafs recording on mp3quran")
@@ -146,7 +168,7 @@ def main() -> int:
                     "mp3quran_id": mq_id,
                     "mp3quran_audio": audio,
                 },
-                "active": True,
+                "active": slug not in INACTIVE_UNTIL_GALLERY,
             }
         )
         print(f"{slug:16} {registry[-1]['name_en']:32} {registry[-1]['name_ar']}")

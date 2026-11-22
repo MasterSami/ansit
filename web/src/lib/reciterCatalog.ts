@@ -52,7 +52,7 @@ export const RECITER_IMAGES: Record<string, string> = {
     "https://gate.ahram.org.eg/Media/News/2024/7/5/2024-638557711777264726-726.jpg",
   "taha-al-fashni":
     "https://i1.sndcdn.com/artworks-XKkmWVcKKfglF1Y6-BpZ7QQ-t500x500.jpg",
-  "badr-al-turki": "https://media.way2quran.com/imgs/badr-al-turki.jpg",
+  "badr-turki": "https://media.way2quran.com/imgs/badr-al-turki.jpg",
   "waleed-shamsan": "https://img.youtube.com/vi/mdZLoXQ1nc4/maxresdefault.jpg",
   "bandar-baleela":
     "https://i1.sndcdn.com/artworks-QLbSbMcexsj0i22x-l1p2DQ-t500x500.jpg",
@@ -195,10 +195,10 @@ export const CURATED_RECITERS: CuratedReciter[] = [
     sourceUrl: "https://x.com/alla1402/status/1940595710908670259",
   },
   {
-    id: "badr-al-turki",
+    id: "badr-turki",
     name_ar: "بدر بن محمد التركي",
     name_en: "Badr Al-Turki",
-    image: RECITER_IMAGES["badr-al-turki"],
+    image: RECITER_IMAGES["badr-turki"],
     imageCredit: "Way2Quran",
     sourceUrl: "https://www.way2quran.com/en/reciters/badr-al-turki",
     audioUrl: mp3("https://cdn.mp3quran.net/audio/badr-turki/r1/"),
@@ -257,7 +257,7 @@ export const CURATED_RECITERS: CuratedReciter[] = [
     audioUrl: mp3("https://cdn.mp3quran.net/audio/abdulbari-thubaiti/r1/"),
   },
   {
-    id: "abdulmohsen-qasim",
+    id: "qasim",
     name_ar: "عبدالمحسن بن محمد القاسم",
     name_en: "Abdulmohsen Al-Qasim",
     sourceUrl:
