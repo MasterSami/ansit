@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { BookIcon, MicIcon, PlayIcon, SearchIcon, ShieldIcon } from "@/components/icons";
+import { BookIcon, MicIcon, SearchIcon, ShieldIcon } from "@/components/icons";
 
 const featuredReciters = [
   { id: "minshawi", name: "محمد صديق المنشاوي", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Elminshwey.jpg" },
@@ -68,7 +68,6 @@ export function LandingPage() {
         <nav className="landing-nav" aria-label="التنقل الرئيسي">
           <a href="#mission">رسالتنا</a>
           <a href="#ai">الذكاء الاصطناعي</a>
-          <a href="#how">كيف يعمل</a>
         </nav>
         <Link className="landing-nav-cta" href="/reciters">مكتبة القراء <ArrowIcon /></Link>
       </header>
@@ -153,24 +152,6 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="landing-how landing-shell" id="how" aria-labelledby="how-title">
-          <div className="landing-how-heading"><SectionKicker>تجربة بسيطة</SectionKicker><h2 id="how-title">من لحظة الإنصات،<br /><span>إلى معرفة الموضع.</span></h2><p>لا تحتاج إلى معرفة اسم السورة مسبقًا. ابدأ من الصوت واتبع الخطوات.</p><Link className="landing-text-link" href="/listen">ابدأ التجربة الآن <ArrowIcon /></Link></div>
-          <div className="landing-how-steps">
-            <article><span>١</span><MicIcon size={22} /><h3>ابدأ الاستماع</h3><p>اضغط على زر الاستماع واسمح للمتصفح باستخدام الميكروفون.</p></article>
-            <article><span>٢</span><Waveform compact /><h3>قرّب صوت التلاوة</h3><p>اجعل التلاوة واضحة ودع التطبيق يحلل مقطعًا قصيرًا منها.</p></article>
-            <article><span>٣</span><BookIcon size={22} /><h3>تعرّف على الآية</h3><p>راجع السورة ورقم الآية، واسم القارئ إن توفرت مطابقة موثوقة.</p></article>
-          </div>
-        </section>
-
-        <section className="landing-features landing-shell" aria-labelledby="features-title">
-          <div className="landing-features-heading"><SectionKicker>مصمّم لخدمة رحلتك</SectionKicker><h2 id="features-title">تفاصيل صغيرة،<br /><span>تجعل الوصول أسهل.</span></h2></div>
-          <div className="landing-feature-grid">
-            <article><BookIcon size={22} /><h3>موضع الآية</h3><p>الوصول إلى اسم السورة ورقم الآية والنص المرتبط بالنتيجة.</p></article>
-            <article><PlayIcon size={21} /><h3>التعرّف على القارئ</h3><p>إظهار اسم القارئ عندما تتوفر بيانات ومطابقة صوتية مناسبة.</p></article>
-            <article><ShieldIcon size={22} /><h3>خصوصية أوضح</h3><p>لا يحتفظ الخادم بملف التسجيل الصوتي بعد انتهاء عملية التعرّف.</p></article>
-          </div>
-        </section>
-
         <section className="landing-reciter-section landing-shell" id="reciters" aria-labelledby="reciters-title">
           <div className="landing-reciter-heading"><div><SectionKicker>أصوات نحب الاستماع إليها</SectionKicker><h2 id="reciters-title">من مكتبة القرّاء.</h2></div><p>تعرّف على بعض القرّاء المتاحين ضمن مكتبة أنصت، واستكشف التلاوات من داخل التطبيق.</p></div>
           <div className="landing-reciter-row">{featuredReciters.map((reciter) => <div className="landing-reciter" key={reciter.id}><Image className="landing-reciter-photo" src={reciter.image} alt={`صورة القارئ ${reciter.name}`} width={84} height={84} unoptimized /><strong>{reciter.name}</strong></div>)}<Link className="landing-reciter-more" href="/reciters"><span>+</span><small>اكتشف المكتبة</small></Link></div>
@@ -188,7 +169,7 @@ export function LandingPage() {
 
       <footer className="landing-footer landing-shell">
         <Link className="landing-brand" href="/" aria-label="أنصت — الرئيسية"><BrandMark /><span className="landing-brand-copy"><strong>أنصِت</strong><small>التقنية في خدمة القرآن</small></span></Link>
-        <p>مبادرة خيرية تسعى لخدمة القرآن الكريم والسنة النبوية.<br /><span className="landing-credit">تم التصميم والبرمجة والتدريب بواسطة م. أحمد سامي التحيوي</span></p>
+        <p>مبادرة خيرية تسعى لخدمة القرآن الكريم والسنة النبوية.<br /><span className="landing-credit">Designed, Developed and trained by Eng. Ahmad Sami Eltehawy</span></p>
         <div><Link href="/mushaf">افتح التطبيق</Link><Link href="/settings">الإعدادات</Link></div>
       </footer>
     </div>

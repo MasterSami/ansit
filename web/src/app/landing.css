@@ -36,7 +36,7 @@
 .landing-eyebrow,.landing-section-kicker { display:flex; align-items:center; gap:10px; color:var(--land-gold); font-size:12px; font-weight:600; letter-spacing:.02em; }
 .landing-eyebrow-dot,.landing-section-kicker span { width:7px; height:7px; border-radius:50%; background:var(--land-gold); box-shadow:0 0 16px rgba(216,185,120,.6); }
 .landing-hero h1 { margin:25px 0 20px; font-family:var(--font-amiri),serif; font-size:clamp(43px,5.3vw,68px); line-height:1.35; font-weight:700; letter-spacing:-.025em; }
-.landing-hero h1 span,.landing-mission h2 span,.landing-ai-heading h2 span,.landing-how h2 span,.landing-features h2 span,.landing-final-cta h2 span { color:var(--land-gold); }
+.landing-hero h1 span,.landing-mission h2 span,.landing-ai-heading h2 span,.landing-final-cta h2 span { color:var(--land-gold); }
 .landing-hero-lead { max-width:590px; margin:0; color:#b8c1b8; font-size:15px; line-height:2.15; }
 .landing-actions { display:flex; flex-wrap:wrap; align-items:center; gap:13px; margin-top:30px; }
 .landing-button { min-height:52px; display:inline-flex; align-items:center; justify-content:center; gap:12px; padding:0 19px; border-radius:11px; font-size:13px; font-weight:600; transition:transform .2s,background .2s,border-color .2s; }
@@ -80,7 +80,7 @@
 .landing-manifesto-caption { color:#9ba79c; font-size:10px; letter-spacing:.04em; }
 .landing-mission { display:grid; grid-template-columns:.8fr 1.2fr; gap:22px 75px; padding-block:110px; scroll-margin-top:35px; }
 .landing-section-kicker { margin:0 0 17px; }
-.landing-mission h2,.landing-ai-heading h2,.landing-how h2,.landing-features h2,.landing-final-cta h2 { margin:0; font-family:var(--font-amiri),serif; font-size:clamp(34px,4vw,48px); line-height:1.45; }
+.landing-mission h2,.landing-ai-heading h2,.landing-final-cta h2 { margin:0; font-family:var(--font-amiri),serif; font-size:clamp(34px,4vw,48px); line-height:1.45; }
 .landing-mission-copy { padding-top:28px; }
 .landing-mission-copy p { margin:0 0 13px; color:#b4beb4; font-size:14px; line-height:2.15; }
 .landing-values { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-top:22px; }
@@ -88,8 +88,8 @@
 .landing-values article>span:first-child { position:absolute; top:20px; left:22px; color:#69796d; font-size:11px; }
 .landing-values article>svg,.landing-value-spark { color:var(--land-gold); }
 .landing-value-spark { display:block; font-size:24px; line-height:24px; }
-.landing-values h3,.landing-ai-flow h3,.landing-how-steps h3,.landing-feature-grid h3 { margin:17px 0 7px; font-size:15px; }
-.landing-values p,.landing-ai-flow p,.landing-how-steps p,.landing-feature-grid p { margin:0; color:#9eaa9f; font-size:12px; line-height:1.9; }
+.landing-values h3,.landing-ai-flow h3 { margin:17px 0 7px; font-size:15px; }
+.landing-values p,.landing-ai-flow p { margin:0; color:#9eaa9f; font-size:12px; line-height:1.9; }
 .landing-ai-section { padding:100px 0; border-block:1px solid rgba(255,255,255,.055); background:radial-gradient(ellipse at 50% 0,rgba(50,91,62,.17),transparent 60%),#0e1913; scroll-margin-top:25px; }
 .landing-ai-heading { display:flex; align-items:end; justify-content:space-between; gap:50px; }
 .landing-ai-heading>p { max-width:420px; margin:0 0 7px; color:#aab5aa; font-size:13px; line-height:2; }
@@ -105,21 +105,7 @@
 .landing-ai-disclaimer svg { flex-shrink:0; margin-top:2px; }
 .landing-ai-disclaimer p { margin:0; color:#aeb8ad; font-size:11px; line-height:2; }
 .landing-ai-disclaimer strong { color:#e5d3a7; }
-.landing-how { display:grid; grid-template-columns:.8fr 1.2fr; gap:60px; align-items:center; padding-block:110px; scroll-margin-top:25px; }
-.landing-how-heading>p,.landing-reciter-heading>p { max-width:360px; color:#aab4aa; font-size:13px; line-height:2; }
-.landing-text-link { display:inline-flex; align-items:center; gap:10px; margin-top:14px; color:var(--land-gold)!important; font-size:12px; font-weight:600; }
-.landing-how-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:13px; }
-.landing-how-steps article { min-height:205px; padding:22px 18px; border:1px solid var(--land-line); border-radius:14px; background:rgba(255,255,255,.02); }
-.landing-how-steps article>span:first-child { display:block; margin-bottom:25px; color:var(--land-gold); font-family:var(--font-amiri),serif; font-size:21px; }
-.landing-how-steps article>svg,.landing-how-steps article>.landing-waveform { color:var(--land-gold); }
-.landing-how-steps article>.landing-waveform { justify-content:flex-start; height:26px; }
-.landing-how-steps h3 { margin-top:17px; font-size:13px; }
-.landing-how-steps p { font-size:11px; }
-.landing-features { padding-block:80px; border-top:1px solid rgba(255,255,255,.06); }
-.landing-feature-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-top:34px; }
-.landing-feature-grid article { padding:25px; border:1px solid var(--land-line); border-radius:14px; background:rgba(255,255,255,.02); }
-.landing-feature-grid article>svg { color:var(--land-gold); }
-.landing-feature-grid h3 { margin-top:16px; }
+.landing-reciter-heading>p { max-width:360px; color:#aab4aa; font-size:13px; line-height:2; }
 .landing-reciter-section { padding-block:85px; border-top:1px solid rgba(255,255,255,.06); scroll-margin-top:25px; }
 .landing-reciter-heading { display:flex; justify-content:space-between; align-items:end; gap:35px; }
 .landing-reciter-heading>p { max-width:390px; margin-bottom:4px; }
@@ -144,7 +130,6 @@
   .landing-hero { gap:15px; }
   .landing-floating-top { right:-14px; }
   .landing-floating-bottom { left:-14px; }
-  .landing-how { grid-template-columns:1fr; gap:30px; }
   .landing-reciter-row { grid-template-columns:repeat(3,1fr); }
 }
 @media (max-width: 680px) {
@@ -181,12 +166,6 @@
   .landing-ai-flow article { min-height:0; padding:21px; }
   .landing-ai-connector { transform:rotate(90deg); }
   .landing-ai-disclaimer { padding:14px; }
-  .landing-how { padding-block:75px; }
-  .landing-how-steps { grid-template-columns:1fr; }
-  .landing-how-steps article { min-height:0; }
-  .landing-how-steps article>span:first-child { margin-bottom:13px; }
-  .landing-features { padding-block:65px; }
-  .landing-feature-grid { grid-template-columns:1fr; }
   .landing-reciter-section { padding-block:65px; }
   .landing-reciter-heading { display:block; }
   .landing-reciter-heading>p { margin-top:12px; }
