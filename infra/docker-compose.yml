@@ -51,7 +51,7 @@ services:
       - ../ml/artifacts:/app/artifacts:ro
       - ../ml/registry:/app/registry:ro
     ports:
-      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+      - "127.0.0.1:${BACKEND_PORT:-8765}:8000"
     # Audio scratch space lives in RAM only (privacy: clips are never written to disk).
     tmpfs:
       - /tmp:size=64m,mode=1777

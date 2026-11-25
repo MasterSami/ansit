@@ -17,7 +17,7 @@ import '../services/recorder.dart';
 /// from the Android emulator.
 const defaultApiUrl = String.fromEnvironment(
   'API_URL',
-  defaultValue: 'http://10.0.2.2:8000',
+  defaultValue: 'http://10.0.2.2:8765',
 );
 
 // ---- things the app is given at start-up (overridden in main and in tests)

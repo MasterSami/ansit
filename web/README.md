@@ -20,9 +20,8 @@ npm run dev
 ```
 
 Open <http://localhost:3000>. The app talks to the API at
-`http://localhost:8000` unless you say otherwise. If the API runs on another
-port, copy `.env.example` to `.env.local` and change `NEXT_PUBLIC_API_URL`,
-for example `NEXT_PUBLIC_API_URL=http://localhost:8765`.
+`http://localhost:8765` by default. To use another address, copy
+`.env.example` to `.env.local` and change `NEXT_PUBLIC_API_URL`.
 
 The API must allow the web app's address: start it with
 `CORS_ORIGINS=http://localhost:3000`.

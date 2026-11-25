@@ -1,6 +1,6 @@
 # API
 
-Interactive docs: `http://localhost:8000/docs` (OpenAPI at `/openapi.json`).
+Interactive docs: `http://localhost:8765/docs` (OpenAPI at `/openapi.json`).
 The Swagger page can upload a file, which is the quickest way to try
 `/v1/identify` by hand.
 
@@ -37,7 +37,7 @@ The Swagger page can upload a file, which is the quickest way to try
 | `previous_identify_id` | no       | The `id` of an earlier **ambiguous** result that this clip continues from ("listen longer"). |
 
 ```bash
-curl -F "audio=@clip.webm" -F client=web http://localhost:8000/v1/identify
+curl -F "audio=@clip.webm" -F client=web http://localhost:8765/v1/identify
 ```
 
 ### Response

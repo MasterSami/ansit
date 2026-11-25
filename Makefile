@@ -59,10 +59,10 @@ gallery-db: ## Load the registry + gallery into Postgres (uses DATABASE_URL; add
 	uv run --project backend python ml/scripts/load_gallery_db.py $(if $(RECITER),--reciter $(RECITER))
 
 serve: ## Run the API locally without Docker (needs the artifacts; no Postgres/Redis required)
-	uv run --directory backend uvicorn app.main:create_app --factory --port $(or $(PORT),8000)
+	uv run --directory backend uvicorn app.main:create_app --factory --port $(or $(PORT),8765)
 
 loadtest: ## Locust load test against a running server (HOST=..., USERS=...)
-	uvx locust -f infra/locust/locustfile.py --headless --host $(or $(HOST),http://localhost:8000) \
+	uvx locust -f infra/locust/locustfile.py --headless --host $(or $(HOST),http://localhost:8765) \
 		-u $(or $(USERS),2) -r $(or $(USERS),2) -t $(or $(DURATION),75s) --only-summary
 
 migrate: ## Apply database migrations (uses DATABASE_URL)

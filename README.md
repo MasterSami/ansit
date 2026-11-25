@@ -35,7 +35,7 @@ are `ml/artifacts/speaker/resnet34.onnx` and `ml/artifacts/gallery.npz`.
 Without Docker (no Postgres or Redis needed):
 
 ```bash
-make serve          # http://localhost:8000  (PORT=8080 make serve for another port)
+make serve          # http://localhost:8765  (PORT=8080 make serve for another port)
 ```
 
 With Docker (Postgres + pgvector, Redis and the API):
@@ -45,11 +45,11 @@ make up
 make gallery-db DATABASE_URL=postgresql+asyncpg://ansit:ansit@localhost:5432/ansit
 ```
 
-Then open `http://localhost:8000/docs` and use `POST /v1/identify` to upload a
+Then open `http://localhost:8765/docs` and use `POST /v1/identify` to upload a
 short recording, or:
 
 ```bash
-curl -F "audio=@clip.m4a" http://localhost:8000/v1/identify
+curl -F "audio=@clip.m4a" http://localhost:8765/v1/identify
 ```
 
 `make check` runs lint, type-check and tests. `make help` lists every target.

@@ -29,7 +29,7 @@ flutter pub get
 ```
 
 ```bash
-flutter run --dart-define=API_URL=http://10.0.2.2:8000
+flutter run --dart-define=API_URL=http://10.0.2.2:8765
 ```
 
 `10.0.2.2` is the host computer as seen from the Android emulator. For a real

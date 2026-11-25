@@ -3,7 +3,7 @@
 Each simulated user uploads one recitation clip after another, with no pause.
 
 Usage (server already running, rate limit raised for the test):
-  uvx locust -f infra/locust/locustfile.py --headless --host http://localhost:8000 \
+  uvx locust -f infra/locust/locustfile.py --headless --host http://localhost:8765 \
       -u 4 -r 4 -t 90s --csv /tmp/ansit-load
 
 Clips are read from ANSIT_LOAD_CLIPS (default: the Phase 2 evaluation clips,
