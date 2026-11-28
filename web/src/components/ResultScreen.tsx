@@ -401,6 +401,11 @@ function MatchView({
                     className="flex min-h-6 items-center gap-2"
                   >
                     <span className="truncate">{alt.name_ar}</span>
+                    {!named && alt.id === alternatives[0]?.id && (
+                      <span className="shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-semibold text-accent">
+                        {t("result.closestVoiceMatch")}
+                      </span>
+                    )}
                     <span className="rounded-full bg-divider px-2 py-0.5 text-xs text-muted">
                       {formatPercent(alt.similarity)}
                     </span>

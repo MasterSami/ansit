@@ -99,6 +99,7 @@
     "reciterPage": "صفحة القارئ",
     "voiceSimilarity": "تشابه الصوت",
     "mayAlsoBe": "قد يكون أيضًا",
+    "closestVoiceMatch": "الأقرب صوتيًا",
     "unknownReciter": "قارئ غير معروف",
     "unknownHint": "لم نتأكد من صوت القارئ",
     "addName": "أضِف الاسم",

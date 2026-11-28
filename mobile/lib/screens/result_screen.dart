@@ -500,9 +500,43 @@ class _MatchViewState extends ConsumerState<_MatchView> {
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 4,
                                             ),
-                                            child: Text(
-                                              '${alt.nameAr}  ${formatPercent(alt.similarity)}',
-                                              style: ts(13),
+                                            child: Wrap(
+                                              alignment: WrapAlignment.end,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.center,
+                                              spacing: 6,
+                                              runSpacing: 4,
+                                              children: [
+                                                Text(alt.nameAr, style: ts(13)),
+                                                if (name == null &&
+                                                    alt.id == alternatives.first.id)
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 3,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: c.accentSoft,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            999,
+                                                          ),
+                                                    ),
+                                                    child: Text(
+                                                      t.resultClosestVoiceMatch,
+                                                      style: ts(
+                                                        11,
+                                                        weight: FontWeight.w600,
+                                                        color: c.accent,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                Text(
+                                                  formatPercent(alt.similarity),
+                                                  style: ts(13),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),

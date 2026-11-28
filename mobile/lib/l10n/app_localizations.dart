@@ -772,6 +772,12 @@ abstract class AppLocalizations {
   /// **'أكمل الاستماع من هذه الآية'**
   String get resultContinueListening;
 
+  /// No description provided for @resultClosestVoiceMatch.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأقرب صوتيًا'**
+  String get resultClosestVoiceMatch;
+
   /// No description provided for @resultMayAlsoBe.
   ///
   /// In ar, this message translates to:

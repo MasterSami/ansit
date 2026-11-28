@@ -177,6 +177,7 @@
     }
   },
   "resultAyahSection": "الآية",
+  "resultClosestVoiceMatch": "الأقرب صوتيًا",
   "resultContinueListening": "أكمل الاستماع من هذه الآية",
   "resultMayAlsoBe": "قد يكون أيضًا",
   "resultMeta": "{revelation} · {count} · الجزء {juz} · صفحة {page}",

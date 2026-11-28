@@ -377,6 +377,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get resultContinueListening => 'أكمل الاستماع من هذه الآية';
 
   @override
+  String get resultClosestVoiceMatch => 'الأقرب صوتيًا';
+
+  @override
   String get resultMayAlsoBe => 'قد يكون أيضًا';
 
   @override

@@ -222,6 +222,7 @@ void main() {
       );
       expect(find.text(t.resultUnknownReciter), findsOneWidget);
       expect(find.textContaining('أبو بكر الشاطري'), findsOneWidget);
+      expect(find.text(t.resultClosestVoiceMatch), findsOneWidget);
 
       await tester.tap(find.text(t.resultAddName));
       await settle(tester);
